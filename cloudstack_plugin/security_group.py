@@ -15,12 +15,9 @@
 
 import copy
 from cloudify.decorators import operation
-from cosmo_cli.cosmo_cli import init_logger
 from cloudstack_plugin.cloudstack_common import get_cloud_driver
 
 __author__ = 'uri1803'
-
-lgr, flgr = init_logger()
 
 @operation
 def create(ctx, **kwargs):
@@ -34,13 +31,13 @@ def create(ctx, **kwargs):
         'name': ctx.node_id,
     }
 
-    lgr.debug('reading security-group configuration.')
+    ctx.logger.debug('reading security-group configuration.')
     rules_to_apply = ctx.properties['rules']
     security_group.update(ctx.properties['security_group'])
 
     security_group_name = security_group['name']
     if not _sg_exists(cloud_driver, security_group_name):
-        lgr.info('creating security group: {0}'
+        ctx.logger.info('creating security group: {0}'
             .format(security_group_name))
         cloud_driver.ex_create_security_group(security_group_name, description=security_group['description'])
 
@@ -55,7 +52,7 @@ def create(ctx, **kwargs):
                       cidr_list=cidr,
                       protocol=protocol)
     else:
-        lgr.info('using existing management security group {0}'.format(security_group_name))
+        ctx.logger.info('using existing management security group {0}'.format(security_group_name))
 
 
 
@@ -66,7 +63,7 @@ def delete(ctx, **kwargs):
         cloud_driver = get_cloud_driver(ctx)
         cloud_driver.ex_delete_security_group(ctx.runtime_properties['external_id'])
     except:
-        lgr.warn(
+        ctx.logger.warn(
             'security-group {0} may not have been deleted'
                 .format(ctx.runtime_properties['external_id']))
         pass
