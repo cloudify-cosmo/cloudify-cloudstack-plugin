@@ -13,9 +13,10 @@
 # * See the License for the specific language governing permissions and
 # * limitations under the License.
 
-import copy
 from cloudify.decorators import operation
+
 from cloudstack_plugin.cloudstack_common import get_cloud_driver
+
 
 __author__ = 'uri1803'
 
@@ -46,7 +47,7 @@ def create(ctx, **kwargs):
             protocol = rule.get('protocol', None)
             start_port = rule.get('start_port', None)
             end_port = rule.get('end_port', None)
-            _add_ingress_rule(cloud_driver, security_group_name=security_group_name,
+            _add_ingress_rule(ctx, cloud_driver, security_group_name=security_group_name,
                       start_port=start_port,
                       end_port=end_port,
                       cidr_list=cidr,
@@ -82,10 +83,10 @@ def get_security_group(cloud_driver, security_group_name):
     return security_groups[0]
 
 
-def _add_ingress_rule(cloud_driver, security_group_name, protocol, cidr_list, start_port,
+def _add_ingress_rule(ctx, cloud_driver, security_group_name, protocol, cidr_list, start_port,
               end_port=None):
 
-    lgr.debug('creating security-group rule for {0} with details {1}'
+    ctx.logger.debug('creating security-group rule for {0} with details {1}'
         .format(security_group_name, locals().values()))
     cloud_driver.ex_authorize_security_group_ingress(
         securitygroupname=security_group_name,
