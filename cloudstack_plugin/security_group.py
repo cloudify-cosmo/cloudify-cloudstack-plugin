@@ -44,7 +44,7 @@ def create(ctx, **kwargs):
 
         for rule in rules_to_apply:
             cidr = rule.get('cidr', None)
-            protocol = rule.get('protocol', None)
+            protocol = rule.get('protocol', 'TCP')
             start_port = rule.get('start_port', None)
             end_port = rule.get('end_port', None)
             _add_ingress_rule(ctx, cloud_driver, security_group_name=security_group_name,
