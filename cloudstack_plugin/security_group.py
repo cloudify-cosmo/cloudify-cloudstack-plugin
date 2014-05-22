@@ -46,7 +46,9 @@ def create(ctx, **kwargs):
             cidr = rule.get('cidr', None)
             protocol = rule.get('protocol', 'TCP')
             start_port = rule.get('start_port', None)
-            end_port = rule.get('end_port', None)
+            if not start_port:
+                raise RuntimeError('You must specify start_port for a security group rule')
+            end_port = rule.get('end_port', start_port)
             _add_ingress_rule(ctx, cloud_driver, security_group_name=security_group_name,
                       start_port=start_port,
                       end_port=end_port,
