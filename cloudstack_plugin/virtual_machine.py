@@ -15,17 +15,11 @@
 import copy
 from cloudify.decorators import operation
 from libcloud.compute.types import Provider
-from libcloud.compute.providers import get_driver
+from cloudstack_plugin.cloudstack_common import get_cloud_driver
 
 __author__ = 'adaml'
 
 
-def _init_cloud_driver(auth_config):
-
-    api_key = auth_config['API_KEY']
-    api_secret_key = auth_config['API_SECRET_KEY']
-    cls = get_driver(Provider.EXOSCALE)
-    return cls(api_key, api_secret_key)
 
 def _get_server_from_context(ctx):
     server = {
@@ -35,21 +29,11 @@ def _get_server_from_context(ctx):
     return server
 
 
-def _get_auth_from_context(ctx):
-    auth_config = {}
-    auth_config.update(copy.deepcopy(ctx.properties['auth']))
-    return auth_config
-
-
 @operation
 def start(ctx, **kwargs):
 
-    ctx.logger.info(
-        'reading provider auth details from context') #Change to debug level
-    auth_details = _get_auth_from_context(ctx)
-
     ctx.logger.info("initializing {0} cloud driver".format(Provider.EXOSCALE))
-    cloud_driver = _init_cloud_driver(auth_details)
+    cloud_driver = get_cloud_driver(ctx)
 
     ctx.logger.info('reading server config from context') #Change to debug level
     server_config = _get_server_from_context(ctx)
@@ -94,12 +78,8 @@ def start(ctx, **kwargs):
 @operation
 def delete(ctx, **kwargs):
 
-    ctx.logger.info(
-        'reading provider auth details from context') #Change to debug level
-    auth_details = _get_auth_from_context(ctx)
-
     ctx.logger.info("initializing {0} cloud driver".format(Provider.EXOSCALE))
-    cloud_driver = _init_cloud_driver(auth_details)
+    cloud_driver = get_cloud_driver(ctx)
 
     node_id = ctx['node_id']
     if node_id is None:
@@ -117,12 +97,8 @@ def delete(ctx, **kwargs):
 @operation
 def stop(ctx, **kwargs):
 
-    ctx.logger.info(
-        'reading provider auth details from context') #Change to debug level
-    auth_details = _get_auth_from_context(ctx)
-
     ctx.logger.info("initializing {0} cloud driver".format(Provider.EXOSCALE))
-    cloud_driver = _init_cloud_driver(auth_details)
+    cloud_driver = get_cloud_driver(ctx)
 
     node_id = ctx.runtime_properties['node_id']
     if node_id is None:
@@ -151,12 +127,8 @@ def _get_node_by_id(cloud_driver, node_id):
 @operation
 def get_state(ctx, **kwargs):
 
-    ctx.logger.info(
-        'reading provider auth details from context') #Change to debug level
-    auth_details = _get_auth_from_context(ctx)
-
     ctx.logger.info("initializing {0} cloud driver".format(Provider.EXOSCALE))
-    cloud_driver = _init_cloud_driver(auth_details)
+    cloud_driver = get_cloud_driver(ctx)
 
     instance_id = ctx.runtime_properties['instance_id']
 

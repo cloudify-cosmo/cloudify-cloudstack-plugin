@@ -17,25 +17,27 @@ import unittest
 
 __author__ = 'adaml'
 
-from exoscale_plugin.exoscale_plugin import start
-from exoscale_plugin.exoscale_plugin import stop
-from exoscale_plugin.exoscale_plugin import delete
-from exoscale_plugin.exoscale_plugin import get_state
+from cloudstack_plugin.virtual_machine import start
+from cloudstack_plugin.virtual_machine import stop
+from cloudstack_plugin.virtual_machine import delete
+from cloudstack_plugin.virtual_machine import get_state
+from cloudstack_plugin.security_group import create as create_security_group
+from cloudstack_plugin.security_group import delete as delete_security_group
 
 from cloudify.mocks import MockCloudifyContext
 
 class ExoscalePluginTestCase(unittest.TestCase):
 
-    def test_start_server(self):
+    def test_create_vm(self):
         context = MockCloudifyContext(
             node_id='id',
             properties={'server':
                             {
                                 'name' : 'adaml2-cloudify-exoscale-testing-vm',
                                 'image_id' : '70d31a38-c030-490b-bca9-b9383895ade7',
-                                'key_name' : 'cloudify-agents-kp',
-                                'security_groups' :['cloudify-sg-agents', ],
-                                'size' : 'Micro'
+                                'keypair_name' : 'cloudify-agents-kp',
+                                'security_groups' :['cloudify-agents-sg', ],
+                                'size' : 'Medium'
                             },
                         'auth':
                             {
@@ -54,6 +56,32 @@ class ExoscalePluginTestCase(unittest.TestCase):
         if state_after_termination:
             raise AssertionError('expecting get_state to return false '
                                  'since server is down.')
+
+
+    def test_create_security_group(self):
+        ctx = MockCloudifyContext(
+            node_id='id',
+            properties={'security_group':
+                            {
+                                'name' : 'uri_test_sec_group',
+                                'description' : 'Test security group'
+                            },
+                        'auth':
+                            {
+                                'API_KEY': '8rVa1PQ6GIchsNgzryI-NGDXO-n9NbI-9fKmvQcW-JfK6D4z8z4RlNdSQ4aD3Mpk2iBgrMzQuP7mHv88f6mTlg',
+                                'API_SECRET_KEY' : 'y2saZqfYPencTkLoEhMa8m-ZZ58L8Gq5m4ojQZhKONljsKtJW0RZuvKKmRUO0HCsjSzM3VdyeY_2_011Usrd4A',
+                            },
+                        'rules':
+                            [
+                                {'cidr':'0.0.0.0/0', 'start_port': 27017, 'protocol':'TCP'},
+                                {'cidr':'0.0.0.0/0', 'start_port': 28017, 'protocol':'TCP'}
+                            ]
+
+            })
+        create_security_group(ctx)
+
+
+
 
 
 
