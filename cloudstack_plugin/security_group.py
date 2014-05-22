@@ -48,7 +48,7 @@ def create(ctx, **kwargs):
             start_port = rule.get('start_port', None)
             if start_port is None:
                 raise RuntimeError('You must specify start_port for a security group rule')
-            end_port = rule.get('end_port', start_port)
+            end_port = rule.get('end_port', None)
             _add_ingress_rule(ctx, cloud_driver, security_group_name=security_group_name,
                       start_port=start_port,
                       end_port=end_port,
