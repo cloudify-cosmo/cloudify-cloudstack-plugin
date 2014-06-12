@@ -16,6 +16,7 @@ import copy
 from cloudify.decorators import operation
 from libcloud.compute.types import Provider
 from cloudstack_plugin.cloudstack_common import get_cloud_driver
+import pprint
 
 __author__ = 'adaml'
 
@@ -32,7 +33,7 @@ def _get_server_from_context(ctx):
 @operation
 def start(ctx, **kwargs):
 
-    ctx.logger.info("initializing {0} cloud driver".format(Provider.EXOSCALE))
+    ctx.logger.info("initializing {0} cloud driver".format(Provider.CLOUDSTACK))
     cloud_driver = get_cloud_driver(ctx)
 
     ctx.logger.info('reading server config from context') #Change to debug level
@@ -42,7 +43,18 @@ def start(ctx, **kwargs):
     image_id = server_config['image_id']
     size_name = server_config['size']
     keypair_name = server_config['keypair_name']
-    security_groups = server_config['security_groups']
+    #security_groups = server_config['security_groups']
+    networks = server_config['networks']
+    
+    network_list = cloud_driver.ex_list_networks()
+    
+   
+    
+    nets = [ net for net in network_list if net.name in networks ]
+    
+    for bla in nets:
+        ctx.logger.info('id: {0} name: {1}'.format(net.id,net.name))
+    
 
     ctx.logger.info('getting required size {0}'.format(size_name))
     sizes = [size for size in cloud_driver.list_sizes() if size.name
@@ -53,8 +65,7 @@ def start(ctx, **kwargs):
     size = sizes[0]
 
     ctx.logger.info('getting required image with ID {0}'.format(image_id))
-    images = [image for image in cloud_driver.list_images() if image_id
-                                                              == image.id]
+    images = [template for template in cloud_driver.list_images() if image_id == template.id]
     if images is None:
         raise RuntimeError('Could not find image with ID {0}'.format(image_id))
     image = images[0]
@@ -66,7 +77,7 @@ def start(ctx, **kwargs):
                                     image=image,
                                     size=size,
                                     ex_keyname=keypair_name,
-                                    ex_security_groups=security_groups)
+                                    networks=nets)
     ctx.logger.info(
         'vm {0} was started successfully {1}'.format(
             node.name, server_config))
@@ -78,7 +89,7 @@ def start(ctx, **kwargs):
 @operation
 def delete(ctx, **kwargs):
 
-    ctx.logger.info("initializing {0} cloud driver".format(Provider.EXOSCALE))
+    ctx.logger.info("initializing {0} cloud driver".format(Provider.CLOUDSTACK))
     cloud_driver = get_cloud_driver(ctx)
 
     node_id = ctx['node_id']
@@ -97,7 +108,7 @@ def delete(ctx, **kwargs):
 @operation
 def stop(ctx, **kwargs):
 
-    ctx.logger.info("initializing {0} cloud driver".format(Provider.EXOSCALE))
+    ctx.logger.info("initializing {0} cloud driver".format(Provider.CLOUDSTACK))
     cloud_driver = get_cloud_driver(ctx)
 
     node_id = ctx.runtime_properties['node_id']
@@ -119,30 +130,61 @@ def _get_node_by_id(cloud_driver, node_id):
     nodes = [node for node in cloud_driver.list_nodes() if node_id
                                                           == node.id]
     if nodes is None:
+        raise RuntimeError('could not find node by ID {0}'.format(node_id))
         return None
-
+        
     return nodes[0]
 
 
 @operation
 def get_state(ctx, **kwargs):
 
-    ctx.logger.info("initializing {0} cloud driver".format(Provider.EXOSCALE))
+    ctx.logger.info("initializing {0} cloud driver".format(Provider.CLOUDSTACK))
     cloud_driver = get_cloud_driver(ctx)
 
+    
     instance_id = ctx.runtime_properties['instance_id']
+   
 
     ctx.logger.info('getting node with ID {0}'.format(instance_id))
     node = _get_node_by_id(cloud_driver, instance_id)
     if node is None:
         return False
-
-    ctx['ip'] = node.public_ips[0]
+    pprint.pprint(node)
+   
+    
+    ctx.runtime_properties['ip'] = node.private_ips[0]
+    ctx.runtime_properties['ip_address'] = node.private_ips[0]
     ctx.logger.info(
-        'instance started successfully with IP {0}'.format(ctx['ip']))
+        'instance started successfully with IP {0}'.format(ctx.runtime_properties['ip']))
     return True
 
+def get_mgmt_pub_ip(cloud_driver, networks):
+       
+        network = networks[0]
 
+        nets = cloud_driver.ex_list_networks()
+
+        for net in nets:
+            print net.name
+            if net.name == network.name:
+                lgr.debug('Network {0} found!'.format(network.name))
+                break
+        else:
+            raise RuntimeError('Management network {0} not found'.
+                                   format(mgmt_net))
+
+        publicips = self.cloud_driver.ex_list_public_ips()
+
+        for public_ip in publicips:
+
+            if public_ip.associated_network_id == net.id:
+                lgr.debug('Found acquired Public IP: {0} with ID {1} '
+                          'Associated with network id {2}'.
+                          format(public_ip.address, public_ip.id, net.id))
+                return public_ip
+        else:
+            raise RuntimeError('No matching mgmt public ip found')
 
 
 

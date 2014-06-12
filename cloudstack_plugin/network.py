@@ -22,40 +22,50 @@ __author__ = 'uri1803'
 
 @operation
 def create(ctx, **kwargs):
-    """ Create security group with rules.
+    """ Create network with rules.
     """
 
     cloud_driver = get_cloud_driver(ctx)
 
-    security_group = {
+    network = {
         'description': None,
         'name': ctx.node_id,
     }
 
-    ctx.logger.debug('reading security-group configuration.')
+    ctx.logger.debug('reading network configuration.')
     rules_to_apply = ctx.properties['rules']
-    security_group.update(ctx.properties['security_group'])
+    network.update(ctx.properties['network'])
 
-    security_group_name = security_group['name']
-    if not _sg_exists(cloud_driver, security_group_name):
-        ctx.logger.info('creating security group: {0}'
-            .format(security_group_name))
-        cloud_driver.ex_create_security_group(security_group_name, description=security_group['description'])
+    network_name = network['name']
+    zone = network['zone']
+    location = get_location(cloud_driver, zone)
+    netoffer = network['service_offering']
+    network_offering = get_network_offering(cloud_driver, netoffer)
+    
+    ctx.logger.info('Current node {0}{1}'.format(ctx.node_id, ctx.properties))
+    
+    ctx['network_id'] = ctx.node_id
 
-        for rule in rules_to_apply:
-            cidr = rule.get('cidr', None)
-            protocol = rule.get('protocol', 'TCP')
-            start_port = rule.get('start_port', None)
-            if start_port is None:
-                raise RuntimeError('You must specify start_port for a security group rule')
-            end_port = rule.get('end_port', None)
-            _add_ingress_rule(ctx, cloud_driver, security_group_name=security_group_name,
-                      start_port=start_port,
-                      end_port=end_port,
-                      cidr_list=cidr,
-                      protocol=protocol)
+    
+    if not _network_exists(cloud_driver, network_name):
+        ctx.logger.info('creating network: {0}'
+            .format(network_name))
+        nets = cloud_driver.ex_create_network(name=network_name, display_text=network['description'], location=location, network_offering=network_offering)
+
+       # for rule in rules_to_apply:
+       #     cidr = rule.get('cidr', None)
+       #     protocol = rule.get('protocol', 'TCP')
+       #     start_port = rule.get('start_port', None)
+       #     if start_port is None:
+       #         raise RuntimeError('You must specify start_port for a portforward rule')
+       #     end_port = rule.get('end_port', None)
+       #     _add_ingress_rule(ctx, cloud_driver, network_name=network_name,
+       #               start_port=start_port,
+       #               end_port=end_port,
+       #               cidr_list=cidr,
+       #               protocol=protocol)
     else:
-        ctx.logger.info('using existing management security group {0}'.format(security_group_name))
+        ctx.logger.info('using existing management network {0}'.format(network_name))
 
 
 
@@ -64,33 +74,49 @@ def create(ctx, **kwargs):
 def delete(ctx, **kwargs):
     try:
         cloud_driver = get_cloud_driver(ctx)
-        cloud_driver.ex_delete_security_group(ctx.runtime_properties['external_id'])
+        cloud_driver.ex_delete_network(ctx.runtime_properties['external_id'])
     except:
         ctx.logger.warn(
-            'security-group {0} may not have been deleted'
+            'network {0} may not have been deleted'
                 .format(ctx.runtime_properties['external_id']))
         pass
 
-def _sg_exists(cloud_driver, security_group_name):
-    exists = get_security_group(cloud_driver, security_group_name)
+def _network_exists(cloud_driver, network_name):
+    exists = get_network(cloud_driver, network_name)
     if not exists:
         return False
     return True
 
-def get_security_group(cloud_driver, security_group_name):
-    security_groups = [sg for sg in cloud_driver
-        .ex_list_security_groups() if sg['name'] == security_group_name]
-    if security_groups.__len__() == 0:
+def get_network(cloud_driver, network_name):
+    networks = [net for net in cloud_driver
+        .ex_list_networks() if net.name == network_name]
+    if networks.__len__() == 0:
         return None
-    return security_groups[0]
+    return networks[0]
 
+def get_location(cloud_driver, location_name):
 
-def _add_ingress_rule(ctx, cloud_driver, security_group_name, protocol, cidr_list, start_port,
+    locations = [location for location in cloud_driver
+        .list_locations() if location.name == location_name]
+    if locations.__len__() == 0:
+        return None
+    return locations[0]
+
+def get_network_offering(cloud_driver, netoffer_name):
+    netoffers = [offer for offer in cloud_driver
+        .ex_list_network_offerings() if offer.name == netoffer_name]
+    if netoffers.__len__() == 0:
+        return None
+    return netoffers[0]
+    
+    
+
+def _add_ingress_rule(ctx, cloud_driver, node_name, protocol, cidr_list, start_port,
               end_port=None):
 
-    ctx.logger.debug('creating security-group rule for {0} with details {1}'
-        .format(security_group_name, locals().values()))
-    cloud_driver.ex_authorize_security_group_ingress(
+    ctx.logger.debug('creating port forward rule for {0} with details {1}'
+        .format(network_name, locals().values()))
+    cloud_driver.ex_create_port_forwarding_rule(
         securitygroupname=security_group_name,
         startport=start_port,
         endport=end_port,

@@ -17,12 +17,12 @@ import unittest
 
 __author__ = 'adaml'
 
-from cloudstack_plugin.virtual_machine import start
-from cloudstack_plugin.virtual_machine import stop
-from cloudstack_plugin.virtual_machine import delete
-from cloudstack_plugin.virtual_machine import get_state
-from cloudstack_plugin.security_group import create as create_security_group
-from cloudstack_plugin.security_group import delete as delete_security_group
+from cloudstack_exoscale_plugin.virtual_machine import start
+from cloudstack_exoscale_plugin.virtual_machine import stop
+from cloudstack_exoscale_plugin.virtual_machine import delete
+from cloudstack_exoscale_plugin.virtual_machine import get_state
+from cloudstack_exoscale_plugin.security_group import create as create_security_group
+from cloudstack_exoscale_plugin.security_group import delete as delete_security_group
 
 from cloudify.mocks import MockCloudifyContext
 
