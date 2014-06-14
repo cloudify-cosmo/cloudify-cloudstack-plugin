@@ -20,7 +20,6 @@ from cloudstack_plugin.cloudstack_common import get_cloud_driver
 __author__ = 'adaml'
 
 
-
 def _get_server_from_context(ctx):
     server = {
         'name': ctx.node_id.replace('_', '-')
@@ -35,7 +34,7 @@ def start(ctx, **kwargs):
     ctx.logger.info("initializing {0} cloud driver".format(Provider.EXOSCALE))
     cloud_driver = get_cloud_driver(ctx)
 
-    ctx.logger.info('reading server config from context') #Change to debug level
+    ctx.logger.info('reading server config from context')
     server_config = _get_server_from_context(ctx)
 
     name = server_config['name']
@@ -45,16 +44,14 @@ def start(ctx, **kwargs):
     security_groups = server_config['security_groups']
 
     ctx.logger.info('getting required size {0}'.format(size_name))
-    sizes = [size for size in cloud_driver.list_sizes() if size.name
-                                                          == size_name]
+    sizes = [size for size in cloud_driver.list_sizes() if size.name == size_name]  # NOQA
     if sizes is None:
         raise RuntimeError(
             'Could not find size with name {0}'.format(size_name))
     size = sizes[0]
 
     ctx.logger.info('getting required image with ID {0}'.format(image_id))
-    images = [image for image in cloud_driver.list_images() if image_id
-                                                              == image.id]
+    images = [image for image in cloud_driver.list_images() if image_id == image.id]  # NOQA
     if images is None:
         raise RuntimeError('Could not find image with ID {0}'.format(image_id))
     image = images[0]
@@ -74,7 +71,6 @@ def start(ctx, **kwargs):
     ctx['instance_id'] = node.id
 
 
-
 @operation
 def delete(ctx, **kwargs):
 
@@ -83,7 +79,8 @@ def delete(ctx, **kwargs):
 
     node_id = ctx['node_id']
     if node_id is None:
-        raise NameError('could not find node ID in runtime context: ' + node_id)
+        raise NameError(
+            'could not find node ID in runtime context: ' + node_id)
 
     ctx.logger.info('getting node with ID: ' + node_id)
     node = _get_node_by_id(cloud_driver, node_id)
@@ -116,8 +113,7 @@ def stop(ctx, **kwargs):
 
 def _get_node_by_id(cloud_driver, node_id):
 
-    nodes = [node for node in cloud_driver.list_nodes() if node_id
-                                                          == node.id]
+    nodes = [node for node in cloud_driver.list_nodes() if node_id == node.id]  # NOQA
     if nodes is None:
         return None
 
@@ -141,9 +137,3 @@ def get_state(ctx, **kwargs):
     ctx.logger.info(
         'instance started successfully with IP {0}'.format(ctx['ip']))
     return True
-
-
-
-
-
-
