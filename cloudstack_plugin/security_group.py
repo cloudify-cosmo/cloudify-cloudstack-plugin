@@ -20,6 +20,7 @@ from cloudstack_plugin.cloudstack_common import get_cloud_driver
 
 __author__ = 'uri1803'
 
+
 @operation
 def create(ctx, **kwargs):
     """ Create security group with rules.
@@ -38,38 +39,42 @@ def create(ctx, **kwargs):
 
     security_group_name = security_group['name']
     if not _sg_exists(cloud_driver, security_group_name):
-        ctx.logger.info('creating security group: {0}'
-            .format(security_group_name))
-        cloud_driver.ex_create_security_group(security_group_name, description=security_group['description'])
+        ctx.logger.info('creating security group: {0}'.format(
+            security_group_name))
+        cloud_driver.ex_create_security_group(
+            security_group_name, description=security_group['description'])
 
         for rule in rules_to_apply:
             cidr = rule.get('cidr', None)
             protocol = rule.get('protocol', 'TCP')
             start_port = rule.get('start_port', None)
             if start_port is None:
-                raise RuntimeError('You must specify start_port for a security group rule')
+                raise RuntimeError('You must specify start_port '
+                                   'for a security group rule')
             end_port = rule.get('end_port', None)
-            _add_ingress_rule(ctx, cloud_driver, security_group_name=security_group_name,
-                      start_port=start_port,
-                      end_port=end_port,
-                      cidr_list=cidr,
-                      protocol=protocol)
+            _add_ingress_rule(ctx, cloud_driver,
+                              security_group_name=security_group_name,
+                              start_port=start_port,
+                              end_port=end_port,
+                              cidr_list=cidr,
+                              protocol=protocol)
     else:
-        ctx.logger.info('using existing management security group {0}'.format(security_group_name))
-
-
+        ctx.logger.info('using existing management security group {0}'.format(
+            security_group_name))
 
 
 @operation
 def delete(ctx, **kwargs):
     try:
         cloud_driver = get_cloud_driver(ctx)
-        cloud_driver.ex_delete_security_group(ctx.runtime_properties['external_id'])
+        cloud_driver.ex_delete_security_group(
+            ctx.runtime_properties['external_id'])
     except:
         ctx.logger.warn(
-            'security-group {0} may not have been deleted'
-                .format(ctx.runtime_properties['external_id']))
+            'security-group {0} may not have been deleted'.format(
+                ctx.runtime_properties['external_id']))
         pass
+
 
 def _sg_exists(cloud_driver, security_group_name):
     exists = get_security_group(cloud_driver, security_group_name)
@@ -77,23 +82,23 @@ def _sg_exists(cloud_driver, security_group_name):
         return False
     return True
 
+
 def get_security_group(cloud_driver, security_group_name):
     security_groups = [sg for sg in cloud_driver
-        .ex_list_security_groups() if sg['name'] == security_group_name]
+        .ex_list_security_groups() if sg['name'] == security_group_name]  # NOQA
     if security_groups.__len__() == 0:
         return None
     return security_groups[0]
 
 
-def _add_ingress_rule(ctx, cloud_driver, security_group_name, protocol, cidr_list, start_port,
-              end_port=None):
+def _add_ingress_rule(ctx, cloud_driver, security_group_name, protocol,
+                      cidr_list, start_port, end_port=None):
 
     ctx.logger.debug('creating security-group rule for {0} with details {1}'
-        .format(security_group_name, locals().values()))
+                     .format(security_group_name, locals().values()))
     cloud_driver.ex_authorize_security_group_ingress(
         securitygroupname=security_group_name,
         startport=start_port,
         endport=end_port,
         cidrlist=cidr_list,
         protocol=protocol)
-
