@@ -52,7 +52,6 @@ coverage.xml
 # Sphinx documentation
 docs/_build/
 
-# pycharm files 
-.idea/
 *.iml
 
+*COMMIT_MSG
