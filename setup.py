@@ -12,7 +12,7 @@ setup(
     description='Cloudify plugin for the Exoscale cloud infrastructure.',
     install_requires=[
         "cloudify-plugins-common",
-        "apache-libcloud>=0.14.1",
+        "apache-libcloud>=0.15.0",
         'cloudify-plugins-common==3.0',
     ],
 )
