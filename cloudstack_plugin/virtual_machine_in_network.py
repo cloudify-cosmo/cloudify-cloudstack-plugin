@@ -45,6 +45,7 @@ def start(ctx, **kwargs):
     keypair_name = server_config['keypair_name']
     #security_groups = server_config['security_groups']
     networks = server_config['networks']
+    ipaddress = server_config['ip_address']
 
     network_list = cloud_driver.ex_list_networks()
 
@@ -75,7 +76,8 @@ def start(ctx, **kwargs):
                                     image=image,
                                     size=size,
                                     ex_keyname=keypair_name,
-                                    networks=nets)
+                                    networks=nets,
+                                    ipaddress=ipaddress)
     ctx.logger.info(
         'vm {0} was started successfully {1}'.format(
             node.name, server_config))
