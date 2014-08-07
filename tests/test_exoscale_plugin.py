@@ -41,8 +41,8 @@ class ExoscalePluginTestCase(unittest.TestCase):
                             },
                         'auth':
                             {
-                                'API_KEY': '8rVa1PQ6GIchsNgzryI-NGDXO-n9NbI-9fKmvQcW-JfK6D4z8z4RlNdSQ4aD3Mpk2iBgrMzQuP7mHv88f6mTlg',
-                                'API_SECRET_KEY' : 'y2saZqfYPencTkLoEhMa8m-ZZ58L8Gq5m4ojQZhKONljsKtJW0RZuvKKmRUO0HCsjSzM3VdyeY_2_011Usrd4A',
+                                'API_KEY': 'API_KEY',
+                                'API_SECRET_KEY' : 'API_SECRET_KEY',
                             }
             })
         start(context)
@@ -68,8 +68,8 @@ class ExoscalePluginTestCase(unittest.TestCase):
                             },
                         'auth':
                             {
-                                'API_KEY': '8rVa1PQ6GIchsNgzryI-NGDXO-n9NbI-9fKmvQcW-JfK6D4z8z4RlNdSQ4aD3Mpk2iBgrMzQuP7mHv88f6mTlg',
-                                'API_SECRET_KEY' : 'y2saZqfYPencTkLoEhMa8m-ZZ58L8Gq5m4ojQZhKONljsKtJW0RZuvKKmRUO0HCsjSzM3VdyeY_2_011Usrd4A',
+                                'API_KEY': 'API_KEY',
+                                'API_SECRET_KEY' : 'API_SECRET_KEY',
                             },
                         'rules':
                             [
