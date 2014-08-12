@@ -51,7 +51,7 @@ def create(ctx, **kwargs):
         ctx.logger.info('creating network: {0}'
             .format(network_name))
 
-        nets = cloud_driver\
+        network = cloud_driver\
         .ex_create_network(name=network_name,
                            display_text=network['description'],
                            location=location,
@@ -60,13 +60,16 @@ def create(ctx, **kwargs):
         ctx.logger.info('using existing management network {0}'.
                         format(network_name))
 
+    ctx['network_id'] = network.id
+    ctx['network_name'] = network.name
+
 
 @operation
 def delete(ctx, **kwargs):
 
-    name = ctx.runtime_properties['node_id']
+    network_name = ctx.runtime_properties['network_name']
     cloud_driver = get_cloud_driver(ctx)
-    network = get_network(cloud_driver, name)
+    network = get_network(cloud_driver, network_name)
 
     try:
 
@@ -74,7 +77,7 @@ def delete(ctx, **kwargs):
     except:
         ctx.logger.warn(
             'network {0} may not have been deleted'
-                .format(ctx.runtime_properties['node_id']))
+                .format(ctx.runtime_properties['network_name']))
         pass
 
 

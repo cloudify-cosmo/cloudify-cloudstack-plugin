@@ -46,7 +46,6 @@ def start(ctx, **kwargs):
     #security_groups = server_config['security_groups']
     networks = server_config['networks']
     ipaddress = server_config['ip_address']
-    
 
     network_list = cloud_driver.ex_list_networks()
 
