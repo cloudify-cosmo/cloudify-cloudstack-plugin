@@ -51,7 +51,7 @@ def create(ctx, **kwargs):
         ctx.logger.info('creating network: {0}'
             .format(network_name))
 
-        network = cloud_driver\
+        net = cloud_driver\
         .ex_create_network(name=network_name,
                            display_text=network['description'],
                            location=location,
@@ -60,8 +60,8 @@ def create(ctx, **kwargs):
         ctx.logger.info('using existing management network {0}'.
                         format(network_name))
 
-    ctx['network_id'] = network.id
-    ctx['network_name'] = network.name
+    ctx['network_id'] = net.id
+    ctx['network_name'] = net.name
 
 
 @operation
