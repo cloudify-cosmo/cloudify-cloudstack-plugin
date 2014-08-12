@@ -59,7 +59,7 @@ def create(ctx, **kwargs):
     else:
         ctx.logger.info('using existing management network {0}'.
                         format(network_name))
-        net = get_network(cloud_driver, network_name)[0]
+        net = get_network(cloud_driver, network_name)
 
     ctx['network_id'] = net.id
     ctx['network_name'] = net.name
