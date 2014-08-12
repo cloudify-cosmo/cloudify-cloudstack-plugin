@@ -46,6 +46,7 @@ def start(ctx, **kwargs):
     #security_groups = server_config['security_groups']
     networks = server_config['networks']
     ipaddress = server_config['ip_address']
+    
 
     network_list = cloud_driver.ex_list_networks()
 
@@ -94,13 +95,13 @@ def delete(ctx, **kwargs):
 
     node_id = ctx['node_id']
     if node_id is None:
-        raise NameError('could not find node ID in runtime context: '
-                        + node_id)
+        raise NameError('could not find node ID in runtime context: {0{} '
+                        .format(node_id))
 
-    ctx.logger.info('getting node with ID: ' + node_id)
+    ctx.logger.info('getting node with ID: '.format(node_id))
     node = _get_node_by_id(cloud_driver, node_id)
     if node is None:
-        raise NameError('could not find node with ID: ' + node_id)
+        raise NameError('could not find node with ID: {0} '.format(node_id))
 
     ctx.logger.info('destroying vm with details: {0}'.format(node))
     cloud_driver.destroy_node(node)
@@ -113,26 +114,28 @@ def stop(ctx, **kwargs):
                     .format(Provider.CLOUDSTACK))
     cloud_driver = get_cloud_driver(ctx)
 
-    node_id = ctx.runtime_properties['node_id']
-    if node_id is None:
+    instance_id = ctx.runtime_properties['instance_id']
+    if instance_id is None:
         raise RuntimeError(
-            'could not find node ID in runtime context: ' + node_id)
+            'could not find node ID in runtime context: {0} '
+            .format(instance_id))
 
-    ctx.logger.info('getting node with ID: ' + node_id)
-    node = _get_node_by_id(cloud_driver, node_id)
+    ctx.logger.info('getting node with ID: {0{ '.format(instance_id))
+    node = _get_node_by_id(cloud_driver, instance_id)
     if node is None:
-        raise RuntimeError('could not find node with ID {0}'.format(node_id))
+        raise RuntimeError('could not find node with ID {0}'
+                           .format(instance_id))
 
     ctx.logger.info('stopping node with details {0}'.format(node))
     cloud_driver.ex_stop(node)
 
 
-def _get_node_by_id(cloud_driver, node_id):
+def _get_node_by_id(cloud_driver, instance_id):
 
-    nodes = [node for node in cloud_driver.list_nodes() if node_id
+    nodes = [node for node in cloud_driver.list_nodes() if instance_id
                                                           == node.id]
     if nodes is None:
-        raise RuntimeError('could not find node by ID {0}'.format(node_id))
+        raise RuntimeError('could not find node by ID {0}'.format(instance_id))
         return None
 
     return nodes[0]
