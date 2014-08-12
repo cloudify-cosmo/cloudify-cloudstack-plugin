@@ -63,13 +63,18 @@ def create(ctx, **kwargs):
 
 @operation
 def delete(ctx, **kwargs):
+
+    name = ctx.runtime_properties['node_id']
+    cloud_driver = get_cloud_driver(ctx)
+    network = get_network(cloud_driver, name)
+
     try:
-        cloud_driver = get_cloud_driver(ctx)
-        cloud_driver.ex_delete_network(ctx['name'])
+
+        cloud_driver.ex_delete_network(network)
     except:
         ctx.logger.warn(
             'network {0} may not have been deleted'
-                .format(ctx.runtime_properties['external_id']))
+                .format(ctx.runtime_properties['node_id']))
         pass
 
 
