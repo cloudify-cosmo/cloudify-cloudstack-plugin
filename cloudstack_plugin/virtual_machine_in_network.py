@@ -95,7 +95,7 @@ def delete(ctx, **kwargs):
 
     node_id = ctx['node_id']
     if node_id is None:
-        raise NameError('could not find node ID in runtime context: {0{} '
+        raise NameError('could not find node ID in runtime context: {0} '
                         .format(node_id))
 
     ctx.logger.info('getting node with ID: '.format(node_id))
@@ -120,7 +120,7 @@ def stop(ctx, **kwargs):
             'could not find node ID in runtime context: {0} '
             .format(instance_id))
 
-    ctx.logger.info('getting node with ID: {0{ '.format(instance_id))
+    ctx.logger.info('getting node with ID: {0} '.format(instance_id))
     node = _get_node_by_id(cloud_driver, instance_id)
     if node is None:
         raise RuntimeError('could not find node with ID {0}'
