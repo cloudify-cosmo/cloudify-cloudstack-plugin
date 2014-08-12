@@ -77,7 +77,7 @@ def start(ctx, **kwargs):
                                     size=size,
                                     ex_keyname=keypair_name,
                                     networks=nets,
-                                    ipaddress=ipaddress)
+                                    ex_ip_address=ipaddress)
     ctx.logger.info(
         'vm {0} was started successfully {1}'.format(
             node.name, server_config))
