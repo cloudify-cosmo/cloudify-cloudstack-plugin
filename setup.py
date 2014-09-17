@@ -1,7 +1,6 @@
 __author__ = 'adaml'
 from setuptools import setup
 
-
 setup(
     zip_safe=True,
     name='cloudify-plugin',
