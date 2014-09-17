@@ -19,7 +19,6 @@ import libcloud.security
 
 __author__ = 'uri1803'
 
-
 def _get_auth_from_context(ctx):
     auth_config = {}
     auth_config.update(copy.deepcopy(ctx.properties['auth']))
@@ -30,8 +29,8 @@ def get_cloud_driver(ctx):
     auth_config = _get_auth_from_context(ctx)
     api_key = auth_config['API_KEY']
     api_secret_key = auth_config['API_SECRET_KEY']
-    api_url = auth_config['API_URL']
-    driver = get_driver(Provider.CLOUDSTACK)
+    driver = get_driver(Provider.EXOSCALE)
     libcloud.security.VERIFY_SSL_CERT = False
-    return driver(key=api_key, secret=api_secret_key,url=api_url)
+    return driver(api_key, api_secret_key)
+
 
