@@ -11,12 +11,12 @@ setup(
     ],
     license='LICENSE',
     description='Cloudify plugin for the Cloudstack cloud infrastructure.',
+    dependency_links=[
+        'https://github.com/boul/libcloud/archive/cloudstackvpc.zip#egg=apache-libcloud'
+    ],
     install_requires=[
         "cloudify-plugins-common",
         "cloudify-plugins-common>=3.0",
         "apache-libcloud"
-    ],
-    dependency_links=[
-        'git+ssh://git@github.com:boul/libcloud.git@cloudstackvpc#egg=apache-libcloud',
     ]
 )
