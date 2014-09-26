@@ -34,6 +34,7 @@ def create(ctx, **kwargs):
     }
 
     ctx.logger.debug('reading network configuration.')
+    #rules_to_apply = ctx.properties['rules']
     network.update(ctx.properties['network'])
 
     network_name = network['name']
@@ -47,25 +48,14 @@ def create(ctx, **kwargs):
     ctx['network_id'] = ctx.node_id
 
     if not _network_exists(cloud_driver, network_name):
-        ctx.logger.info('creating network: {0}'.format(network_name))
+        ctx.logger.info('creating network: {0}'
+            .format(network_name))
 
-        net = cloud_driver.ex_create_network(
-            name=network_name,
-            display_text=network['description'],
-            location=location,
-            network_offering=network_offering)
-
-        # Create firewall rules for new network
-        firewall_config = network['firewall']
-        egress_rules = firewall_config['egress']
-        egr_ports = egress_rules['ports']
-
-        for port in egr_ports:
-            _create_egr_rules(
-                ctx, cloud_driver, net.id, egress_rules['cidr'],
-                egress_rules['protocol'],
-                port, port):
-
+        net = cloud_driver\
+        .ex_create_network(name=network_name,
+                           display_text=network['description'],
+                           location=location,
+                           network_offering=network_offering)
     else:
         ctx.logger.info('using existing management network {0}'.
                         format(network_name))
@@ -102,7 +92,6 @@ def _network_exists(cloud_driver, network_name):
 def get_network(cloud_driver, network_name):
     networks = [net for net in cloud_driver
         .ex_list_networks() if net.name == network_name]
-
     if networks.__len__() == 0:
         return None
     return networks[0]
@@ -124,33 +113,15 @@ def get_network_offering(cloud_driver, netoffer_name):
         return None
     return netoffers[0]
 
-@operation
-def _create_egr_rules(ctx, cloud_driver, network_id, cidr_list, protocol,
-                      start_port, end_port):
 
-    cloud_driver.ex_create_egress_firewall_rule(
-        network_id=network_id,
-        cidr_list=cidr_list,
-        protocol=protocol,
-        start_port=start_port,
-        end_port=end_port)
-
-
-# def _add_ingress_rule(ctx, node_name, protocol,
+# def _add_ingress_rule(ctx, cloud_driver, node_name, protocol,
 #                       cidr_list, start_port, end_port=None):
 #
-#     network_name = ctx.runtime_properties['network_name']
-#     cloud_driver = get_cloud_driver(ctx)
-#
-#     ctx.logger.debug(
-#         'creating port forward rule for {0} with details {1}'
+#     ctx.logger.debug('creating port forward rule for {0} with details {1}'
 #         .format(network_name, locals().values()))
-#
 #     cloud_driver.ex_create_port_forwarding_rule(
-#         address=ip_address,
-#         private_port=privateport,
-#         public_port=publicport,
-#         node=node,
-#         protocol=protocol,
-#         openfirewall=False)
-
+#         securitygroupname=security_group_name,
+#         startport=start_port,
+#         endport=end_port,
+#         cidrlist=cidr_list,
+#         protocol=protocol)
