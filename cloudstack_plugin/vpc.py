@@ -37,6 +37,7 @@ def create(ctx, **kwargs):
     vpc.update(ctx.properties['vpc'])
 
     vpc_name = vpc['name']
+    cidr = vpc['cidr']
     zone = vpc['zone']
     location = get_location(cloud_driver, zone)
     vpcoffer = vpc['service_offering']
@@ -50,6 +51,7 @@ def create(ctx, **kwargs):
         ctx.logger.info('creating vpc: {0}'.format(vpc_name))
 
         vpc = cloud_driver.ex_create_vpc(
+            cidr=cidr,
             name=vpc_name,
             display_text=vpc['description'],
             vpc_offering=vpc_offering,
