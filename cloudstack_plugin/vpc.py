@@ -34,7 +34,7 @@ def create(ctx, **kwargs):
     }
 
     ctx.logger.debug('reading vpc configuration.')
-    vpc.update(ctx.properties['vpc'])
+    vpc.update(ctx.properties['network'])
 
     vpc_name = vpc['name']
     cidr = vpc['cidr']
