@@ -125,7 +125,7 @@ def get_network_offering(cloud_driver, netoffer_name):
     return netoffers[0]
 
 @operation
-def _create_egr_rules(ctx, cloud_driver, network_id, cidr_list, protocol,
+def _create_egr_rules(cloud_driver, network_id, cidr_list, protocol,
                       start_port, end_port):
 
     cloud_driver.ex_create_egress_firewall_rule(
