@@ -55,7 +55,7 @@ def create(ctx, **kwargs):
             name=vpc_name,
             display_text=vpc_name,
             vpc_offering=vpc_offering,
-            zoneid=location.id)
+            zone_id=location.id)
 
         # # Create acl rules for new
         # firewall_config = network['firewall']
