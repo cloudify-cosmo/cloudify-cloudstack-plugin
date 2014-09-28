@@ -79,7 +79,7 @@ def create(ctx, **kwargs):
 
             for port in acl_ingress_ports:
                 create_acl(cloud_driver, acl_ingress_protocol, acl_list.id,
-                           acl_ingress_cidr, port, port)
+                           acl_ingress_cidr, port, port, "ingress")
 
              # Creat egress ACL rules in ACLlist
             acl_egress_ports = firewall_config['egress']['ports']
@@ -88,7 +88,7 @@ def create(ctx, **kwargs):
 
             for port in acl_egress_ports:
                 create_acl(cloud_driver, acl_egress_protocol, acl_list.id,
-                           acl_egress_cidr, port, port)
+                           acl_egress_cidr, port, port, "egress")
 
         else:
             # Create firewall rules for new network
@@ -176,13 +176,14 @@ def create_acl_list(cloud_driver, name, vpc_id):
 
 
 def create_acl(cloud_driver, protocol, acl_id,
-               cidr_list, start_port, end_port):
+               cidr_list, start_port, end_port, traffic_type):
     acl = cloud_driver.ex_create_network_acl(
         protocol=protocol,
         acl_id=acl_id,
         cidr_list=cidr_list,
         start_port=start_port,
-        end_port=end_port)
+        end_port=end_port,
+        traffic_type=traffic_type)
     return acl
 
 
