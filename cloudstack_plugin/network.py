@@ -45,13 +45,18 @@ def create(ctx, **kwargs):
 
     if network['vpc']:
         vpc = get_vpc_id(cloud_driver, network['vpc'])
+        ctx.logger.info('DEBUG: VPC id: '.format(vpc.id))
 
     ctx.logger.info('Current node {0}{1}'.format(ctx.node_id, ctx.properties))
 
     ctx['network_id'] = ctx.node_id
 
     if not _network_exists(cloud_driver, network_name):
-        ctx.logger.info('creating network: {0}'.format(network_name))
+
+        if vpc:
+            ctx.logger.info('creating network: {0} in VPC with ID: {1}'.format(network_name, vpc.id))
+        else:
+            ctx.logger.info('creating network: {0}'.format(network_name))
 
         net = cloud_driver.ex_create_network(
             name=network_name,
@@ -163,7 +168,7 @@ def get_vpc_id(cloud_driver, vpc_name):
 
 def create_acl_list(cloud_driver, name, vpc_id):
     acllist = cloud_driver.ex_create_network_acllist(
-        name=vpc_name,
+        name=name,
         vpc_id=vpc_id,
         description=name)
     return acllist
