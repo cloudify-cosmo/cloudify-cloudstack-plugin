@@ -45,7 +45,7 @@ def create(ctx, **kwargs):
 
     ctx.logger.info('Current node {0}{1}'.format(ctx.node_id, ctx.properties))
 
-    ctx['vpc_id'] = ctx.node_id
+    ctx['vpc_id'] = ctx.properties
 
     if not _vpc_exists(cloud_driver, vpc_name):
         ctx.logger.info('creating vpc: {0}'.format(vpc_name))
@@ -53,11 +53,11 @@ def create(ctx, **kwargs):
         vpc = cloud_driver.ex_create_vpc(
             cidr=cidr,
             name=vpc_name,
-            display_text=vpc['description'],
+            display_text=vpc_name,
             vpc_offering=vpc_offering,
             zoneid=location.id)
 
-        # # Create firewall rules for new network
+        # # Create acl rules for new
         # firewall_config = network['firewall']
         # egress_rules = firewall_config['egress']
         # egr_ports = egress_rules['ports']

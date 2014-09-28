@@ -41,6 +41,10 @@ def create(ctx, **kwargs):
     location = get_location(cloud_driver, zone)
     netoffer = network['service_offering']
     network_offering = get_network_offering(cloud_driver, netoffer)
+    firewall_config = network['firewall']
+
+    if network['vpc']:
+        vpc = get_vpc_id(network['vpc'])
 
     ctx.logger.info('Current node {0}{1}'.format(ctx.node_id, ctx.properties))
 
@@ -53,18 +57,42 @@ def create(ctx, **kwargs):
             name=network_name,
             display_text=network['description'],
             location=location,
-            network_offering=network_offering)
+            network_offering=network_offering,
+            vpc_id=vpc.id)
 
-        # Create firewall rules for new network
-        firewall_config = network['firewall']
-        egress_rules = firewall_config['egress']
-        egr_ports = egress_rules['ports']
+        # Create ACL for the network if it's is part of a VPC
+        if vpc:
 
-        for port in egr_ports:
-            _create_egr_rules(
-                ctx, cloud_driver, net.id, egress_rules['cidr'],
-                egress_rules['protocol'],
-                port, port)
+            acl_list_id = create_acl_list(cloud_driver, vpc.name, vpc.id)
+
+            # Creat ingress ACL rules in ACLlist
+            acl_ingress_ports = firewall_config['ingress']['ports']
+            acl_ingress_protocol = firewall_config['ingress']['protocol']
+            acl_ingress_cidr = firewall_config['ingress']['cidr']
+
+            for port in acl_ingress_ports:
+                create_acl(cloud_driver, acl_ingress_protocol, acl_list_id,
+                           acl_ingress_cidr, port, port)
+
+             # Creat egress ACL rules in ACLlist
+            acl_egress_ports = firewall_config['egress']['ports']
+            acl_egress_protocol = firewall_config['egress']['protocol']
+            acl_egress_cidr = firewall_config['egress']['cidr']
+
+            for port in acl_egress_ports:
+                create_acl(cloud_driver, acl_egress_protocol, acl_list_id,
+                           acl_egress_cidr, port, port)
+
+        else:
+            # Create firewall rules for new network
+            egress_rules = firewall_config['egress']
+            egr_ports = egress_rules['ports']
+
+            for port in egr_ports:
+                _create_egr_rules(
+                    ctx, cloud_driver, net.id, egress_rules['cidr'],
+                    egress_rules['protocol'],
+                    port, port)
 
     else:
         ctx.logger.info('using existing management network {0}'.
@@ -123,6 +151,34 @@ def get_network_offering(cloud_driver, netoffer_name):
     if netoffers.__len__() == 0:
         return None
     return netoffers[0]
+
+
+def get_vpc_id(cloud_driver, vpc_name):
+    vpcs = [vpc for vpc in cloud_driver
+        .ex_list_network_vpcs() if vpc.name == vpc_name]
+    if vpcs.__len__() == 0:
+        return None
+    return vpcs[0]
+
+
+def create_acl_list(cloud_driver, name, vpc_id):
+    acllist = cloud_driver.ex_create_network_acllist(
+        name=vpc_name,
+        vpc_id=vpc_id,
+        description=name)
+    return acllist
+
+
+def create_acl(cloud_driver, protocol, acl_id,
+               cidr_list, start_port, end_port):
+    acl = cloud_driver.ex_create_network_acl(
+        protocol=protocol,
+        acl_id=acl_id,
+        cidr_list=cidr_list,
+        start_port=start_port,
+        end_port=end_port)
+    return acl
+
 
 @operation
 def _create_egr_rules(cloud_driver, network_id, cidr_list, protocol,
