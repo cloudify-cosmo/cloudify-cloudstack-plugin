@@ -155,7 +155,7 @@ def get_network_offering(cloud_driver, netoffer_name):
 
 def get_vpc_id(cloud_driver, vpc_name):
     vpcs = [vpc for vpc in cloud_driver
-        .ex_list_network_vpcs() if vpc.name == vpc_name]
+        .ex_list_vpcs() if vpc.name == vpc_name]
     if vpcs.__len__() == 0:
         return None
     return vpcs[0]
