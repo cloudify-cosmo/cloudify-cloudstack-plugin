@@ -70,7 +70,7 @@ def create(ctx, **kwargs):
         # Create ACL for the network if it's is part of a VPC
         if vpc:
 
-            acl_list_id = create_acl_list(cloud_driver, vpc.name, vpc.id)
+            acl_list = create_acl_list(cloud_driver, vpc.name, vpc.id)
 
             # Creat ingress ACL rules in ACLlist
             acl_ingress_ports = firewall_config['ingress']['ports']
@@ -78,7 +78,7 @@ def create(ctx, **kwargs):
             acl_ingress_cidr = firewall_config['ingress']['cidr']
 
             for port in acl_ingress_ports:
-                create_acl(cloud_driver, acl_ingress_protocol, acl_list_id,
+                create_acl(cloud_driver, acl_ingress_protocol, acl_list.id,
                            acl_ingress_cidr, port, port)
 
              # Creat egress ACL rules in ACLlist
@@ -87,7 +87,7 @@ def create(ctx, **kwargs):
             acl_egress_cidr = firewall_config['egress']['cidr']
 
             for port in acl_egress_ports:
-                create_acl(cloud_driver, acl_egress_protocol, acl_list_id,
+                create_acl(cloud_driver, acl_egress_protocol, acl_list.id,
                            acl_egress_cidr, port, port)
 
         else:
