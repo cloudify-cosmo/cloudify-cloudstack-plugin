@@ -70,7 +70,7 @@ def create(ctx, **kwargs):
         # Create ACL for the network if it's is part of a VPC
         if vpc:
 
-            acl_list = create_acl_list(cloud_driver, vpc.name, vpc.id)
+            acl_list = create_acl_list(cloud_driver, vpc.name, vpc.id, net.id)
 
             # Creat ingress ACL rules in ACLlist
             acl_ingress_ports = firewall_config['ingress']['ports']
@@ -167,11 +167,17 @@ def get_vpc_id(cloud_driver, vpc_name):
     return vpcs[0]
 
 
-def create_acl_list(cloud_driver, name, vpc_id):
+def create_acl_list(cloud_driver, name, vpc_id, network_id):
     acllist = cloud_driver.ex_create_network_acllist(
         name=name,
         vpc_id=vpc_id,
         description=name)
+
+    # Replace the newly created ACL list on to the network
+    cloud_driver.ex_replace_network_acllist(
+        acl_id=acllist.id,
+        network_id=network_id)
+
     return acllist
 
 
