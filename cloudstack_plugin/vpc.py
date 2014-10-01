@@ -56,18 +56,6 @@ def create(ctx, **kwargs):
             display_text=vpc_name,
             vpc_offering=vpc_offering,
             zone_id=location.id)
-
-        # # Create acl rules for new
-        # firewall_config = network['firewall']
-        # egress_rules = firewall_config['egress']
-        # egr_ports = egress_rules['ports']
-        #
-        # for port in egr_ports:
-        #     _create_egr_rules(
-        #         ctx, cloud_driver, net.id, egress_rules['cidr'],
-        #         egress_rules['protocol'],
-        #         port, port)
-
     else:
         ctx.logger.info('using existing vpc network {0}'.
                         format(vpc_name))
