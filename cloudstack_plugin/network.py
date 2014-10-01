@@ -56,17 +56,23 @@ def create(ctx, **kwargs):
 
         if vpc:
             ctx.logger.info('creating network: {0} in VPC with ID: {1}'.format(network_name, vpc.id))
+
+            net = cloud_driver.ex_create_network(
+                display_text=network_name,
+                name=network_name,
+                network_offering=network_offering,
+                location=location,
+                gateway=network['gateway'],
+                netmask=network['netmask'],
+                vpc_id=vpc.id)
         else:
             ctx.logger.info('creating network: {0}'.format(network_name))
 
-        net = cloud_driver.ex_create_network(
-            display_text=network_name,
-            name=network_name,
-            network_offering=network_offering,
-            location=location,
-            gateway=network['gateway'],
-            netmask=network['netmask'],
-            vpc_id=vpc.id)
+            net = cloud_driver.ex_create_network(
+                display_text=network_name,
+                name=network_name,
+                network_offering=network_offering,
+                location=location)
 
         # Create ACL for the network if it's is part of a VPC
         if vpc:
