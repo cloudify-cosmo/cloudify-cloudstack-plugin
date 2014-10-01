@@ -30,7 +30,7 @@ def _get_server_from_context(ctx):
 
 
 @operation
-def start(ctx, **kwargs):
+def create(ctx, **kwargs):
 
     ctx.logger.info("initializing {0} cloud driver"
                     .format(Provider.CLOUDSTACK))
@@ -84,6 +84,10 @@ def start(ctx, **kwargs):
 
     ctx['instance_id'] = node.id
 
+@operation
+def start():
+    #start node
+    return None
 
 @operation
 def delete(ctx, **kwargs):
