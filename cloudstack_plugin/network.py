@@ -41,7 +41,7 @@ def create(ctx, **kwargs):
     location = get_location(cloud_driver, zone)
     netoffer = network['service_offering']
     network_offering = get_network_offering(cloud_driver, netoffer)
-    firewall_config = network['firewall']
+    firewall_config = ctx.properties['firewall']['default']
 
     # if network['vpc']:
     #     vpc = get_vpc_id(cloud_driver, network['vpc'])
@@ -103,10 +103,9 @@ def create(ctx, **kwargs):
             egr_ports = egress_rules['ports']
 
             for port in egr_ports:
-                _create_egr_rules(
-                    cloud_driver, net.id, egress_rules['cidr'],
-                    egress_rules['protocol'],
-                    port, port)
+                _create_egr_rules(cloud_driver, net.id, egress_rules['cidr'],
+                                  egress_rules['protocol'],
+                                  port, port)
 
     else:
         ctx.logger.info('using existing management network {0}'.
