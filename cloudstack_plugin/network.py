@@ -46,6 +46,7 @@ def create(ctx, **kwargs):
     # if network['vpc']:
     #     vpc = get_vpc_id(cloud_driver, network['vpc'])
     #     ctx.logger.info('DEBUG: VPC id: '.format(vpc.id))
+    vpc = False
 
     ctx.logger.info('Current node {0}{1}'.format(ctx.node_id, ctx.properties))
 
