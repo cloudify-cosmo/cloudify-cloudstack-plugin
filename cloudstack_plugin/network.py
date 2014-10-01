@@ -104,7 +104,7 @@ def create(ctx, **kwargs):
 
             for port in egr_ports:
                 _create_egr_rules(
-                    ctx, cloud_driver, net.id, egress_rules['cidr'],
+                    cloud_driver, net.id, egress_rules['cidr'],
                     egress_rules['protocol'],
                     port, port)
 
