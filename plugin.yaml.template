@@ -1,0 +1,149 @@
+##################################################################################
+# Cloudify cloudstack built in types and plugins definitions.
+##################################################################################
+
+plugins:
+    cloudstack:
+        executor: central_deployment_agent
+        source: https://github.com/cloudify-cosmo/cloudify-cloudstack-plugin/archive/{{ plugin_branch }}.zip
+
+node_types:
+    cloudify.cloudstack.advanced_server:
+        derived_from: cloudify.types.host
+        properties:
+            server: {}
+            use_external_resource:
+                default: false
+            resource_id:
+                default: ''
+            management_network_name:
+                default: ''
+            cloudstack_config:
+                default: {}
+        interfaces:
+            cloudify.interfaces.lifecycle:
+                - create: cloudstack.cloudstack_plugin.virtual_machine_in_network.create
+                - start: cloudstack.cloudstack_plugin.virtual_machine_in_network.start
+                - stop: cloudstack.cloudstack_plugin.virtual_machine_in_network.stop
+                - delete: cloudstack.cloudstack_plugin.virtual_machine_in_network.delete
+            cloudify.interfaces.host:
+                - get_state: cloudstack.cloudstack_plugin.virtual_machine_in_network.get_state
+    
+    cloudify.cloudstack.windows_server:
+        derived_from: cloudify.cloudstack.server
+        interfaces:
+            cloudify.interfaces.worker_installer:
+                - install: windows_agent_installer.windows_agent_installer.tasks.install
+                - start: windows_agent_installer.windows_agent_installer.tasks.start
+                - stop: windows_agent_installer.windows_agent_installer.tasks.stop
+                - uninstall: windows_agent_installer.windows_agent_installer.tasks.uninstall
+                - restart: windows_agent_installer.windows_agent_installer.tasks.restart
+            cloudify.interfaces.plugin_installer:
+                - install: windows_plugin_installer.windows_plugin_installer.tasks.install
+
+
+    cloudify.cloudstack.network:
+        derived_from: cloudify.types.network
+        properties:
+            subnet: {}
+            use_external_resource:
+                default: false
+            resource_id:
+                default: ''
+            cloudstack_config:
+                default: {}
+        interfaces:
+             cloudify.interfaces.lifecycle:
+                  - create: cloudstack.cloudstack_plugin.network.create
+                  - delete: cloudstack.cloudstack_plugin.network.delete
+
+    cloudify.cloudstack.security_group:
+        derived_from: cloudify.types.base
+        properties:
+            security_group:
+                default: {}
+            use_external_resource:
+                default: false
+            resource_id:
+                default: ''
+            cloudstack_config:
+                default: {}
+            rules:
+                default: []
+            disable_default_egress_rules:
+                default: false
+        interfaces:
+            cloudify.interfaces.lifecycle:
+                - create: cloudstack.cloudstack_plugin.security_group.create
+                - delete: cloudstack.cloudstack_plugin.security_group.delete
+
+    
+
+    cloudify.cloudstack.network:
+        derived_from: cloudify.types.network
+        properties:
+            network:
+                default: {}
+            use_external_resource:
+                default: false
+            resource_id:
+                default: ''
+            cloudstack_config:
+                default: {}
+        interfaces:
+            cloudify.interfaces.lifecycle:
+                - create: cloudstack.cloudstack_plugin.network.create
+                - delete: cloudstack.cloudstack_plugin.network.delete
+
+    cloudify.cloudstack.floatingip:
+        derived_from: cloudify.types.base
+        properties:
+            floatingip:
+                default: {}
+            use_external_resource:
+                default: false
+            resource_id:
+                default: ''
+            cloudstack_config:
+                default: {}
+        interfaces:
+             cloudify.interfaces.lifecycle:
+                  - create: cloudstack.neutron_plugin.floatingip.create
+                  - delete: cloudstack.neutron_plugin.floatingip.delete
+
+relationships:
+    cloudify.cloudstack.port_connected_to_security_group:
+        derived_from: cloudify.relationships.connected_to
+        source_interfaces:
+            cloudify.interfaces.relationship_lifecycle:
+                - establish: cloudstack.neutron_plugin.port.connect_security_group
+
+    cloudify.cloudstack.subnet_connected_to_router:
+        derived_from: cloudify.relationships.connected_to
+        target_interfaces:
+            cloudify.interfaces.relationship_lifecycle:
+                - establish: cloudstack.neutron_plugin.router.connect_subnet
+                - unlink: cloudstack.neutron_plugin.router.disconnect_subnet
+
+    cloudify.cloudstack.server_connected_to_floating_ip:
+        derived_from: cloudify.relationships.connected_to
+        source_interfaces:
+            cloudify.interfaces.relationship_lifecycle:
+                - establish: cloudstack.nova_plugin.server.connect_floatingip
+                - unlink: cloudstack.nova_plugin.server.disconnect_floatingip
+
+    cloudify.cloudstack.server_connected_to_security_group:
+        derived_from: cloudify.relationships.connected_to
+        source_interfaces:
+            cloudify.interfaces.relationship_lifecycle:
+                - establish: cloudstack.nova_plugin.server.connect_security_group
+                - unlink: cloudstack.nova_plugin.server.disconnect_security_group
+
+    cloudify.cloudstack.server_connected_to_port:
+        derived_from: cloudify.relationships.connected_to
+        
+    cloudify.cloudstack.floating_ip_connected_to_port:
+        derived_from: cloudify.relationships.connected_to
+
+    cloudify.cloudstack.security_group_rule_in_security_group:
+        derived_from: cloudify.relationships.contained_in
