@@ -31,7 +31,7 @@ node_types:
                 - get_state: cloudstack.cloudstack_plugin.virtual_machine_in_network.get_state
     
     cloudify.cloudstack.windows_server:
-        derived_from: cloudify.cloudstack.server
+        derived_from: cloudify.cloudstack.virtual_machine
         interfaces:
             cloudify.interfaces.worker_installer:
                 - install: windows_agent_installer.windows_agent_installer.tasks.install
@@ -46,9 +46,12 @@ node_types:
     cloudify.cloudstack.network:
         derived_from: cloudify.types.network
         properties:
-            network: {}
-            auth: {}
-            firewall: {}
+            network: 
+                default: {}
+            auth: 
+                default: {}
+            firewall: 
+                default: {}
             use_external_resource:
                 default: false
             resource_id:
@@ -82,21 +85,7 @@ node_types:
 
     
 
-    cloudify.cloudstack.network:
-        derived_from: cloudify.types.network
-        properties:
-            network:
-                default: {}
-            use_external_resource:
-                default: false
-            resource_id:
-                default: ''
-            cloudstack_config:
-                default: {}
-        interfaces:
-            cloudify.interfaces.lifecycle:
-                - create: cloudstack.cloudstack_plugin.network.create
-                - delete: cloudstack.cloudstack_plugin.network.delete
+ 
 
     # cloudify.cloudstack.floatingip:
     #     derived_from: cloudify.types.base
