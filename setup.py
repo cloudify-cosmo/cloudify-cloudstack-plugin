@@ -11,10 +11,10 @@ setup(
     ],
     license='Apache License 2.0',
     description='Cloudify plugin for the Cloudstack cloud infrastructure.',
-   
+
     install_requires=[
         "cloudify-plugins-common",
         "cloudify-plugins-common>=3.0"
-        "apache-libcloud==0.15.1"
+        "apache-libcloud"
     ]
 )
