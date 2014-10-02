@@ -85,9 +85,25 @@ def create(ctx, **kwargs):
     ctx['instance_id'] = node.id
 
 @operation
-def start():
-    #start node
-    return None
+def start(ctx, **kwargs):
+    ctx.logger.info("initializing {0} cloud driver"
+                    .format(Provider.CLOUDSTACK))
+    cloud_driver = get_cloud_driver(ctx)
+
+    instance_id = ctx.runtime_properties['instance_id']
+    if instance_id is None:
+        raise RuntimeError(
+            'could not find node ID in runtime context: {0} '
+            .format(instance_id))
+
+    ctx.logger.info('getting node with ID: {0} '.format(instance_id))
+    node = _get_node_by_id(cloud_driver, instance_id)
+    if node is None:
+        raise RuntimeError('could not find node with ID {0}'
+                           .format(instance_id))
+
+    ctx.logger.info('starting node with details {0}'.format(node))
+    cloud_driver.ex_start(node)
 
 @operation
 def delete(ctx, **kwargs):
