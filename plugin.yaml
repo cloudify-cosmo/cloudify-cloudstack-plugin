@@ -8,7 +8,7 @@ plugins:
         source: https://github.com/boul/cloudify-cloudstack-plugin/archive/relationships.zip
 
 node_types:
-    cloudify.cloudstack.virtual_machine:
+    cloudify.cloudstack.host:
         derived_from: cloudify.types.host
         properties:
             server: {}
