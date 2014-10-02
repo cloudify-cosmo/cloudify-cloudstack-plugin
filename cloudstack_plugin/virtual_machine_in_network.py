@@ -45,7 +45,7 @@ def create(ctx, **kwargs):
     keypair_name = server_config['keypair_name']
     #security_groups = server_config['security_groups']
     networks = server_config['networks']
-    ipaddress = server_config['ip']['default']
+    ipaddress = server_config['ip_address']
 
     network_list = cloud_driver.ex_list_networks()
 
