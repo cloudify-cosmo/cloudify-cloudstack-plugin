@@ -12,7 +12,11 @@ node_types:
         derived_from: cloudify.types.host
         properties:
             server: {}
-            auth: {}
+            auth:
+                default:
+                    API_KEY: { get_input: cloudstack_key }
+                    API_SECRET_KEY: { get_input: cloudstack_secret }
+                    API_URL: { get_input: cloudstack_api_url }
             use_external_resource:
                 default: false
             resource_id:
@@ -23,12 +27,12 @@ node_types:
                 default: {}
         interfaces:
             cloudify.interfaces.lifecycle:
-                - create: cloudstack.cloudstack_plugin.virtual_machine_in_network.create
-                - start: cloudstack.cloudstack_plugin.virtual_machine_in_network.start
-                - stop: cloudstack.cloudstack_plugin.virtual_machine_in_network.stop
-                - delete: cloudstack.cloudstack_plugin.virtual_machine_in_network.delete
+                - create: cloudstack.cloudstack_plugin.virtual_machine.create
+                - start: cloudstack.cloudstack_plugin.virtual_machine.start
+                - stop: cloudstack.cloudstack_plugin.virtual_machine.stop
+                - delete: cloudstack.cloudstack_plugin.virtual_machine.delete
             cloudify.interfaces.host:
-                - get_state: cloudstack.cloudstack_plugin.virtual_machine_in_network.get_state
+                - get_state: cloudstack.cloudstack_plugin.virtual_machine.get_state
     
     cloudify.cloudstack.windows_server:
         derived_from: cloudify.cloudstack.virtual_machine
@@ -49,7 +53,10 @@ node_types:
             network: 
                 default: {}
             auth: 
-                default: {}
+                default:
+                    API_KEY: { get_input: cloudstack_key }
+                    API_SECRET_KEY: { get_input: cloudstack_secret }
+                    API_URL: { get_input: cloudstack_api_url }
             firewall: 
                 default: {}
             use_external_resource:
@@ -68,6 +75,11 @@ node_types:
         properties:
             security_group:
                 default: {}
+            auth: 
+                default:
+                    API_KEY: { get_input: cloudstack_key }
+                    API_SECRET_KEY: { get_input: cloudstack_secret }
+                    API_URL: { get_input: cloudstack_api_url }
             use_external_resource:
                 default: false
             resource_id:
