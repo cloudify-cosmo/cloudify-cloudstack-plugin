@@ -143,12 +143,12 @@ relationships:
                 - establish: cloudstack.cloudstack_plugin.server.connect_security_group
                 - unlink: cloudstack.cloudstack_plugin.server.disconnect_security_group
 
-    cloudify.cloudstack.server_connected_to_network:
+    cloudify.cloudstack.virtual_machine_connected_to_network:
         derived_from: cloudify.relationships.connected_to
         source_interfaces:
             cloudify.interfaces.relationship_lifecycle:
-                - establish: cloudstack.cloudstack_plugin.server.connect_network
-                - unlink: cloudstack.cloudstack_plugin.server.disconnect_network
+                - establish: cloudstack.cloudstack_plugin.virtual_machine.connect_network
+                - unlink: cloudstack.cloudstack_plugin.virtual_machine.disconnect_network
 
 #     cloudify.cloudstack.server_connected_to_port:
 #         derived_from: cloudify.relationships.connected_to

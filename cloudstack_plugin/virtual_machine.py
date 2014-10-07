@@ -16,7 +16,6 @@ import copy
 from cloudify.decorators import operation
 from libcloud.compute.types import Provider
 from cloudstack_plugin.cloudstack_common import get_cloud_driver
-CLOUDSTACK_ID_PROPERTY =
 
 __author__ = 'adaml'
 
