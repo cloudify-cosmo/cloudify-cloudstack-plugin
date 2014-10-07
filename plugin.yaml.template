@@ -103,7 +103,7 @@ node_types:
     #               - create: cloudstack.neutron_plugin.floatingip.create
     #               - delete: cloudstack.neutron_plugin.floatingip.delete
 
-# relationships:
+relationships:
 #     cloudify.cloudstack.port_connected_to_security_group:
 #         derived_from: cloudify.relationships.connected_to
 #         source_interfaces:
@@ -124,12 +124,19 @@ node_types:
 #                 - establish: cloudstack.nova_plugin.server.connect_floatingip
 #                 - unlink: cloudstack.nova_plugin.server.disconnect_floatingip
 
-#     cloudify.cloudstack.server_connected_to_security_group:
-#         derived_from: cloudify.relationships.connected_to
-#         source_interfaces:
-#             cloudify.interfaces.relationship_lifecycle:
-#                 - establish: cloudstack.nova_plugin.server.connect_security_group
-#                 - unlink: cloudstack.nova_plugin.server.disconnect_security_group
+    cloudify.cloudstack.server_connected_to_security_group:
+        derived_from: cloudify.relationships.connected_to
+        source_interfaces:
+            cloudify.interfaces.relationship_lifecycle:
+                - establish: cloudstack.cloudstack_plugin.server.connect_security_group
+                - unlink: cloudstack.cloudstack_plugin.server.disconnect_security_group
+
+    cloudify.cloudstack.server_connected_to_network:
+        derived_from: cloudify.relationships.connected_to
+        source_interfaces:
+            cloudify.interfaces.relationship_lifecycle:
+                - establish: cloudstack.cloudstack_plugin.server.connect_network
+                - unlink: cloudstack.cloudstack_plugin.server.disconnect_network
 
 #     cloudify.cloudstack.server_connected_to_port:
 #         derived_from: cloudify.relationships.connected_to
