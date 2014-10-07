@@ -202,9 +202,9 @@ def start(ctx, **kwargs):
         raise RuntimeError('could not find node with ID {0}'
                            .format(instance_id))
 
-    ctx.logger.info('starting node with details {0}'.format(node))
+    #ctx.logger.info('starting node with details {0}'.format(node))
     cloud_driver.ex_start(node)
-
+    #node.ex_start()
 @operation
 def delete(ctx, **kwargs):
 
@@ -225,6 +225,7 @@ def delete(ctx, **kwargs):
 
     ctx.logger.info('destroying vm with details: {0}'.format(node))
     cloud_driver.destroy_node(node)
+
 
 
 @operation
@@ -296,9 +297,9 @@ def connect_network(ctx, **kwargs):
     network = [net for net in cloud_driver.ex_list_networks() if
                net.id == network_id ][0]
     instance = [node for node in cloud_driver.list_nodes() if
-                node.id == network_id][0]
+                node.id == instance_id][0]
 
-    ctx.logger.info('Adding a NIC to VM {0} in Network {1}'.format(instance, network))
+    ctx.logger.info('Adding a NIC to VM {0} in Network {1}'.format(instance.name, network.name))
 
     result = cloud_driver.ex_add_nic_to_vm(instance, network)
 
