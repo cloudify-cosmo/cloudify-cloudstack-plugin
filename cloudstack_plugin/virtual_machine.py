@@ -16,7 +16,7 @@ import copy
 from cloudify.decorators import operation
 from libcloud.compute.types import Provider
 from cloudstack_plugin.cloudstack_common import get_cloud_driver
-
+CLOUDSTACK_ID_PROPERTY =
 
 __author__ = 'adaml'
 
@@ -177,7 +177,7 @@ def _create_in_security_group(ctx, cloud_driver, name, image, size, keypair_name
                                     ex_security_groups=default_security_group_name,
                                     ex_start_vm=False,
                                     ex_ipaddress=ip_address)
-    
+
     ctx.logger.info(
         'vm {0} was started successfully {1}'.format(
             node.name, server_config))
@@ -282,3 +282,42 @@ def get_state(ctx, **kwargs):
         'instance started successfully with IP {0}'
         .format(ctx.runtime_properties['ip']))
     return True
+
+@operation
+def connect_network(ctx, **kwargs):
+
+    instance_id = ctx.runtime_properties['instance_id']
+    network_id = ctx.related.runtime_properties['network_id']
+
+    ctx.logger.info('Adding a NIC to VM-ID {0} in Network-ID {1}'.format(instance_id, network_id))
+
+    cloud_driver = get_cloud_driver(ctx)
+    nodes = cloud_driver.list_nodes(instance_id)
+
+    network = [net for net in cloud_driver.ex_list_networks() if
+               net.id == network_id ][0]
+    instance = [node for node in cloud_driver.list_nodes() if
+                node.id == network_id][0]
+
+    ctx.logger.info('Adding a NIC to VM {0} in Network {1}'.format(instance, network))
+
+    result = cloud_driver.ex_add_nic_to_vm(instance, network)
+
+    ctx.runtime_properties['nic_id'] = result.id
+
+    return True
+
+    # if is_external_relationship(ctx):
+    #     ctx.logger.info('Validating external network and VM '
+    #                     'are associated')
+    #     cloud_driver = get_cloud_driver(ctx)
+    #     nodes = cloud_driver.list_nodes(server_id)
+    #     if [sg for sg in server.list_security_group() if sg.id ==
+    #             security_group_id]:
+    #         return
+    #     raise NonRecoverableError(
+    #         'Expected external resources server {0} and security-group {1} to '
+    #         'be connected'.format(server_id, security_group_id))
+    #
+    # server = nova_client.servers.get(server_id)
+    # server.add_security_group(security_group_id)
