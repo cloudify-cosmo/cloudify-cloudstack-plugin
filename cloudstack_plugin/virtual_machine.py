@@ -253,13 +253,26 @@ def stop(ctx, **kwargs):
 
 def _get_node_by_id(cloud_driver, instance_id):
 
-    nodes = [node for node in cloud_driver.list_nodes() if instance_id
-                                                          == node.id]
+    nodes = [node for node in cloud_driver.list_nodes() if
+             instance_id == node.id]
+    
     if nodes is None:
         raise RuntimeError('could not find node by ID {0}'.format(instance_id))
         return None
 
     return nodes[0]
+
+
+def _get_network_by_id(cloud_driver, network_id):
+
+    networks = [network for network in cloud_driver.ex_list_networks() if
+                network_id == network.id]
+
+    if networks is None:
+        raise RuntimeError('could not find network by ID {0}'.format(network_id))
+        return None
+
+    return networks[0]
 
 
 @operation
@@ -292,17 +305,19 @@ def connect_network(ctx, **kwargs):
     ctx.logger.info('Adding a NIC to VM-ID {0} in Network-ID {1}'.format(instance_id, network_id))
 
     cloud_driver = get_cloud_driver(ctx)
-    nodes = cloud_driver.list_nodes(instance_id)
+    # nodes = cloud_driver.list_nodes(instance_id)
 
-    network = [net for net in cloud_driver.ex_list_networks() if
-               net.id == network_id ][0]
-    instance = [node for node in cloud_driver.list_nodes() if
-                node.id == instance_id][0]
+    # network = [net for net in cloud_driver.ex_list_networks() if
+    #            net.id == network_id ][0]
+    # instance = [node for node in cloud_driver.list_nodes() if
+    #             node.id == instance_id][0]
 
-    ctx.logger.info('Adding a NIC to VM {0} in Network {1}'.format(instance.name, network.name))
+    node = _get_node_by_id(cloud_driver, instance_id)
+    network = _get_network_by_id(cloud_driver, network_id)
 
-    result = cloud_driver.ex_add_nic_to_vm(instance, network)
+    ctx.logger.info('Adding a NIC to VM {0} in Network {1}'.format(node.name, network.name))
 
+    result = cloud_driver.ex_add_nic_to_node(node=node, network=network)
     ctx.runtime_properties['nic_id'] = result.id
 
     return True
