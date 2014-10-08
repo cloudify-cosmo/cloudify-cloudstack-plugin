@@ -48,7 +48,7 @@ node_types:
 
 
     cloudify.cloudstack.network:
-        derived_from: cloudify.types.network
+        derived_from: cloudify.types.subnet
         properties:
             network: 
                 default: {}
@@ -136,12 +136,12 @@ relationships:
 #                 - establish: cloudstack.nova_plugin.server.connect_floatingip
 #                 - unlink: cloudstack.nova_plugin.server.disconnect_floatingip
 
-    cloudify.cloudstack.server_connected_to_security_group:
-        derived_from: cloudify.relationships.connected_to
-        source_interfaces:
-            cloudify.interfaces.relationship_lifecycle:
-                - establish: cloudstack.cloudstack_plugin.server.connect_security_group
-                - unlink: cloudstack.cloudstack_plugin.server.disconnect_security_group
+    # cloudify.cloudstack.server_connected_to_security_group:
+    #     derived_from: cloudify.relationships.connected_to
+    #     source_interfaces:
+    #         cloudify.interfaces.relationship_lifecycle:
+    #             - establish: cloudstack.cloudstack_plugin.server.connect_security_group
+    #             - unlink: cloudstack.cloudstack_plugin.server.disconnect_security_group
 
     cloudify.cloudstack.virtual_machine_connected_to_network:
         derived_from: cloudify.relationships.connected_to

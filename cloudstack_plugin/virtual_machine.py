@@ -16,6 +16,7 @@ import copy
 from cloudify.decorators import operation
 from libcloud.compute.types import Provider
 from cloudstack_plugin.cloudstack_common import get_cloud_driver
+from pprint import pprint
 
 __author__ = 'adaml'
 
@@ -197,7 +198,7 @@ def start(ctx, **kwargs):
             .format(instance_id))
 
     ctx.logger.info('getting node with ID: {0} '.format(instance_id))
-    node = _get_node_by_id(cloud_driver, instance_id)
+    node = _get_node_by_id(ctx, cloud_driver, instance_id)
     if node is None:
         raise RuntimeError('could not find node with ID {0}'
                            .format(instance_id))
@@ -218,7 +219,7 @@ def delete(ctx, **kwargs):
                         .format(instance_id))
 
     ctx.logger.info('getting node with ID: {0} '.format(instance_id))
-    node = _get_node_by_id(cloud_driver, instance_id)
+    node = _get_node_by_id(ctx, cloud_driver, instance_id)
     if node is None:
         raise NameError('could not find node with ID: {0} '
                         .format(instance_id))
@@ -242,7 +243,7 @@ def stop(ctx, **kwargs):
             .format(instance_id))
 
     ctx.logger.info('getting node with ID: {0} '.format(instance_id))
-    node = _get_node_by_id(cloud_driver, instance_id)
+    node = _get_node_by_id(ctx, cloud_driver, instance_id)
     if node is None:
         raise RuntimeError('could not find node with ID {0}'
                            .format(instance_id))
@@ -251,28 +252,44 @@ def stop(ctx, **kwargs):
     cloud_driver.ex_stop(node)
 
 
-def _get_node_by_id(cloud_driver, instance_id):
+def _get_node_by_id(ctx, cloud_driver, instance_id):
 
     nodes = [node for node in cloud_driver.list_nodes() if
              instance_id == node.id]
     
-    if nodes is None:
-        raise RuntimeError('could not find node by ID {0}'.format(instance_id))
+    if not nodes:
+        ctx.logger.info('could not find node by ID {0}'.format(instance_id))
         return None
 
     return nodes[0]
 
 
-def _get_network_by_id(cloud_driver, network_id):
+def _get_network_by_id(ctx, cloud_driver, network_id):
 
     networks = [network for network in cloud_driver.ex_list_networks() if
                 network_id == network.id]
 
-    if networks is None:
-        raise RuntimeError('could not find network by ID {0}'.format(network_id))
+    if not networks:
+        ctx.logger.info('could not find network by ID {0}'.format(network_id))
         return None
 
     return networks[0]
+
+
+def _get_nic_by_node_and_network_id(ctx, cloud_driver, node, network_id):
+
+    #node = _get_node_by_id(cloud_driver, node_id)
+    #network = _get_network_by_id(cloud_driver, network_id)
+
+    nics = [nic for nic in cloud_driver.ex_list_nics(node) if
+            network_id == nic.network_id]
+
+    if not nics:
+        ctx.logger.info('could not find nic by node_id {0} and network_id {1}'
+                        .format(node.id, network_id))
+        return None
+
+    return nics[0]
 
 
 @operation
@@ -285,7 +302,7 @@ def get_state(ctx, **kwargs):
     instance_id = ctx.runtime_properties['instance_id']
 
     ctx.logger.info('getting node with ID {0}'.format(instance_id))
-    node = _get_node_by_id(cloud_driver, instance_id)
+    node = _get_node_by_id(ctx, cloud_driver, instance_id)
     if node is None:
         return False
 
@@ -302,7 +319,7 @@ def connect_network(ctx, **kwargs):
     instance_id = ctx.runtime_properties['instance_id']
     network_id = ctx.related.runtime_properties['network_id']
 
-    ctx.logger.info('Adding a NIC to VM-ID {0} in Network-ID {1}'.format(instance_id, network_id))
+
 
     cloud_driver = get_cloud_driver(ctx)
     # nodes = cloud_driver.list_nodes(instance_id)
@@ -312,13 +329,43 @@ def connect_network(ctx, **kwargs):
     # instance = [node for node in cloud_driver.list_nodes() if
     #             node.id == instance_id][0]
 
-    node = _get_node_by_id(cloud_driver, instance_id)
-    network = _get_network_by_id(cloud_driver, network_id)
+    node = _get_node_by_id(ctx, cloud_driver, instance_id)
+    network = _get_network_by_id(ctx, cloud_driver, network_id)
 
-    ctx.logger.info('Adding a NIC to VM {0} in Network {1}'.format(node.name, network.name))
+    ctx.logger.info('Checking if there is a nice for  '
+                    'vm: {0} with id: {1} in network {2} with id: {3}'
+                    .format(node.name, network.name, instance_id, network_id,))
 
-    result = cloud_driver.ex_add_nic_to_node(node=node, network=network)
-    ctx.runtime_properties['nic_id'] = result.id
+    nic_exists = _get_nic_by_node_and_network_id(cloud_driver, node, network_id)
+
+    #ctx.logger.info('Adding a NIC to VM {0} in Network {1}'.format(node.name, network.name))
+
+    if nic_exists is not None:
+        ctx.logger.info('No need to connect network {0}, already connected to nic {1}'
+                        .format(network.name, nic_exists.id))
+        return False
+
+    cloud_driver.ex_add_nic_to_node(node=node, network=network)
+    #ctx.runtime_properties['nic_id'] = result.id
+
+    return True
+
+@operation
+def disconnect_network(ctx, **kwargs):
+
+    instance_id = ctx.runtime_properties['instance_id']
+    network_id = ctx.related.runtime_properties['network_id']
+
+    ctx.logger.info('Removing a NIC from VM-ID {0} in Network-ID {1}'.format(instance_id, network_id))
+
+    cloud_driver = get_cloud_driver(ctx)
+
+    node = _get_node_by_id(ctx, cloud_driver, instance_id)
+    nic = _get_nic_by_node_and_network_id(ctx, cloud_driver, node, network_id)
+
+    #ctx.logger.info('Adding a NIC to VM {0} in Network with id {1}'.format(node.name, nic.network_id))
+
+    cloud_driver.ex_remove_nic_from_node(nic=nic, node=node)
 
     return True
 

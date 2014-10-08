@@ -200,7 +200,6 @@ def create_acl(cloud_driver, protocol, acl_id,
     return acl
 
 
-@operation
 def _create_egr_rules(cloud_driver, network_id, cidr_list, protocol,
                       start_port, end_port):
 
