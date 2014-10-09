@@ -123,15 +123,17 @@ def delete(ctx, **kwargs):
     network_name = ctx.runtime_properties['network_name']
     cloud_driver = get_cloud_driver(ctx)
     network = get_network(cloud_driver, network_name)
-
+    
     try:
 
         cloud_driver.ex_delete_network(network)
-    except:
-        ctx.logger.warn(
-            'network {0} may not have been deleted'
-                .format(ctx.runtime_properties['network_name']))
+    except Exception as e:
+        ctx.logger.warn('network {0} may not have been deleted: {1}'
+                        .format(ctx.runtime_properties['network_name'], str(e)))
+        return False
         pass
+
+    return True
 
 
 def _network_exists(cloud_driver, network_name):
