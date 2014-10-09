@@ -84,6 +84,7 @@ def create(ctx, **kwargs):
                            default_network_name=default_network,
                            ip_address=ip_address)
 
+
     if default_security_group is not None:
         ctx.logger.info('Creating this VM in default_security_group.'.format(default_security_group))
         ctx.logger.info("Creating VM with the following details: {0}".format(
@@ -98,7 +99,6 @@ def create(ctx, **kwargs):
                                   ip_address=ip_address)
 
 
-@operation
 def _create_in_network(ctx, cloud_driver, name, image, size, keypair_name,
                        default_network_name, ip_address=None):
 
@@ -136,39 +136,13 @@ def _create_in_network(ctx, cloud_driver, name, image, size, keypair_name,
             node.name))
 
     ctx['instance_id'] = node.id
+    ctx.runtime_properties['networking_type'] = 'network'
+
 
 @operation
 def _create_in_security_group(ctx, cloud_driver, name, image, size, keypair_name,
                               default_security_group_name, ip_address=None):
 
-    # ctx.logger.info("initializing {0} cloud driver".format(Provider.EXOSCALE))
-    # cloud_driver = get_cloud_driver(ctx)
-    #
-    # ctx.logger.info('reading server config from context')
-    # server_config = _get_server_from_context(ctx)
-    #
-    # name = server_config['name']
-    # image_id = server_config['image_id']
-    # size_name = server_config['size']
-    # keypair_name = server_config['keypair_name']
-    # security_groups = server_config['security_groups']
-
-    # ctx.logger.info('getting required size {0}'.format(size_name))
-    # sizes = [size for size in cloud_driver.list_sizes() if size.name == size_name]  # NOQA
-    # if sizes is None:
-    #     raise RuntimeError(
-    #         'Could not find size with name {0}'.format(size_name))
-    # size = sizes[0]
-    #
-    # ctx.logger.info('getting required image with ID {0}'.format(image_id))
-    # images = [image for image in cloud_driver.list_images() if image_id == image.id]  # NOQA
-    # if images is None:
-    #     raise RuntimeError('Could not find image with ID {0}'.format(image_id))
-    # image = images[0]
-
-    # ctx.logger.info(
-    #     "creating server vm with the following details: {0}".format(
-    #         server_config))
 
     node = cloud_driver.create_node(name=name,
                                     image=image,
@@ -183,6 +157,7 @@ def _create_in_security_group(ctx, cloud_driver, name, image, size, keypair_name
             node.name, server_config))
 
     ctx['instance_id'] = node.id
+    ctx.runtime_properties['networking_type'] = 'security_group'
 
 
 @operation
@@ -301,18 +276,33 @@ def get_state(ctx, **kwargs):
     cloud_driver = get_cloud_driver(ctx)
 
     instance_id = ctx.runtime_properties['instance_id']
+    networking_type = ctx.runtime_properties['networking_type']
 
     ctx.logger.info('getting node with ID {0}'.format(instance_id))
     node = _get_node_by_id(ctx, cloud_driver, instance_id)
     if node is None:
         return False
 
-    ctx.runtime_properties['ip'] = node.private_ips[0]
-    ctx.runtime_properties['ip_address'] = node.private_ips[0]
-    ctx.logger.info(
-        'instance started successfully with IP {0}'
-        .format(ctx.runtime_properties['ip']))
-    return True
+    if networking_type == 'network':
+        ctx.runtime_properties['ip'] = node.private_ips[0]
+        #ctx.runtime_properties['ip_address'] = node.private_ips[0]
+        ctx.logger.info('instance started successfully with IP {0}'
+                        .format(ctx.runtime_properties['ip']))
+        return True
+
+    elif networking_type == 'security_group':
+        ctx.runtime.properties['ip'] = node.public_ips[0]
+        ctx.logger.info('instance started successfully with IP {0}'
+                        .format(ctx.runtime_properties['ip']))
+        return True
+
+    else:
+        ctx.runtime_properties['ip'] = node.private_ips[0]
+        ctx.logger.info('Cannot determine networking type,'
+                        ' using private_ip as {0} ip'
+                        .format(ctx.runtime_properties['ip']))
+        return True
+
 
 @operation
 def connect_network(ctx, **kwargs):
@@ -333,7 +323,7 @@ def connect_network(ctx, **kwargs):
     node = _get_node_by_id(ctx, cloud_driver, instance_id)
     network = _get_network_by_id(ctx, cloud_driver, network_id)
 
-    ctx.logger.info('Checking if there is a nice for  '
+    ctx.logger.info('Checking if there is a nic for  '
                     'vm: {0} with id: {1} in network {2} with id: {3}'
                     .format(node.name, network.name, instance_id, network_id,))
 

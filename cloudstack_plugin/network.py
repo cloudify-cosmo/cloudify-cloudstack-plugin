@@ -123,7 +123,7 @@ def delete(ctx, **kwargs):
     network_name = ctx.runtime_properties['network_name']
     cloud_driver = get_cloud_driver(ctx)
     network = get_network(cloud_driver, network_name)
-    
+
     try:
 
         cloud_driver.ex_delete_network(network)
