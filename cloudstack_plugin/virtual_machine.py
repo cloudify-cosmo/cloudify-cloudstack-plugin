@@ -203,9 +203,10 @@ def start(ctx, **kwargs):
         raise RuntimeError('could not find node with ID {0}'
                            .format(instance_id))
 
-    #ctx.logger.info('starting node with details {0}'.format(node))
+    ctx.logger.info('starting node with details {0}'.format(node.name))
     cloud_driver.ex_start(node)
-    #node.ex_start()
+
+
 @operation
 def delete(ctx, **kwargs):
 
@@ -224,7 +225,7 @@ def delete(ctx, **kwargs):
         raise NameError('could not find node with ID: {0} '
                         .format(instance_id))
 
-    ctx.logger.info('destroying vm with details: {0}'.format(node))
+    ctx.logger.info('destroying vm with details: {0}'.format(node.name))
     cloud_driver.destroy_node(node)
 
 
@@ -248,7 +249,7 @@ def stop(ctx, **kwargs):
         raise RuntimeError('could not find node with ID {0}'
                            .format(instance_id))
 
-    ctx.logger.info('stopping node with details {0}'.format(node))
+    ctx.logger.info('stopping node with details {0}'.format(node.name))
     cloud_driver.ex_stop(node)
 
 
@@ -365,7 +366,11 @@ def disconnect_network(ctx, **kwargs):
 
     #ctx.logger.info('Adding a NIC to VM {0} in Network with id {1}'.format(node.name, nic.network_id))
 
-    cloud_driver.ex_remove_nic_from_node(nic=nic, node=node)
+    try:
+        cloud_driver.ex_remove_nic_from_node(nic=nic, node=node)
+    except Exception as e:
+        ctx.logger.warn('NIC may not have been removed: {0}'.format(str(e)))
+        return false
 
     return True
 
