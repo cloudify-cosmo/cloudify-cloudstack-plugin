@@ -336,7 +336,7 @@ def connect_network(ctx, **kwargs):
                         .format(network.name, nic_exists.id))
         return False
 
-    cloud_driver.ex_add_nic_to_node(node=node, network=network)
+    cloud_driver.ex_attach_nic_to_node(node=node, network=network)
     #ctx.runtime_properties['nic_id'] = result.id
 
     return True
@@ -357,7 +357,7 @@ def disconnect_network(ctx, **kwargs):
     #ctx.logger.info('Adding a NIC to VM {0} in Network with id {1}'.format(node.name, nic.network_id))
 
     try:
-        cloud_driver.ex_remove_nic_from_node(nic=nic, node=node)
+        cloud_driver.ex_detach_nic_from_node(nic=nic, node=node)
     except Exception as e:
         ctx.logger.warn('NIC may not have been removed: {0}'.format(str(e)))
         return false
