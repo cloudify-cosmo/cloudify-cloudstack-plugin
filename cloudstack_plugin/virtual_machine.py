@@ -336,7 +336,7 @@ def connect_network(ctx, **kwargs):
                     'vm: {0} with id: {1} in network {2} with id: {3}'
                     .format(node.name, network.name, instance_id, network_id,))
 
-    nic_exists = _get_nic_by_node_and_network_id(cloud_driver, node, network_id)
+    nic_exists = _get_nic_by_node_and_network_id(ctx, cloud_driver, node, network_id)
 
     #ctx.logger.info('Adding a NIC to VM {0} in Network {1}'.format(node.name, network.name))
 
