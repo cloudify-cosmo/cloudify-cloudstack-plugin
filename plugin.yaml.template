@@ -5,7 +5,7 @@
 plugins:
     cloudstack:
         executor: central_deployment_agent
-        source: https://github.com/boul/cloudify-cloudstack-plugin/archive/relationships.zip
+        source: https://github.com/boul/cloudify-cloudstack-plugin/archive/master.zip
 
 node_types:
     cloudify.cloudstack.virtual_machine:
