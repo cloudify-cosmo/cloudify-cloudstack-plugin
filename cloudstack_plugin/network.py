@@ -43,10 +43,10 @@ def create(ctx, **kwargs):
     network_offering = get_network_offering(cloud_driver, netoffer)
     # firewall_config = ctx.properties['firewall']['default']
 
-    # if network['vpc']:
-    #     vpc = get_vpc_id(cloud_driver, network['vpc'])
-    #     ctx.logger.info('DEBUG: VPC id: '.format(vpc.id))
-    vpc = False
+    if 'vpc' in network:
+        if network['vpc']:
+            vpc = get_vpc_id(cloud_driver, network['vpc'])
+            ctx.logger.info('DEBUG: VPC id: '.format(vpc.id))
 
     ctx.logger.info('Current node {0}{1}'.format(ctx.node_id, ctx.properties))
 
