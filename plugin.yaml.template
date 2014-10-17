@@ -90,8 +90,8 @@ node_types:
                 default: {}
         interfaces:
              cloudify.interfaces.lifecycle:
-                  - create: cloudstack.cloudstack_plugin.network.create
-                  - delete: cloudstack.cloudstack_plugin.network.delete
+                  - create: cloudstack.cloudstack_plugin.vpc.create
+                  - delete: cloudstack.cloudstack_plugin.vpc.delete
 
     cloudify.cloudstack.security_group:
         derived_from: cloudify.types.base
