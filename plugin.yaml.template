@@ -71,7 +71,7 @@ node_types:
                   - delete: cloudstack.cloudstack_plugin.network.delete
 
     cloudify.cloudstack.vpc:
-        derived_from: cloudify.types.subnet
+        derived_from: cloudify.types.network
         properties:
             network:
                 default: {}
