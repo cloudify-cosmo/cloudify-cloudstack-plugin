@@ -22,15 +22,15 @@ __author__ = 'uri1803'
 
 def _get_auth_from_context(ctx):
     auth_config = {}
-    auth_config.update(copy.deepcopy(ctx.properties['auth']))
+    auth_config.update(copy.deepcopy(ctx.properties['cloudstack_config']))
     return auth_config
 
 
 def get_cloud_driver(ctx):
     auth_config = _get_auth_from_context(ctx)
-    api_key = auth_config['API_KEY']
-    api_secret_key = auth_config['API_SECRET_KEY']
-    api_url = auth_config['API_URL']
+    api_key = auth_config['cs_api_key']
+    api_secret_key = auth_config['cs_secret_key']
+    api_url = auth_config['cs_api_url']
     driver = get_driver(Provider.CLOUDSTACK)
     libcloud.security.VERIFY_SSL_CERT = False
     return driver(key=api_key, secret=api_secret_key,url=api_url)
