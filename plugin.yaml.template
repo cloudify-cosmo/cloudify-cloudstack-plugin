@@ -70,6 +70,29 @@ node_types:
                   - create: cloudstack.cloudstack_plugin.network.create
                   - delete: cloudstack.cloudstack_plugin.network.delete
 
+    cloudify.cloudstack.vpc:
+        derived_from: cloudify.types.subnet
+        properties:
+            network:
+                default: {}
+            auth:
+                default:
+                    API_KEY: { get_input: cloudstack_key }
+                    API_SECRET_KEY: { get_input: cloudstack_secret }
+                    API_URL: { get_input: cloudstack_api_url }
+            firewall:
+                default: {}
+            use_external_resource:
+                default: false
+            resource_id:
+                default: ''
+            cloudstack_config:
+                default: {}
+        interfaces:
+             cloudify.interfaces.lifecycle:
+                  - create: cloudstack.cloudstack_plugin.network.create
+                  - delete: cloudstack.cloudstack_plugin.network.delete
+
     cloudify.cloudstack.security_group:
         derived_from: cloudify.types.base
         properties:
