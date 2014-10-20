@@ -41,7 +41,7 @@ def create(ctx, **kwargs):
     location = get_location(cloud_driver, zone)
     netoffer = network['service_offering']
     network_offering = get_network_offering(cloud_driver, netoffer)
-    # firewall_config = ctx.properties['firewall']['default']
+    firewall_config = ctx.properties['firewall']
 
     if 'vpc' in network:
         if network['vpc']:
