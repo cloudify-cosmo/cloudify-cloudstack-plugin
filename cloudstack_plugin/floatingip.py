@@ -39,5 +39,5 @@ def create(ctx, **kwargs):
 
 
 
-@operation
-def delete(ctx, **kwargs):
+# @operation
+# def delete(ctx, **kwargs):
