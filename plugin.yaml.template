@@ -20,9 +20,9 @@ node_types:
                 default: ''
             cloudstack_config:
                 default:
-                    API_KEY: { get_input: cloudstack_key }
-                    API_SECRET_KEY: { get_input: cloudstack_secret }
-                    API_URL: { get_input: cloudstack_api_url }
+                    cs_api_key: { get_input: cloudstack_key }
+                    cs_secret_key: { get_input: cloudstack_secret }
+                    cs_api_url: { get_input: cloudstack_cs_api_url }
         interfaces:
             cloudify.interfaces.lifecycle:
                 - create: cloudstack.cloudstack_plugin.virtual_machine.create
@@ -58,9 +58,9 @@ node_types:
                 default: ''
             cloudstack_config:
                 default:
-                    API_KEY: { get_input: cloudstack_key }
-                    API_SECRET_KEY: { get_input: cloudstack_secret }
-                    API_URL: { get_input: cloudstack_api_url }
+                    cs_api_key: { get_input: cloudstack_key }
+                    cs_secret_key: { get_input: cloudstack_secret }
+                    cs_api_url: { get_input: cloudstack_cs_api_url }
         interfaces:
              cloudify.interfaces.lifecycle:
                   - create: cloudstack.cloudstack_plugin.network.create
@@ -79,9 +79,9 @@ node_types:
                 default: ''
             cloudstack_config:
                 default:
-                    API_KEY: { get_input: cloudstack_key }
-                    API_SECRET_KEY: { get_input: cloudstack_secret }
-                    API_URL: { get_input: cloudstack_api_url }
+                    cs_api_key: { get_input: cloudstack_key }
+                    cs_secret_key: { get_input: cloudstack_secret }
+                    cs_api_url: { get_input: cloudstack_cs_api_url }
         interfaces:
              cloudify.interfaces.lifecycle:
                   - create: cloudstack.cloudstack_plugin.network.create
@@ -98,9 +98,9 @@ node_types:
                 default: ''
             cloudstack_config:
                 default:
-                    API_KEY: { get_input: cloudstack_key }
-                    API_SECRET_KEY: { get_input: cloudstack_secret }
-                    API_URL: { get_input: cloudstack_api_url }
+                    cs_api_key: { get_input: cloudstack_key }
+                    cs_secret_key: { get_input: cloudstack_secret }
+                    cs_api_url: { get_input: cloudstack_cs_api_url }
             rules:
                 default: []
             disable_default_egress_rules:
@@ -122,9 +122,9 @@ node_types:
                 default: ''
             cloudstack_config:
                 default:
-                    API_KEY: { get_input: cloudstack_key }
-                    API_SECRET_KEY: { get_input: cloudstack_secret }
-                    API_URL: { get_input: cloudstack_api_url }
+                    cs_api_key: { get_input: cloudstack_key }
+                    cs_secret_key: { get_input: cloudstack_secret }
+                    cs_api_url: { get_input: cloudstack_cs_api_url }
         interfaces:
              cloudify.interfaces.lifecycle:
                   - create: cloudstack.cloudstack_plugin.floatingip.create
