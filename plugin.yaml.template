@@ -7,6 +7,7 @@ plugins:
         executor: central_deployment_agent
         source: https://github.com/boul/cloudify-cloudstack-plugin/archive/acls.zip
 
+
 node_types:
     cloudify.cloudstack.virtual_machine:
         derived_from: cloudify.types.host
@@ -50,7 +51,7 @@ node_types:
 
 
     cloudify.cloudstack.network:
-        derived_from: cloudify.types.network
+        derived_from: cloudify.types.subnet
         properties:
             network: 
                 default: {}
@@ -71,7 +72,7 @@ node_types:
                   - delete: cloudstack.cloudstack_plugin.network.delete
 
     cloudify.cloudstack.vpc:
-        derived_from: cloudify.types.router
+        derived_from: cloudify.types.network
         properties:
             network:
                 default: {}
