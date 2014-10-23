@@ -5,7 +5,7 @@
 plugins:
     cloudstack:
         executor: central_deployment_agent
-        source: https://github.com/boul/cloudify-cloudstack-plugin/archive/master.zip
+        source: https://github.com/boul/cloudify-cloudstack-plugin/archive/floatingip.zip
 
 node_types:
     cloudify.cloudstack.virtual_machine:
@@ -122,21 +122,21 @@ node_types:
 
  
 
-    # cloudify.cloudstack.floatingip:
-    #     derived_from: cloudify.types.base
-    #     properties:
-    #         floatingip:
-    #             default: {}
-    #         use_external_resource:
-    #             default: false
-    #         resource_id:
-    #             default: ''
-    #         cloudstack_config:
-    #             default: {}
-    #     interfaces:
-    #          cloudify.interfaces.lifecycle:
-    #               - create: cloudstack.neutron_plugin.floatingip.create
-    #               - delete: cloudstack.neutron_plugin.floatingip.delete
+    cloudify.cloudstack.floatingip:
+        derived_from: cloudify.types.base
+        properties:
+            floatingip:
+                default: {}
+            use_external_resource:
+                default: false
+            resource_id:
+                default: ''
+            cloudstack_config:
+                default: {}
+        interfaces:
+             cloudify.interfaces.lifecycle:
+                  - create: cloudstack.cloudstack_plugin.floatingip.create
+                  - delete: cloudstack.cloudstack_plugin.floatingip.delete
 
 relationships:
 #     cloudify.cloudstack.port_connected_to_security_group:
