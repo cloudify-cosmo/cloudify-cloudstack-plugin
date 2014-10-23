@@ -18,7 +18,7 @@ from libcloud.compute.types import Provider
 from cloudstack_plugin.cloudstack_common import get_cloud_driver
 from pprint import pprint
 
-__author__ = 'adaml'
+__author__ = 'adaml, boul'
 
 
 def _get_server_from_context(ctx):
