@@ -118,13 +118,14 @@ node_types:
                 - create: cloudstack.cloudstack_plugin.security_group.create
                 - delete: cloudstack.cloudstack_plugin.security_group.delete
 
-    
-
- 
-
     cloudify.cloudstack.floatingip:
         derived_from: cloudify.types.base
         properties:
+            auth: 
+                default:
+                    API_KEY: { get_input: cloudstack_key }
+                    API_SECRET_KEY: { get_input: cloudstack_secret }
+                    API_URL: { get_input: cloudstack_api_url }
             floatingip:
                 default: {}
             use_external_resource:
