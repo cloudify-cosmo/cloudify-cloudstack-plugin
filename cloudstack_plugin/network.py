@@ -41,7 +41,6 @@ def create(ctx, **kwargs):
     location = get_location(cloud_driver, zone)
     netoffer = network['service_offering']
     network_offering = get_network_offering(cloud_driver, netoffer)
-    firewall_config = ctx.properties['firewall']
 
     if 'vpc' in network:
         if network['vpc']:
@@ -73,15 +72,18 @@ def create(ctx, **kwargs):
             acl_list = create_acl_list(cloud_driver, network_name,
                                        vpc.id, net.id)
 
-            for acl in firewall_config:
-                acl_cidr = acl.get('cidr')
-                acl_protocol = acl.get('protocol')
-                acl_ports = acl.get('ports')
-                acl_type = acl.get('type')
+            if 'firewall' in ctx.properties:
+                firewall_config = ctx.properties['firewall']
 
-                for port in acl_ports:
-                    create_acl(cloud_driver, acl_protocol, acl_list.id,
-                               acl_cidr, port, port, acl_type)
+                for acl in firewall_config:
+                    acl_cidr = acl.get('cidr')
+                    acl_protocol = acl.get('protocol')
+                    acl_ports = acl.get('ports')
+                    acl_type = acl.get('type')
+
+                    for port in acl_ports:
+                        create_acl(cloud_driver, acl_protocol, acl_list.id,
+                                   acl_cidr, port, port, acl_type)
 
         else:
             ctx.logger.info('creating network: {0}'.format(network_name))
@@ -92,21 +94,19 @@ def create(ctx, **kwargs):
                 network_offering=network_offering,
                 location=location)
 
-            # Create firewall rules for new network
-            egress_rules = firewall_config['egress']
-            egress_ports = egress_rules['ports']
+            if 'firewall' in ctx.properties:
+                firewall_config = ctx.properties['firewall']
 
-            rules_to_apply = ctx.node.properties['firewall']
-            for rule in rules_to_apply:
-                rule_cidr = rule.get('cidr')
-                rule_protocol = rule.get('protocol')
-                rule_ports = rule.get('ports')
+                for rule in firewall_config:
+                    rule_cidr = rule.get('cidr')
+                    rule_protocol = rule.get('protocol')
+                    rule_ports = rule.get('ports')
 
-            for port in rule_ports:
-                _create_egress_rules(cloud_driver, net.id,
-                                     rule_cidr,
-                                     rule_protocol,
-                                     port, port)
+                    for port in rule_ports:
+                        _create_egress_rules(cloud_driver, net.id,
+                                             rule_cidr,
+                                             rule_protocol,
+                                             port, port)
 
     else:
         ctx.logger.info('using existing management network {0}'.
