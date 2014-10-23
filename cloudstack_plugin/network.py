@@ -73,8 +73,7 @@ def create(ctx, **kwargs):
             acl_list = create_acl_list(cloud_driver, network_name,
                                        vpc.id, net.id)
 
-            acls_to_apply = ctx.node.properties['firewall']
-            for acl in acls_to_apply:
+            for acl in firewall_config:
                 acl_cidr = acl.get('cidr')
                 acl_protocol = acl.get('protocol')
                 acl_ports = acl.get('ports')
