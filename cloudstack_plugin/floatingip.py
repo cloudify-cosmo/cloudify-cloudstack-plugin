@@ -66,9 +66,9 @@ def create(ctx, **kwargs):
     else:
         raise NonRecoverableError('Cannot resole network or vpc id')
 
-    ctx.runtime_properties['external_id'] = fip['id']
+    ctx.runtime_properties['external_id'] = fip.id
     ctx.runtime_properties['external_type'] = 'publicip'
-    ctx.runtime_properties['floating_ip_address'] = fip['address']
+    ctx.runtime_properties['floating_ip_address'] = fip.address
 
 
 
