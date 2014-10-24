@@ -64,8 +64,8 @@ def create(ctx, **kwargs):
 
     elif floatingip['floating_network_id'] is not None:
 
-        ctx.logger.info('Acquiring IP for network with id: {0}'.format(floatingip[
-            'floating_network_id']))
+        ctx.logger.info('Acquiring IP for network with id: {0}'.
+                        format(floatingip['floating_network_id']))
 
         fip = cloud_driver.ex_allocate_public_ip(network_id=floatingip[
             'floating_network_id'])
