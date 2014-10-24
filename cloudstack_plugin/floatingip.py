@@ -51,7 +51,7 @@ def create(ctx, **kwargs):
     # Not belonging to a VPC then we need the network id.
     elif 'floating_network_vpc_id' not in floatingip:
         floatingip['floating_network_id'] = get_network(
-            cloud_driver, floatingip['floating_network_name,']).id
+            cloud_driver, floatingip['floating_network_name']).id
 
     else:
         raise NonRecoverableError('Cannot find the vpc_id or network_id, '
