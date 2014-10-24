@@ -32,15 +32,7 @@ def create(ctx, **kwargs):
     }
     floatingip.update(ctx.properties['floatingip'])
 
-    # ctx.logger.debug('getting id for:{0}'.format(
-    #     floatingip['floating_network_name']))
-    # vpc_result = get_network(
-    #     cloud_driver, floatingip['floating_network_name'])
-    # ctx.logger.info(repr(vpc_result))
-    #
-    # ctx.logger.info('getting id for:{0} networkid {1}, vpcid{2}'.format(
-    #     floatingip['floating_network_name'], vpc_result.id,
-    #     vpc_result.extra['vpc_id']))
+    vpc_result.extra['vpc_id']))
 
     # get the ID's
     if 'floating_network_name' in floatingip:
@@ -78,7 +70,26 @@ def create(ctx, **kwargs):
     ctx.runtime_properties['floating_ip_address'] = fip.address
 
 
+@operation
+def delete(ctx, **kwargs):
+
+    cloud_driver = get_cloud_driver(ctx)
+
+    fip_id = ctx.runtime_properties['external_id']
+    fip = _get_floating_ip_by_id(ctx, cloud_driver, fip_id)
+
+    ctx.logger.info('Deleting floating ip: {0}'.format(fip))
+
+    cloud_driver.ex_release_public_ip(address=fip)
 
 
-# @operation
-# def delete(ctx, **kwargs):
+def _get_floating_ip_by_id(ctx, cloud_driver, floating_ip_id):
+
+    fips = [fip for fip in cloud_driver.ex_list_public_ips() if
+                floating_ip_id == fip.id]
+
+    if not fips:
+        ctx.logger.info('could not find floating ip by ID {0}'.format(floating_ip_id))
+        return None
+
+    return fips[0]
