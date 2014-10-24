@@ -48,6 +48,10 @@ def create(ctx, **kwargs):
             cloud_driver, floatingip['floating_network_name']
         ).extra['vpc_id']
 
+        if floatingip['floating_network_vpc_id'] is None:
+            del floatingip['floating_network_vpc_id']
+
+
         bla2 = get_network(
             cloud_driver, floatingip['floating_network_name']
         ).extra['vpc_id']
