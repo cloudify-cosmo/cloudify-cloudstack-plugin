@@ -32,8 +32,6 @@ def create(ctx, **kwargs):
     }
     floatingip.update(ctx.properties['floatingip'])
 
-    vpc_result.extra['vpc_id']))
-
     # get the ID's
     if 'floating_network_name' in floatingip:
         floatingip['floating_network_vpc_id'] = get_network(
@@ -89,7 +87,8 @@ def _get_floating_ip_by_id(ctx, cloud_driver, floating_ip_id):
                 floating_ip_id == fip.id]
 
     if not fips:
-        ctx.logger.info('could not find floating ip by ID {0}'.format(floating_ip_id))
+        ctx.logger.info('could not find floating ip by ID {0}'.
+                        format(floating_ip_id))
         return None
 
     return fips[0]
