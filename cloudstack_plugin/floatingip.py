@@ -56,10 +56,17 @@ def create(ctx, **kwargs):
     # If we get a vpc-id let's use that otherwise use the network-id
     if floatingip['floating_network_vpc_id'] is not None:
 
+        ctx.logger.info('Acquiring IP for VPC with id: {0}'.format(floatingip[
+            'floating_network_vpc_id']))
+        
         fip = cloud_driver.ex_allocate_public_ip(vpc_id=floatingip[
             'floating_network_vpc_id'])
 
     elif floatingip['floating_network_id'] is not None:
+
+        ctx.logger.info('Acquiring IP for VPC with id: {0}'.format(floatingip[
+            'floating_network_id']))
+
         fip = cloud_driver.ex_allocate_public_ip(network_id=floatingip[
             'floating_network_id'])
 
