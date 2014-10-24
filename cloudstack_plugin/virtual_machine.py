@@ -360,7 +360,7 @@ def disconnect_network(ctx, **kwargs):
         cloud_driver.ex_detach_nic_from_node(nic=nic, node=node)
     except Exception as e:
         ctx.logger.warn('NIC may not have been removed: {0}'.format(str(e)))
-        return false
+        return False
 
     return True
 
