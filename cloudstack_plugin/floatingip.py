@@ -36,9 +36,9 @@ def create(ctx, **kwargs):
         floatingip['floating_network_name']))
     vpc_result = get_network(
         cloud_driver, floatingip['floating_network_name'])
-    ctx.logger.debug(repr(vpc_result))
+    ctx.logger.info(repr(vpc_result))
 
-    ctx.logger.debug('getting id for:{0} networkid {1}, vpcid{2}'.format(
+    ctx.logger.info('getting id for:{0} networkid {1}, vpcid{2}'.format(
         floatingip['floating_network_name'], vpc_result.id,
         vpc_result.extra['vpc_id']))
 
