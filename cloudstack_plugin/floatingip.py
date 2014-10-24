@@ -18,6 +18,7 @@ from cloudstack_plugin.cloudstack_common import get_cloud_driver
 from network import get_network
 from cloudify.exceptions import NonRecoverableError
 
+
 __author__ = 'boul'
 
 
@@ -31,15 +32,27 @@ def create(ctx, **kwargs):
     }
     floatingip.update(ctx.properties['floatingip'])
 
+    ctx.logger.debug('getting id for:{0}'.format(
+        floatingip['floating_network_name']))
+    vpc_result = get_network(
+        cloud_driver, floatingip['floating_network_name'])
+    ctx.logger.debug(repr(vpc_result))
+
+    ctx.logger.debug('getting id for:{0} networkid {1}, vpcid{2}'.format(
+        floatingip['floating_network_name'], vpc_result.id,
+        vpc_result.extra['vpc_id']))
+
     # Check if network belongs to a VPC if so, we need it's id.
     if 'floating_network_name' in floatingip:
         floatingip['floating_network_vpc_id'] = get_network(
             cloud_driver, floatingip['floating_network_name']
         ).extra['vpc_id']
+
     # Not belonging to a VPC then we need the network id.
     elif 'floating_network_vpc_id' not in floatingip:
         floatingip['floating_network_id'] = get_network(
             cloud_driver, floatingip['floating_network_name,']).id
+
     else:
         raise NonRecoverableError('Cannot find the vpc_id or network_id, '
                                   'Does this network exist?')
