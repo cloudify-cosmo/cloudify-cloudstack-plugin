@@ -53,25 +53,17 @@ def create(ctx, **kwargs):
         floatingip['floating_network_id'] = get_network(
             cloud_driver, floatingip['floating_network_name']).id
 
+        bla = get_network(
+            cloud_driver, floatingip['floating_network_name']).id
+        ctx.logger.info('network id is {0} '.format(bla))
+
+
     else:
         raise NonRecoverableError('Cannot find the vpc_id or network_id, '
                                   'Does this network exist?')
-    #
-    #  # Sugar: floating_network_name -> (resolve) -> floating_network_id
-    # if 'floating_network_name' in floatingip:
-    #     floatingip['floating_network_id'] = neutron_client.cosmo_get_named(
-    #         'network', floatingip['floating_network_name'])['id']
-    #     del floatingip['floating_network_name']
-    # elif 'floating_network_id' not in floatingip:
-    #     provider_context = provider(ctx)
-    #     ext_network = provider_context.ext_network
-    #     if ext_network:
-    #         floatingip['floating_network_id'] = ext_network['id']
-    # else:
-    #     raise NonRecoverableError('Missing floating network id or name')
 
     if floatingip['floating_network_vpc_id'] is not None:
-        args = {'vpc_id' : floatingip['floating_network_vpc_id']}
+        args = {'vpc_id': floatingip['floating_network_vpc_id']}
     else:
         args = {'network_id': floatingip['floating_network_id']}
 
