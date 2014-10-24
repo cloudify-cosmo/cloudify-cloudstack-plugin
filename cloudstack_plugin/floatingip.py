@@ -15,7 +15,8 @@
 
 from cloudify.decorators import operation
 from cloudstack_plugin.cloudstack_common import get_cloud_driver
-
+from network import get_network
+from cloudify.exceptions import NonRecoverableError
 
 __author__ = 'boul'
 
@@ -30,7 +31,38 @@ def create(ctx, **kwargs):
     }
     floatingip.update(ctx.properties['floatingip'])
 
-    fip = cloud_driver.ex_allocate_public_ip()
+    # Check if network belongs to a VPC if so, we need it's id.
+    if 'floating_network_name' in floatingip:
+        floatingip['floating_network_vpc_id'] = get_network(
+            cloud_driver, floatingip['floating_network_name,']
+        ).extra['vpc_id']
+    # Not belonging to a VPC then we need the network id.
+    elif 'floating_network_vpc_id' not in floatingip:
+        floatingip['floating_network_id'] = get_network(
+            cloud_driver, floatingip['floating_network_name,']).id
+    else:
+        raise NonRecoverableError('Cannot find the vpc_id or network_id, '
+                                  'Does this network exist?')
+    #
+    #  # Sugar: floating_network_name -> (resolve) -> floating_network_id
+    # if 'floating_network_name' in floatingip:
+    #     floatingip['floating_network_id'] = neutron_client.cosmo_get_named(
+    #         'network', floatingip['floating_network_name'])['id']
+    #     del floatingip['floating_network_name']
+    # elif 'floating_network_id' not in floatingip:
+    #     provider_context = provider(ctx)
+    #     ext_network = provider_context.ext_network
+    #     if ext_network:
+    #         floatingip['floating_network_id'] = ext_network['id']
+    # else:
+    #     raise NonRecoverableError('Missing floating network id or name')
+
+    if floatingip['floating_network_vpc_id'] is not None:
+        args = {'vpc_id' : floatingip['floating_network_vpc_id']}
+    else:
+        args = {'network_id': floatingip['floating_network_id']}
+
+    fip = cloud_driver.ex_allocate_public_ip(args)
 
     ctx.runtime_properties[external_id] = fip['id']
     ctx.runtime_properties[external_type] = 'publicip'
