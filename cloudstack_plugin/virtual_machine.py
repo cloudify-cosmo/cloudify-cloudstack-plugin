@@ -364,12 +364,12 @@ def disconnect_network(ctx, **kwargs):
 
     return True
 
-@operation
-def connect_floating_ip
-
-    server_id = ctx.instance.runtime_properties[instance_id]
-    floating_ip_id = ctx.related.runtime_properties[external_id]
-    floating_ip_address = ctx.related.runtime_properties[floating_ip_address
+# @operation
+# def connect_floating_ip
+#
+#     server_id = ctx.instance.runtime_properties[instance_id]
+#     floating_ip_id = ctx.related.runtime_properties[external_id]
+#     floating_ip_address = ctx.related.runtime_properties[floating_ip_address
 
 
 
