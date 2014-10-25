@@ -3,6 +3,9 @@
 ##################################################################################
 
 plugins:
+    libcloud:
+        executor: central_deployment_agent
+        source: https://github.com/boul/libcloud/archive/pending.zip
     cloudstack:
         executor: central_deployment_agent
         source: https://github.com/boul/cloudify-cloudstack-plugin/archive/floatingip.zip
@@ -12,6 +15,7 @@ node_types:
         derived_from: cloudify.types.host
         properties:
             server: {}
+            nat: {}
             use_external_resource:
                 default: false
             resource_id:
