@@ -15,7 +15,8 @@ node_types:
         derived_from: cloudify.types.host
         properties:
             server: {}
-            nat: {}
+            nat: 
+                default: {}
             use_external_resource:
                 default: false
             resource_id:
