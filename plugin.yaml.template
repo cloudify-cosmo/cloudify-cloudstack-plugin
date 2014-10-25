@@ -3,7 +3,7 @@
 ##################################################################################
 
 plugins:
-    libcloud:
+    alibcloud:
         executor: central_deployment_agent
         source: https://github.com/boul/libcloud/archive/pending.zip
     cloudstack:
