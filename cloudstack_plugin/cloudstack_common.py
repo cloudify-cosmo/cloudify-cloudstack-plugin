@@ -87,3 +87,12 @@ def get_public_ip_by_id(ctx, cloud_driver, public_ip_id):
         return None
 
     return public_ips[0]
+
+
+def get_portmaps_by_node_id(ctx, cloud_driver, node_id):
+
+    portmaps = [portmap for portmap in
+                cloud_driver.ex_list_port_forwarding_rules()
+                if node_id == portmap.node.id]
+
+    return portmaps

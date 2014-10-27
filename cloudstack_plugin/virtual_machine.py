@@ -19,7 +19,7 @@ from cloudify.decorators import operation
 from libcloud.compute.types import Provider
 from cloudstack_plugin.cloudstack_common import get_cloud_driver, \
     get_node_by_id, get_network_by_id, get_nic_by_node_and_network_id, \
-    get_public_ip_by_id
+    get_public_ip_by_id, get_portmaps_by_node_id
 
 
 __author__ = 'adaml, boul'
@@ -316,6 +316,7 @@ def connect_network(ctx, **kwargs):
 
     return True
 
+
 @operation
 def disconnect_network(ctx, **kwargs):
 
@@ -340,6 +341,7 @@ def disconnect_network(ctx, **kwargs):
         return False
 
     return True
+
 
 @operation
 def connect_floating_ip(ctx, **kwargs):
@@ -400,6 +402,28 @@ def connect_floating_ip(ctx, **kwargs):
     return True
 
 
+@operation
 def disconnect_floating_ip(ctx, **kwargs):
+
+    cloud_driver = get_cloud_driver(ctx)
+    node_id = ctx.runtime_properties['instance_id']
+    node = get_node_by_id(ctx, cloud_driver, node_id)
+    portmaps = get_portmaps_by_node_id(ctx, cloud_driver, node_id)
+
+    for portmap in portmaps:
+
+        try:
+            cloud_driver.ex_delete_port_forwarding_rule(node=node, rule=portmap)
+        except Exception as e:
+            ctx.logger.warn('Port forward may not have been removed: '
+                            '{0}'.format(str(e)))
+        return False
+
+    return True
+
+
+
+
+
 
     return True
