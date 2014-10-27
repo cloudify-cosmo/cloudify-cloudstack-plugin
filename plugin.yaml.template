@@ -152,8 +152,8 @@ relationships:
         derived_from: cloudify.relationships.connected_to
         source_interfaces:
             cloudify.interfaces.relationship_lifecycle:
-                - establish: cloudstack.cloudstack_plugin.virtual_machine.connect_floatingip
-                - unlink: cloudstack.cloudstack_plugin.virtual_machine.disconnect_floatingip
+                - establish: cloudstack.cloudstack_plugin.virtual_machine.connect_floating_ip
+                - unlink: cloudstack.cloudstack_plugin.virtual_machine.disconnect_floating_ip
 
     # cloudify.cloudstack.server_connected_to_security_group:
     #     derived_from: cloudify.relationships.connected_to
