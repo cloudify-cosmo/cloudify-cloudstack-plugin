@@ -54,7 +54,7 @@ def create(ctx, **kwargs):
 
     ctx.logger.info('getting required size {0}'.format(size_name))
     sizes = [size for size in cloud_driver.list_sizes() if size.name
-                                                          == size_name]
+             == size_name]
     if sizes is None:
         raise RuntimeError(
             'Could not find size with name {0}'.format(size_name))
@@ -351,9 +351,9 @@ def connect_floating_ip(ctx, **kwargs):
     portmaps = ctx.properties['portmaps']
 
     if not portmaps:
-         raise NonRecoverableError('Relation defined but no portmaps set'
-                                   ' either remove relation or'
-                                   ' define the portmaps')
+        raise NonRecoverableError('Relation defined but no portmaps set'
+                                  ' either remove relation or'
+                                  ' define the portmaps')
 
     server_id = ctx.runtime_properties['instance_id']
     floating_ip_id = ctx.related.runtime_properties['external_id']
@@ -361,11 +361,27 @@ def connect_floating_ip(ctx, **kwargs):
 
     for portmap in portmaps:
 
-        protocol = portmap['protocol']
-        pub_port = portmap['public_port']
-        pub_end_port = portmap['public_end_port']
-        priv_port = portmap['private_port']
-        priv_end_port = portmap['private_end_port']
+        protocol = portmap.get(['protocol'][0], None)
+        pub_port = portmap.get(['public_port'][0], None)
+        pub_end_port = portmap.get(['public_end_port'][0], None)
+        priv_port = portmap.get(['private_port'][0], None)
+        priv_end_port = portmap.get(['private_end_port'][0], None)
+
+        #If not specified assume closed
+        open_fw = portmap.get(['open_firewall'][0], False)
+
+        if pub_port is None:
+            raise NonRecoverableError('Please specify the public_port')
+        elif pub_end_port is None:
+            pub_end_port = pub_port
+
+        if priv_port is None:
+            raise NonRecoverableError('Please specify the private_port')
+        elif priv_end_port is None:
+            priv_end_port = priv_port
+
+        if protocol is None:
+            raise NonRecoverableError('Please specify the protocol TCP or UDP')
 
         node = get_node_by_id(ctx, cloud_driver, server_id)
         public_ip = get_public_ip_by_id(ctx, cloud_driver, floating_ip_id)
@@ -379,7 +395,7 @@ def connect_floating_ip(ctx, **kwargs):
                                                     private_port=priv_port,
                                                     private_end_port=
                                                     priv_end_port,
-                                                    openfirewall=False)
+                                                    openfirewall=open_fw)
 
     return True
 
