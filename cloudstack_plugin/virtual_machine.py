@@ -345,7 +345,7 @@ def disconnect_network(ctx, **kwargs):
 def connect_floating_ip(ctx, **kwargs):
 
     cloud_driver = get_cloud_driver(ctx)
-    server_config = _get_server_from_context(ctx)
+    #server_config = _get_server_from_context(ctx)
 
     ctx.logger.debug('reading portmap configuration.')
     portmaps = ctx.properties['portmaps']
@@ -355,7 +355,7 @@ def connect_floating_ip(ctx, **kwargs):
                                    ' either remove relation or'
                                    ' define the portmaps')
 
-    server_id = ctx.instance.runtime_properties['instance_id']
+    server_id = ctx.runtime_properties['instance_id']
     floating_ip_id = ctx.related.runtime_properties['external_id']
 #    floating_ip_address = ctx.related.runtime_properties['floating_ip_address']
 
