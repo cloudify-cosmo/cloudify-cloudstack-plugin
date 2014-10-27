@@ -13,7 +13,7 @@
 # * See the License for the specific language governing permissions and
 # * limitations under the License.
 import copy
-
+from cloudify.exceptions import NonRecoverableError
 from cloudify.decorators import operation
 
 from libcloud.compute.types import Provider
@@ -348,7 +348,12 @@ def connect_floating_ip(ctx, **kwargs):
     server_config = _get_server_from_context(ctx)
 
     ctx.logger.debug('reading portmap configuration.')
-    portmaps = ctx.properties['rules']
+    portmaps = ctx.properties['portmaps']
+
+    if not portmaps:
+         raise NonRecoverableError('Relation defined but no portmaps set'
+                                   ' either remove relation or'
+                                   ' define the portmaps')
 
     server_id = ctx.instance.runtime_properties['instance_id']
     floating_ip_id = ctx.related.runtime_properties['external_id']
