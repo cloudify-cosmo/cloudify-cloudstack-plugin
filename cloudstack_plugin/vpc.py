@@ -18,7 +18,7 @@ from cloudify.decorators import operation
 from cloudstack_plugin.cloudstack_common import get_cloud_driver
 
 
-__author__ = 'jedeko'
+__author__ = 'jedeko, boul'
 
 
 @operation

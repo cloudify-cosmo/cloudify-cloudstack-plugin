@@ -1,4 +1,4 @@
-__author__ = 'adaml, Roeland Kuipers'
+__author__ = 'adaml, boul, jedeko'
 from setuptools import setup
 
 setup(

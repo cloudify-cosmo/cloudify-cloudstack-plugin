@@ -12,11 +12,10 @@ node_types:
         derived_from: cloudify.types.host
         properties:
             server: {}
-            auth:
-                default:
-                    API_KEY: { get_input: cloudstack_key }
-                    API_SECRET_KEY: { get_input: cloudstack_secret }
-                    API_URL: { get_input: cloudstack_api_url }
+            portmaps: 
+                default: {}
+            network:
+                default: {}
             use_external_resource:
                 default: false
             resource_id:
@@ -24,7 +23,10 @@ node_types:
             management_network_name:
                 default: ''
             cloudstack_config:
-                default: {}
+                default:
+                    cs_api_key: { get_input: cloudstack_key }
+                    cs_secret_key: { get_input: cloudstack_secret }
+                    cs_api_url: { get_input: cloudstack_api_url }
         interfaces:
             cloudify.interfaces.lifecycle:
                 - create: cloudstack.cloudstack_plugin.virtual_machine.create
@@ -33,7 +35,7 @@ node_types:
                 - delete: cloudstack.cloudstack_plugin.virtual_machine.delete
             cloudify.interfaces.host:
                 - get_state: cloudstack.cloudstack_plugin.virtual_machine.get_state
-    
+
     cloudify.cloudstack.windows_server:
         derived_from: cloudify.cloudstack.virtual_machine
         interfaces:
@@ -52,11 +54,6 @@ node_types:
         properties:
             network: 
                 default: {}
-            auth: 
-                default:
-                    API_KEY: { get_input: cloudstack_key }
-                    API_SECRET_KEY: { get_input: cloudstack_secret }
-                    API_URL: { get_input: cloudstack_api_url }
             firewall: 
                 default: {}
             use_external_resource:
@@ -64,7 +61,10 @@ node_types:
             resource_id:
                 default: ''
             cloudstack_config:
-                default: {}
+                default:
+                    cs_api_key: { get_input: cloudstack_key }
+                    cs_secret_key: { get_input: cloudstack_secret }
+                    cs_api_url: { get_input: cloudstack_api_url }
         interfaces:
              cloudify.interfaces.lifecycle:
                   - create: cloudstack.cloudstack_plugin.network.create
@@ -75,11 +75,6 @@ node_types:
         properties:
             network:
                 default: {}
-            auth:
-                default:
-                    API_KEY: { get_input: cloudstack_key }
-                    API_SECRET_KEY: { get_input: cloudstack_secret }
-                    API_URL: { get_input: cloudstack_api_url }
             firewall:
                 default: {}
             use_external_resource:
@@ -87,7 +82,10 @@ node_types:
             resource_id:
                 default: ''
             cloudstack_config:
-                default: {}
+                default:
+                    cs_api_key: { get_input: cloudstack_key }
+                    cs_secret_key: { get_input: cloudstack_secret }
+                    cs_api_url: { get_input: cloudstack_api_url }
         interfaces:
              cloudify.interfaces.lifecycle:
                   - create: cloudstack.cloudstack_plugin.vpc.create
@@ -98,17 +96,15 @@ node_types:
         properties:
             security_group:
                 default: {}
-            auth: 
-                default:
-                    API_KEY: { get_input: cloudstack_key }
-                    API_SECRET_KEY: { get_input: cloudstack_secret }
-                    API_URL: { get_input: cloudstack_api_url }
             use_external_resource:
                 default: false
             resource_id:
                 default: ''
             cloudstack_config:
-                default: {}
+                default:
+                    cs_api_key: { get_input: cloudstack_key }
+                    cs_secret_key: { get_input: cloudstack_secret }
+                    cs_api_url: { get_input: cloudstack_api_url }
             rules:
                 default: []
             disable_default_egress_rules:
@@ -119,24 +115,21 @@ node_types:
                 - delete: cloudstack.cloudstack_plugin.security_group.delete
 
     
-
- 
-
-    # cloudify.cloudstack.floatingip:
-    #     derived_from: cloudify.types.base
-    #     properties:
-    #         floatingip:
-    #             default: {}
-    #         use_external_resource:
-    #             default: false
-    #         resource_id:
-    #             default: ''
-    #         cloudstack_config:
-    #             default: {}
-    #     interfaces:
-    #          cloudify.interfaces.lifecycle:
-    #               - create: cloudstack.neutron_plugin.floatingip.create
-    #               - delete: cloudstack.neutron_plugin.floatingip.delete
+    cloudify.cloudstack.floatingip:
+        derived_from: cloudify.types.base
+        properties:
+            floatingip:
+                default: {}
+            use_external_resource:
+                default: false
+            resource_id:
+                default: ''
+            cloudstack_config:
+                default:
+                    cs_api_key: { get_input: cloudstack_key }
+                    cs_secret_key: { get_input: cloudstack_secret }
+                    cs_api_url: { get_input: cloudstack_api_url }
+       
 
 relationships:
 #     cloudify.cloudstack.port_connected_to_security_group:
@@ -152,12 +145,19 @@ relationships:
 #                 - establish: cloudstack.neutron_plugin.router.connect_subnet
 #                 - unlink: cloudstack.neutron_plugin.router.disconnect_subnet
 
-#     cloudify.cloudstack.server_connected_to_floating_ip:
-#         derived_from: cloudify.relationships.connected_to
-#         source_interfaces:
-#             cloudify.interfaces.relationship_lifecycle:
-#                 - establish: cloudstack.nova_plugin.server.connect_floatingip
-#                 - unlink: cloudstack.nova_plugin.server.disconnect_floatingip
+    cloudify.cloudstack.virtual_machine_connected_to_floating_ip:
+        derived_from: cloudify.relationships.connected_to
+        source_interfaces:
+            cloudify.interfaces.relationship_lifecycle:
+                - establish: cloudstack.cloudstack_plugin.virtual_machine.connect_floating_ip
+                - unlink: cloudstack.cloudstack_plugin.virtual_machine.disconnect_floating_ip
+
+    cloudify.cloudstack.floating_ip_connected_to_network:
+        derived_from: cloudify.relationships.connected_to
+        source_interfaces:
+            cloudify.interfaces.relationship_lifecycle:
+                - establish: cloudstack.cloudstack_plugin.floatingip.connect_network
+                - unlink: cloudstack.cloudstack_plugin.floatingip.disconnect_network
 
     # cloudify.cloudstack.server_connected_to_security_group:
     #     derived_from: cloudify.relationships.connected_to
