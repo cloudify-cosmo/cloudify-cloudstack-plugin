@@ -148,7 +148,7 @@ relationships:
 #                 - establish: cloudstack.neutron_plugin.router.connect_subnet
 #                 - unlink: cloudstack.neutron_plugin.router.disconnect_subnet
 
-    cloudify.cloudstack.server_connected_to_floating_ip:
+    cloudify.cloudstack.virtual_machine_connected_to_floating_ip:
         derived_from: cloudify.relationships.connected_to
         source_interfaces:
             cloudify.interfaces.relationship_lifecycle:
