@@ -14,7 +14,8 @@
 
 
 from cloudify.decorators import operation
-from cloudstack_plugin.cloudstack_common import get_cloud_driver
+from cloudstack_plugin.cloudstack_common import get_cloud_driver, \
+     get_network_by_id
 from network import get_network
 from cloudify.exceptions import NonRecoverableError
 
@@ -23,42 +24,45 @@ __author__ = 'boul'
 
 
 @operation
-def create(ctx, **kwargs):
+def connect_network(ctx, **kwargs):
 
     cloud_driver = get_cloud_driver(ctx)
 
-    floatingip = {
-        # No defaults
-    }
-    floatingip.update(ctx.properties['floatingip'])
+    # floatingip = {
+    #     # No defaults
+    # }
+    # floatingip.update(ctx.properties['floatingip'])
+
+    network_id = ctx.related.runtime_properties['network_id']
+    network = get_network_by_id(ctx, cloud_driver, network_id)
+
 
     # get the ID's
-    if 'floating_network_name' in floatingip:
-        floatingip['floating_network_vpc_id'] = get_network(
-            cloud_driver, floatingip['floating_network_name']
-        ).extra['vpc_id']
-
-        floatingip['floating_network_id'] = get_network(
-            cloud_driver, floatingip['floating_network_name']).id
-    else:
-        raise NonRecoverableError('floating_network_name, not specified?')
+    # if network:
+    #     floatingip['floating_network_vpc_id'] = get_network(
+    #         cloud_driver, floatingip['floating_network_name']
+    #     ).extra['vpc_id']
+    #
+    #     floatingip['floating_network_id'] = get_network(
+    #         cloud_driver, floatingip['floating_network_name']).id
+    # else:
+    #     raise NonRecoverableError('floating_network_name, not specified?')
 
     # If we get a vpc-id let's use that otherwise use the network-id
-    if floatingip['floating_network_vpc_id'] is not None:
+    if network.extra['vpc_id'] is not None:
 
-        ctx.logger.info('Acquiring IP for VPC with id: {0}'.format(floatingip[
-            'floating_network_vpc_id']))
+        ctx.logger.info('Acquiring IP for VPC with id: {0}'
+                        .format(network.extra['vpc_id']))
 
-        fip = cloud_driver.ex_allocate_public_ip(vpc_id=floatingip[
-            'floating_network_vpc_id'])
+        fip = cloud_driver.ex_allocate_public_ip(vpc_id=
+                                                 network.extra['vpc_id'])
 
-    elif floatingip['floating_network_id'] is not None:
+    elif network.id is not None:
 
         ctx.logger.info('Acquiring IP for network with id: {0}'.
-                        format(floatingip['floating_network_id']))
+                        format(network.id))
 
-        fip = cloud_driver.ex_allocate_public_ip(network_id=floatingip[
-            'floating_network_id'])
+        fip = cloud_driver.ex_allocate_public_ip(network_id=network.id)
 
     else:
         raise NonRecoverableError('Cannot resolve network or vpc id')
@@ -69,7 +73,7 @@ def create(ctx, **kwargs):
 
 
 @operation
-def delete(ctx, **kwargs):
+def disconnect_network(ctx, **kwargs):
 
     cloud_driver = get_cloud_driver(ctx)
 

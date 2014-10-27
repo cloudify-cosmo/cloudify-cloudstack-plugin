@@ -129,10 +129,7 @@ node_types:
                     cs_api_key: { get_input: cloudstack_key }
                     cs_secret_key: { get_input: cloudstack_secret }
                     cs_api_url: { get_input: cloudstack_api_url }
-        interfaces:
-             cloudify.interfaces.lifecycle:
-                  - create: cloudstack.cloudstack_plugin.floatingip.create
-                  - delete: cloudstack.cloudstack_plugin.floatingip.delete
+       
 
 relationships:
 #     cloudify.cloudstack.port_connected_to_security_group:
@@ -154,6 +151,13 @@ relationships:
             cloudify.interfaces.relationship_lifecycle:
                 - establish: cloudstack.cloudstack_plugin.virtual_machine.connect_floating_ip
                 - unlink: cloudstack.cloudstack_plugin.virtual_machine.disconnect_floating_ip
+
+    cloudify.cloudstack.floating_ip_connected_to_network:
+        derived_from: cloudify.relationships.connected_to
+        source_interfaces:
+            cloudify.interfaces.relationship_lifecycle:
+                - establish: cloudstack.cloudstack_plugin.floatingip.connect_network
+                - unlink: cloudstack.cloudstack_plugin.floatingip.disconnect_network
 
     # cloudify.cloudstack.server_connected_to_security_group:
     #     derived_from: cloudify.relationships.connected_to
