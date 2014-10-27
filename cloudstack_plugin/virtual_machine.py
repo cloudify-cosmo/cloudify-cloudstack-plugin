@@ -41,15 +41,16 @@ def create(ctx, **kwargs):
     #Change to debug level
     ctx.logger.info('reading server config from context')
     server_config = _get_server_from_context(ctx)
+    network_config = ctx.properties['network']
 
     name = server_config['name']
     image_id = server_config['image_id']
     size_name = server_config['size']
     keypair_name = server_config['keypair_name']
-    default_security_group = server_config.get(['default_security_group'][0],
-                                               None)
-    default_network = server_config.get(['default_network'][0], None)
-    ip_address = server_config.get(['ip_address'][0], None)
+    default_security_group = network_config.get(['default_security_group'][0],
+                                                None)
+    default_network = network_config.get(['default_network'][0], None)
+    ip_address = network_config.get(['ip_address'][0], None)
 
     ctx.logger.info('getting required size {0}'.format(size_name))
     sizes = [size for size in cloud_driver.list_sizes() if size.name
