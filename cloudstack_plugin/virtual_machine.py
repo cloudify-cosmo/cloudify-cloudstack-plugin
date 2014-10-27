@@ -375,3 +375,8 @@ def connect_floating_ip(ctx, **kwargs):
                                                     openfirewall=False)
 
     return True
+
+
+def disconnect_floating_ip(ctx, **kwargs):
+
+    return True
