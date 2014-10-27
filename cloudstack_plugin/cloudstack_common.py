@@ -74,3 +74,16 @@ def get_nic_by_node_and_network_id(ctx, cloud_driver, node, network_id):
         return None
 
     return nics[0]
+
+
+def get_public_ip_by_id(ctx, cloud_driver, public_ip_id):
+
+    public_ips = [pubip for pubip in cloud_driver.ex_list_public_ips() if
+                  public_ip_id == pubip.id]
+
+    if not public_ips:
+        ctx.logger.info('could not find public_ip by id {0}'
+                        .format(public_ip_id))
+        return None
+
+    return public_ips[0]

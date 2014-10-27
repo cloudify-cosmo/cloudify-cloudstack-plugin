@@ -18,7 +18,8 @@ from cloudify.decorators import operation
 
 from libcloud.compute.types import Provider
 from cloudstack_plugin.cloudstack_common import get_cloud_driver, \
-    get_node_by_id, get_network_by_id, get_nic_by_node_and_network_id
+    get_node_by_id, get_network_by_id, get_nic_by_node_and_network_id, \
+    get_public_ip_by_id
 
 
 __author__ = 'adaml, boul'
@@ -152,7 +153,6 @@ def _create_in_network(ctx, cloud_driver, name, image, size, keypair_name,
 def _create_in_security_group(ctx, cloud_driver, name, image, size,
                               keypair_name,
                               default_security_group_name, ip_address=None):
-
 
     node = cloud_driver.create_node(name=name,
                                     image=image,
@@ -343,10 +343,34 @@ def disconnect_network(ctx, **kwargs):
 @operation
 def connect_floating_ip(ctx, **kwargs):
 
+    cloud_driver = get_cloud_driver(ctx)
+    server_config = _get_server_from_context(ctx)
+
+    ctx.logger.debug('reading portmap configuration.')
+    portmaps = ctx.properties['rules']
+
     server_id = ctx.instance.runtime_properties['instance_id']
     floating_ip_id = ctx.related.runtime_properties['external_id']
-    floating_ip_address = ctx.related.runtime_properties['floating_ip_address']
+#    floating_ip_address = ctx.related.runtime_properties['floating_ip_address']
 
+    for portmap in portmaps:
 
+        pub_port = portmap['public_port']
+        pub_end_port = portmap['public_end_port']
+        priv_port = portmap['private_port']
+        priv_end_port = portmap['private_end_port']
 
+        node = get_node_by_id(ctx, cloud_driver, server_id)
+        public_ip = get_public_ip_by_id(ctx, cloud_driver, floating_ip_id)
 
+        cloud_driver.ex_create_port_forwarding_rule(node=node,
+                                                    address=public_ip,
+                                                    public_port=pub_port,
+                                                    public_end_port=
+                                                    pub_end_port,
+                                                    private_port=priv_port,
+                                                    private_end_port=
+                                                    priv_end_port,
+                                                    openfirewall=False)
+
+    return True

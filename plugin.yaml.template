@@ -12,7 +12,9 @@ node_types:
         derived_from: cloudify.types.host
         properties:
             server: {}
-            nat: 
+            portmaps: 
+                default: {}
+            network:
                 default: {}
             use_external_resource:
                 default: false
@@ -146,12 +148,12 @@ relationships:
 #                 - establish: cloudstack.neutron_plugin.router.connect_subnet
 #                 - unlink: cloudstack.neutron_plugin.router.disconnect_subnet
 
-#     cloudify.cloudstack.server_connected_to_floating_ip:
-#         derived_from: cloudify.relationships.connected_to
-#         source_interfaces:
-#             cloudify.interfaces.relationship_lifecycle:
-#                 - establish: cloudstack.nova_plugin.server.connect_floatingip
-#                 - unlink: cloudstack.nova_plugin.server.disconnect_floatingip
+    cloudify.cloudstack.server_connected_to_floating_ip:
+        derived_from: cloudify.relationships.connected_to
+        source_interfaces:
+            cloudify.interfaces.relationship_lifecycle:
+                - establish: cloudstack.cloudstack_plugin.server.connect_floatingip
+                - unlink: cloudstack.cloudstack_plugin.server.disconnect_floatingip
 
     # cloudify.cloudstack.server_connected_to_security_group:
     #     derived_from: cloudify.relationships.connected_to
