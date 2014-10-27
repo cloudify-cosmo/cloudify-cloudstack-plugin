@@ -361,6 +361,7 @@ def connect_floating_ip(ctx, **kwargs):
 
     for portmap in portmaps:
 
+        protocol = portmap['protocol']
         pub_port = portmap['public_port']
         pub_end_port = portmap['public_end_port']
         priv_port = portmap['private_port']
@@ -371,6 +372,7 @@ def connect_floating_ip(ctx, **kwargs):
 
         cloud_driver.ex_create_port_forwarding_rule(node=node,
                                                     address=public_ip,
+                                                    protocol=protocol,
                                                     public_port=pub_port,
                                                     public_end_port=
                                                     pub_end_port,
