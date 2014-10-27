@@ -388,16 +388,22 @@ def connect_floating_ip(ctx, **kwargs):
         node = get_node_by_id(ctx, cloud_driver, server_id)
         public_ip = get_public_ip_by_id(ctx, cloud_driver, floating_ip_id)
 
-        cloud_driver.ex_create_port_forwarding_rule(node=node,
-                                                    address=public_ip,
-                                                    protocol=protocol,
-                                                    public_port=pub_port,
-                                                    public_end_port=
-                                                    pub_end_port,
-                                                    private_port=priv_port,
-                                                    private_end_port=
-                                                    priv_end_port,
-                                                    openfirewall=open_fw)
+        try:
+
+            cloud_driver.ex_create_port_forwarding_rule(node=node,
+                                                        address=public_ip,
+                                                        protocol=protocol,
+                                                        public_port=pub_port,
+                                                        public_end_port=
+                                                        pub_end_port,
+                                                        private_port=priv_port,
+                                                        private_end_port=
+                                                        priv_end_port,
+                                                        openfirewall=open_fw)
+        except Exception as e:
+            ctx.logger.warn('Port forward creation failed: '
+                            '{0}'.format(str(e)))
+            return False
 
     return True
 
