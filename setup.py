@@ -15,6 +15,6 @@ setup(
     install_requires=[
         "cloudify-plugins-common",
         "cloudify-plugins-common>=3.0",
-#        "apache-libcloud"
+        "apache-libcloud"
     ]
 )

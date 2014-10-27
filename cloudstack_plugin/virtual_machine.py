@@ -369,7 +369,7 @@ def disconnect_network(ctx, **kwargs):
 #
 #     server_id = ctx.instance.runtime_properties[instance_id]
 #     floating_ip_id = ctx.related.runtime_properties[external_id]
-#     floating_ip_address = ctx.related.runtime_properties[floating_ip_address
+#     floating_ip_address = ctx.related.runtime_properties[floating_ip_address]
 
 
 
