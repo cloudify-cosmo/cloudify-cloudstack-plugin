@@ -14,10 +14,10 @@
 
 
 from cloudify.decorators import operation
-from cloudstack_plugin.cloudstack_common import get_cloud_driver, \
-     get_network_by_id
-from network import get_network
 from cloudify.exceptions import NonRecoverableError
+
+from cloudstack_plugin.cloudstack_common import get_cloud_driver, \
+     get_network_by_id, get_floating_ip_by_id
 
 
 __author__ = 'boul'
@@ -28,27 +28,9 @@ def connect_network(ctx, **kwargs):
 
     cloud_driver = get_cloud_driver(ctx)
 
-    # floatingip = {
-    #     # No defaults
-    # }
-    # floatingip.update(ctx.properties['floatingip'])
-
     network_id = ctx.related.runtime_properties['network_id']
     network = get_network_by_id(ctx, cloud_driver, network_id)
 
-
-    # get the ID's
-    # if network:
-    #     floatingip['floating_network_vpc_id'] = get_network(
-    #         cloud_driver, floatingip['floating_network_name']
-    #     ).extra['vpc_id']
-    #
-    #     floatingip['floating_network_id'] = get_network(
-    #         cloud_driver, floatingip['floating_network_name']).id
-    # else:
-    #     raise NonRecoverableError('floating_network_name, not specified?')
-
-    # If we get a vpc-id let's use that otherwise use the network-id
     if network.extra['vpc_id'] is not None:
 
         ctx.logger.info('Acquiring IP for VPC with id: {0}'
@@ -78,21 +60,9 @@ def disconnect_network(ctx, **kwargs):
     cloud_driver = get_cloud_driver(ctx)
 
     fip_id = ctx.runtime_properties['external_id']
-    fip = _get_floating_ip_by_id(ctx, cloud_driver, fip_id)
+    fip = get_floating_ip_by_id(ctx, cloud_driver, fip_id)
 
     ctx.logger.info('Deleting floating ip: {0}'.format(fip))
 
     cloud_driver.ex_release_public_ip(address=fip)
 
-
-def _get_floating_ip_by_id(ctx, cloud_driver, floating_ip_id):
-
-    fips = [fip for fip in cloud_driver.ex_list_public_ips() if
-                floating_ip_id == fip.id]
-
-    if not fips:
-        ctx.logger.info('could not find floating ip by ID {0}'.
-                        format(floating_ip_id))
-        return None
-
-    return fips[0]

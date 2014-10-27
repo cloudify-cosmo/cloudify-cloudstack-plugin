@@ -96,3 +96,16 @@ def get_portmaps_by_node_id(ctx, cloud_driver, node_id):
                 if node_id == portmap.node.id]
 
     return portmaps
+
+
+def get_floating_ip_by_id(ctx, cloud_driver, floating_ip_id):
+
+    fips = [fip for fip in cloud_driver.ex_list_public_ips() if
+                floating_ip_id == fip.id]
+
+    if not fips:
+        ctx.logger.info('could not find floating ip by ID {0}'.
+                        format(floating_ip_id))
+        return None
+
+    return fips[0]
