@@ -420,10 +420,3 @@ def disconnect_floating_ip(ctx, **kwargs):
         return False
 
     return True
-
-
-
-
-
-
-    return True
