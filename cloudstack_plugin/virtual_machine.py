@@ -13,10 +13,13 @@
 # * See the License for the specific language governing permissions and
 # * limitations under the License.
 import copy
+
 from cloudify.decorators import operation
+
 from libcloud.compute.types import Provider
-from cloudstack_plugin.cloudstack_common import get_cloud_driver
-from pprint import pprint
+from cloudstack_plugin.cloudstack_common import get_cloud_driver, \
+    get_node_by_id, get_network_by_id, get_nic_by_node_and_network_id
+
 
 __author__ = 'adaml, boul'
 
@@ -42,7 +45,8 @@ def create(ctx, **kwargs):
     image_id = server_config['image_id']
     size_name = server_config['size']
     keypair_name = server_config['keypair_name']
-    default_security_group = server_config.get(['default_security_group'][0], None)
+    default_security_group = server_config.get(['default_security_group'][0],
+                                               None)
     default_network = server_config.get(['default_network'][0], None)
     ip_address = server_config.get(['ip_address'][0], None)
 
@@ -63,16 +67,19 @@ def create(ctx, **kwargs):
 
     if default_network is None:
         if default_security_group is None:
-            raise RuntimeError("We need either a default_security_group or default_network, "
+            raise RuntimeError("We need either a default_security_group "
+                               "or default_network, "
                                "none specified")
 
     if default_network is not None:
         if default_security_group is not None:
-            raise RuntimeError("We need either a default_security_group or default_network, "
+            raise RuntimeError("We need either a default_security_group "
+                               "or default_network, "
                                "both are specified")
 
     if default_network is not None:
-        ctx.logger.info('Creating this VM in default_network:'.format(default_network))
+        ctx.logger.info('Creating this VM in default_network:'.
+                        format(default_network))
         ctx.logger.info("Creating VM with the following details: {0}".format(
             server_config))
         _create_in_network(ctx=ctx,
@@ -86,7 +93,8 @@ def create(ctx, **kwargs):
 
 
     if default_security_group is not None:
-        ctx.logger.info('Creating this VM in default_security_group.'.format(default_security_group))
+        ctx.logger.info('Creating this VM in default_security_group.'.
+                        format(default_security_group))
         ctx.logger.info("Creating VM with the following details: {0}".format(
             server_config))
         _create_in_security_group(ctx=ctx,
@@ -95,7 +103,8 @@ def create(ctx, **kwargs):
                                   image=image,
                                   size=size,
                                   keypair_name=keypair_name,
-                                  default_security_group_name=default_security_group,
+                                  default_security_group_name=
+                                  default_security_group,
                                   ip_address=ip_address)
 
 
@@ -140,7 +149,8 @@ def _create_in_network(ctx, cloud_driver, name, image, size, keypair_name,
 
 
 @operation
-def _create_in_security_group(ctx, cloud_driver, name, image, size, keypair_name,
+def _create_in_security_group(ctx, cloud_driver, name, image, size,
+                              keypair_name,
                               default_security_group_name, ip_address=None):
 
 
@@ -148,13 +158,14 @@ def _create_in_security_group(ctx, cloud_driver, name, image, size, keypair_name
                                     image=image,
                                     size=size,
                                     ex_keyname=keypair_name,
-                                    ex_security_groups=default_security_group_name,
+                                    ex_security_groups=
+                                    default_security_group_name,
                                     ex_start_vm=False,
                                     ex_ipaddress=ip_address)
 
     ctx.logger.info(
-        'vm {0} was started successfully {1}'.format(
-            node.name, server_config))
+        'vm {0} was created successfully'.format(
+            node.name))
 
     ctx['instance_id'] = node.id
     ctx.runtime_properties['networking_type'] = 'security_group'
@@ -173,7 +184,7 @@ def start(ctx, **kwargs):
             .format(instance_id))
 
     ctx.logger.info('getting node with ID: {0} '.format(instance_id))
-    node = _get_node_by_id(ctx, cloud_driver, instance_id)
+    node = get_node_by_id(ctx, cloud_driver, instance_id)
     if node is None:
         raise RuntimeError('could not find node with ID {0}'
                            .format(instance_id))
@@ -195,7 +206,7 @@ def delete(ctx, **kwargs):
                         .format(instance_id))
 
     ctx.logger.info('getting node with ID: {0} '.format(instance_id))
-    node = _get_node_by_id(ctx, cloud_driver, instance_id)
+    node = get_node_by_id(ctx, cloud_driver, instance_id)
     if node is None:
         raise NameError('could not find node with ID: {0} '
                         .format(instance_id))
@@ -219,53 +230,13 @@ def stop(ctx, **kwargs):
             .format(instance_id))
 
     ctx.logger.info('getting node with ID: {0} '.format(instance_id))
-    node = _get_node_by_id(ctx, cloud_driver, instance_id)
+    node = get_node_by_id(ctx, cloud_driver, instance_id)
     if node is None:
         raise RuntimeError('could not find node with ID {0}'
                            .format(instance_id))
 
     ctx.logger.info('stopping node with details {0}'.format(node.name))
     cloud_driver.ex_stop(node)
-
-
-def _get_node_by_id(ctx, cloud_driver, instance_id):
-
-    nodes = [node for node in cloud_driver.list_nodes() if
-             instance_id == node.id]
-    
-    if not nodes:
-        ctx.logger.info('could not find node by ID {0}'.format(instance_id))
-        return None
-
-    return nodes[0]
-
-
-def _get_network_by_id(ctx, cloud_driver, network_id):
-
-    networks = [network for network in cloud_driver.ex_list_networks() if
-                network_id == network.id]
-
-    if not networks:
-        ctx.logger.info('could not find network by ID {0}'.format(network_id))
-        return None
-
-    return networks[0]
-
-
-def _get_nic_by_node_and_network_id(ctx, cloud_driver, node, network_id):
-
-    #node = _get_node_by_id(cloud_driver, node_id)
-    #network = _get_network_by_id(cloud_driver, network_id)
-
-    nics = [nic for nic in cloud_driver.ex_list_nics(node) if
-            network_id == nic.network_id]
-
-    if not nics:
-        ctx.logger.info('could not find nic by node_id {0} and network_id {1}'
-                        .format(node.id, network_id))
-        return None
-
-    return nics[0]
 
 
 @operation
@@ -279,7 +250,7 @@ def get_state(ctx, **kwargs):
     networking_type = ctx.runtime_properties['networking_type']
 
     ctx.logger.info('getting node with ID {0}'.format(instance_id))
-    node = _get_node_by_id(ctx, cloud_driver, instance_id)
+    node = get_node_by_id(ctx, cloud_driver, instance_id)
     if node is None:
         return False
 
@@ -320,19 +291,22 @@ def connect_network(ctx, **kwargs):
     # instance = [node for node in cloud_driver.list_nodes() if
     #             node.id == instance_id][0]
 
-    node = _get_node_by_id(ctx, cloud_driver, instance_id)
-    network = _get_network_by_id(ctx, cloud_driver, network_id)
+    node = get_node_by_id(ctx, cloud_driver, instance_id)
+    network = get_network_by_id(ctx, cloud_driver, network_id)
 
     ctx.logger.info('Checking if there is a nic for  '
                     'vm: {0} with id: {1} in network {2} with id: {3}'
                     .format(node.name, network.name, instance_id, network_id,))
 
-    nic_exists = _get_nic_by_node_and_network_id(ctx, cloud_driver, node, network_id)
+    nic_exists = get_nic_by_node_and_network_id(ctx, cloud_driver, node,
+                                                network_id)
 
-    #ctx.logger.info('Adding a NIC to VM {0} in Network {1}'.format(node.name, network.name))
+    #ctx.logger.info('Adding a NIC to VM {0} in Network {1}'.format(
+    # node.name, network.name))
 
     if nic_exists is not None:
-        ctx.logger.info('No need to connect network {0}, already connected to nic {1}'
+        ctx.logger.info('No need to connect network {0}, '
+                        'already connected to nic {1}'
                         .format(network.name, nic_exists.id))
         return False
 
@@ -347,14 +321,16 @@ def disconnect_network(ctx, **kwargs):
     instance_id = ctx.runtime_properties['instance_id']
     network_id = ctx.related.runtime_properties['network_id']
 
-    ctx.logger.info('Removing a NIC from VM-ID {0} in Network-ID {1}'.format(instance_id, network_id))
+    ctx.logger.info('Removing a NIC from VM-ID {0} in Network-ID {1}'.
+                    format(instance_id, network_id))
 
     cloud_driver = get_cloud_driver(ctx)
 
-    node = _get_node_by_id(ctx, cloud_driver, instance_id)
-    nic = _get_nic_by_node_and_network_id(ctx, cloud_driver, node, network_id)
+    node = get_node_by_id(ctx, cloud_driver, instance_id)
+    nic = get_nic_by_node_and_network_id(ctx, cloud_driver, node, network_id)
 
-    #ctx.logger.info('Adding a NIC to VM {0} in Network with id {1}'.format(node.name, nic.network_id))
+    #ctx.logger.info('Adding a NIC to VM {0} in Network with id {1}'.
+    # format(node.name, nic.network_id))
 
     try:
         cloud_driver.ex_detach_nic_from_node(nic=nic, node=node)
@@ -364,26 +340,13 @@ def disconnect_network(ctx, **kwargs):
 
     return True
 
-# @operation
-# def connect_floating_ip
-#
-#     server_id = ctx.instance.runtime_properties[instance_id]
-#     floating_ip_id = ctx.related.runtime_properties[external_id]
-#     floating_ip_address = ctx.related.runtime_properties[floating_ip_address]
+@operation
+def connect_floating_ip(ctx, **kwargs):
+
+    server_id = ctx.instance.runtime_properties['instance_id']
+    floating_ip_id = ctx.related.runtime_properties['external_id']
+    floating_ip_address = ctx.related.runtime_properties['floating_ip_address']
 
 
 
-    # if is_external_relationship(ctx):
-    #     ctx.logger.info('Validating external network and VM '
-    #                     'are associated')
-    #     cloud_driver = get_cloud_driver(ctx)
-    #     nodes = cloud_driver.list_nodes(server_id)
-    #     if [sg for sg in server.list_security_group() if sg.id ==
-    #             security_group_id]:
-    #         return
-    #     raise NonRecoverableError(
-    #         'Expected external resources server {0} and security-group {1} to '
-    #         'be connected'.format(server_id, security_group_id))
-    #
-    # server = nova_client.servers.get(server_id)
-    # server.add_security_group(security_group_id)
+

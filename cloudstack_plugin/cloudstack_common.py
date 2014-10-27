@@ -17,7 +17,7 @@ from libcloud.compute.types import Provider
 from libcloud.compute.providers import get_driver
 import libcloud.security
 
-__author__ = 'uri1803'
+__author__ = 'uri1803, boul'
 
 
 def _get_auth_from_context(ctx):
@@ -35,3 +35,42 @@ def get_cloud_driver(ctx):
     libcloud.security.VERIFY_SSL_CERT = False
     return driver(key=api_key, secret=api_secret_key,url=api_url)
 
+
+def get_node_by_id(ctx, cloud_driver, instance_id):
+
+    nodes = [node for node in cloud_driver.list_nodes() if
+             instance_id == node.id]
+
+    if not nodes:
+        ctx.logger.info('could not find node by ID {0}'.format(instance_id))
+        return None
+
+    return nodes[0]
+
+
+def get_network_by_id(ctx, cloud_driver, network_id):
+
+    networks = [network for network in cloud_driver.ex_list_networks() if
+                network_id == network.id]
+
+    if not networks:
+        ctx.logger.info('could not find network by ID {0}'.format(network_id))
+        return None
+
+    return networks[0]
+
+
+def get_nic_by_node_and_network_id(ctx, cloud_driver, node, network_id):
+
+    #node = _get_node_by_id(cloud_driver, node_id)
+    #network = _get_network_by_id(cloud_driver, network_id)
+
+    nics = [nic for nic in cloud_driver.ex_list_nics(node) if
+            network_id == nic.network_id]
+
+    if not nics:
+        ctx.logger.info('could not find nic by node_id {0} and network_id {1}'
+                        .format(node.id, network_id))
+        return None
+
+    return nics[0]
