@@ -419,7 +419,8 @@ def disconnect_floating_ip(ctx, **kwargs):
     for portmap in portmaps:
 
         try:
-            cloud_driver.ex_delete_port_forwarding_rule(node=node, rule=portmap)
+            cloud_driver.ex_delete_port_forwarding_rule(node=node,
+                                                        rule=portmap)
         except Exception as e:
             ctx.logger.warn('Port forward may not have been removed: '
                             '{0}'.format(str(e)))
