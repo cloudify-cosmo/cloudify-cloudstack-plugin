@@ -30,7 +30,7 @@ def create(ctx, **kwargs):
 
     network = {
         'description': None,
-        'name': ctx.node_id,
+        'name': ctx.runtime_properties.node_id,
     }
 
     ctx.logger.debug('reading network configuration.')
@@ -49,9 +49,9 @@ def create(ctx, **kwargs):
     else:
         vpc = None
 
-    ctx.logger.info('Current node {0}{1}'.format(ctx.node_id, ctx.node.properties))
+    ctx.logger.info('Current node {0}{1}'.format(ctx.runtime_properties.node_id, ctx.node.properties))
 
-    ctx['network_id'] = ctx.node_id
+    ctx.runtime_properties.['network_id'] = ctx.runtime_properties.node_id
 
     if not _network_exists(cloud_driver, network_name):
 
@@ -113,8 +113,8 @@ def create(ctx, **kwargs):
                         format(network_name))
         net = get_network(cloud_driver, network_name)
 
-    ctx['network_id'] = net.id
-    ctx['network_name'] = net.name
+    ctx.runtime_properties['network_id'] = net.id
+    ctx.runtime_properties.['network_name'] = net.name
 
 
 @operation
