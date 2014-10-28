@@ -51,7 +51,7 @@ def create(ctx, **kwargs):
 
     ctx.logger.info('Current node {0}{1}'.format(ctx.runtime_properties.node_id, ctx.node.properties))
 
-    ctx.runtime_properties.['network_id'] = ctx.runtime_properties.node_id
+    ctx.runtime_properties['network_id'] = ctx.runtime_properties.node_id
 
     if not _network_exists(cloud_driver, network_name):
 
