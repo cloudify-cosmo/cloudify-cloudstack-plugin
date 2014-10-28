@@ -30,25 +30,45 @@ node_types:
                     cs_api_url: { get_input: cloudstack_api_url }
         interfaces:
             cloudify.interfaces.lifecycle:
-                - create: cloudstack.cloudstack_plugin.virtual_machine.create
-                - start: cloudstack.cloudstack_plugin.virtual_machine.start
-                - stop: cloudstack.cloudstack_plugin.virtual_machine.stop
-                - delete: cloudstack.cloudstack_plugin.virtual_machine.delete
+                create: 
+                    implementation: cloudstack.cloudstack_plugin.virtual_machine.create
+                    inputs: {}
+                start:
+                    implementation: cloudstack.cloudstack_plugin.virtual_machine.start
+                    inputs: {}
+                stop:
+                    implementation: cloudstack.cloudstack_plugin.virtual_machine.stop
+                    inputs: {}
+                delete: 
+                    implementation: cloudstack.cloudstack_plugin.virtual_machine.delete
+                    inputs: {}
             cloudify.interfaces.host:
-                - get_state: cloudstack.cloudstack_plugin.virtual_machine.get_state
+                get_state: 
+                    implementation: cloudstack.cloudstack_plugin.virtual_machine.get_state
+                    inputs: {}
 
     cloudify.cloudstack.windows_server:
         derived_from: cloudify.cloudstack.virtual_machine
         interfaces:
             cloudify.interfaces.worker_installer:
-                - install: windows_agent_installer.windows_agent_installer.tasks.install
-                - start: windows_agent_installer.windows_agent_installer.tasks.start
-                - stop: windows_agent_installer.windows_agent_installer.tasks.stop
-                - uninstall: windows_agent_installer.windows_agent_installer.tasks.uninstall
-                - restart: windows_agent_installer.windows_agent_installer.tasks.restart
+                install:
+                    implementation: windows_agent_installer.windows_agent_installer.tasks.install
+                    inputs: {}
+                start:
+                    implementation: windows_agent_installer.windows_agent_installer.tasks.start
+                stop:
+                    implementation: windows_agent_installer.windows_agent_installer.tasks.stop
+                    inputs: {}
+                uninstall:
+                    implementation: windows_agent_installer.windows_agent_installer.tasks.uninstall
+                    inputs: {}
+                restart: 
+                    implementation: windows_agent_installer.windows_agent_installer.tasks.restart
+                    inputs: {}
             cloudify.interfaces.plugin_installer:
-                - install: windows_plugin_installer.windows_plugin_installer.tasks.install
-
+                install:
+                    implementation: windows_plugin_installer.windows_plugin_installer.tasks.install
+                    inputs: {}
 
     cloudify.cloudstack.network:
         derived_from: cloudify.types.subnet
@@ -68,8 +88,12 @@ node_types:
                     cs_api_url: { get_input: cloudstack_api_url }
         interfaces:
              cloudify.interfaces.lifecycle:
-                  - create: cloudstack.cloudstack_plugin.network.create
-                  - delete: cloudstack.cloudstack_plugin.network.delete
+                  create:
+                    implementation: cloudstack.cloudstack_plugin.network.create
+                    inputs: {}
+                  delete:
+                    implementation: cloudstack.cloudstack_plugin.network.delete
+                    inputs: {}
 
     cloudify.cloudstack.vpc:
         derived_from: cloudify.types.network
@@ -89,8 +113,12 @@ node_types:
                     cs_api_url: { get_input: cloudstack_api_url }
         interfaces:
              cloudify.interfaces.lifecycle:
-                  - create: cloudstack.cloudstack_plugin.vpc.create
-                  - delete: cloudstack.cloudstack_plugin.vpc.delete
+                create:
+                    implementation: cloudstack.cloudstack_plugin.vpc.create
+                    inputs: {}
+                delete:
+                    implementation: cloudstack.cloudstack_plugin.vpc.delete
+                    inputs: {}
 
     cloudify.cloudstack.security_group:
         derived_from: cloudify.types.base
@@ -112,10 +140,13 @@ node_types:
                 default: false
         interfaces:
             cloudify.interfaces.lifecycle:
-                - create: cloudstack.cloudstack_plugin.security_group.create
-                - delete: cloudstack.cloudstack_plugin.security_group.delete
+                create:
+                    implementation: cloudstack.cloudstack_plugin.security_group.create
+                    inputs: {}
+                delete:
+                    implementation: cloudstack.cloudstack_plugin.security_group.delete
+                    inputs: {}
 
-    
     cloudify.cloudstack.floatingip:
         derived_from: cloudify.types.base
         properties:
@@ -130,7 +161,6 @@ node_types:
                     cs_api_key: { get_input: cloudstack_key }
                     cs_secret_key: { get_input: cloudstack_secret }
                     cs_api_url: { get_input: cloudstack_api_url }
-       
 
 relationships:
 #     cloudify.cloudstack.port_connected_to_security_group:
@@ -189,7 +219,7 @@ relationships:
 
 #     cloudify.cloudstack.server_connected_to_port:
 #         derived_from: cloudify.relationships.connected_to
-        
+
 #     cloudify.cloudstack.floating_ip_connected_to_port:
 #         derived_from: cloudify.relationships.connected_to
 
