@@ -30,7 +30,7 @@ def create(ctx, **kwargs):
 
     network = {
         'description': None,
-        'name': ctx.runtime_properties.node_id,
+        'name': ctx.instance.runtime_properties.node_id,
     }
 
     ctx.logger.debug('reading network configuration.')
