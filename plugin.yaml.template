@@ -171,8 +171,13 @@ relationships:
         derived_from: cloudify.relationships.connected_to
         source_interfaces:
             cloudify.interfaces.relationship_lifecycle:
-                - establish: cloudstack.cloudstack_plugin.virtual_machine.connect_network
-                - unlink: cloudstack.cloudstack_plugin.virtual_machine.disconnect_network
+                establish: 
+                    implementation: cloudstack.cloudstack_plugin.virtual_machine.connect_network
+                    inputs: {}
+                unlink: 
+                    implementation: cloudstack.cloudstack_plugin.virtual_machine.disconnect_network
+                    inputs: {}
+
 
 #     cloudify.cloudstack.server_connected_to_port:
 #         derived_from: cloudify.relationships.connected_to
