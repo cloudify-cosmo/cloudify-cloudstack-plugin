@@ -25,7 +25,7 @@ def _get_server_from_context(ctx):
     server = {
         'name': ctx.node_id.replace('_', '-')
     }
-    server.update(copy.deepcopy(ctx.properties['server']))
+    server.update(copy.deepcopy(ctx.node.properties['server']))
     return server
 
 

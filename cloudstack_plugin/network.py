@@ -34,7 +34,7 @@ def create(ctx, **kwargs):
     }
 
     ctx.logger.debug('reading network configuration.')
-    network.update(ctx.properties['network'])
+    network.update(ctx.node.properties['network'])
 
     network_name = network['name']
     zone = network['zone']
@@ -49,7 +49,7 @@ def create(ctx, **kwargs):
     else:
         vpc = None
 
-    ctx.logger.info('Current node {0}{1}'.format(ctx.node_id, ctx.properties))
+    ctx.logger.info('Current node {0}{1}'.format(ctx.node_id, ctx.node.properties))
 
     ctx['network_id'] = ctx.node_id
 
@@ -72,8 +72,8 @@ def create(ctx, **kwargs):
             acl_list = create_acl_list(cloud_driver, network_name,
                                        vpc.id, net.id)
 
-            if 'firewall' in ctx.properties:
-                firewall_config = ctx.properties['firewall']
+            if 'firewall' in ctx.node.properties:
+                firewall_config = ctx.node.properties['firewall']
 
                 for acl in firewall_config:
                     acl_cidr = acl.get('cidr')
@@ -94,8 +94,8 @@ def create(ctx, **kwargs):
                 network_offering=network_offering,
                 location=location)
 
-            if 'firewall' in ctx.properties:
-                firewall_config = ctx.properties['firewall']
+            if 'firewall' in ctx.node.properties:
+                firewall_config = ctx.node.properties['firewall']
 
                 for rule in firewall_config:
                     rule_cidr = rule.get('cidr')

@@ -34,7 +34,7 @@ def create(ctx, **kwargs):
     }
 
     ctx.logger.debug('reading vpc configuration.')
-    vpc.update(ctx.properties['network'])
+    vpc.update(ctx.node.properties['network'])
 
     vpc_name = vpc['name']
     cidr = vpc['cidr']
@@ -43,9 +43,9 @@ def create(ctx, **kwargs):
     vpcoffer = vpc['service_offering']
     vpc_offering = get_vpc_offering(cloud_driver, vpcoffer)
 
-    ctx.logger.info('Current node {0}{1}'.format(ctx.node_id, ctx.properties))
+    ctx.logger.info('Current node {0}{1}'.format(ctx.node_id, ctx.node.properties))
 
-    ctx['vpc_id'] = ctx.properties
+    ctx['vpc_id'] = ctx.node.properties
 
     if not _vpc_exists(cloud_driver, vpc_name):
         ctx.logger.info('creating vpc: {0}'.format(vpc_name))

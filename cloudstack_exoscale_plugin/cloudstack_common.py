@@ -21,7 +21,7 @@ __author__ = 'uri1803'
 
 def _get_auth_from_context(ctx):
     auth_config = {}
-    auth_config.update(copy.deepcopy(ctx.properties['auth']))
+    auth_config.update(copy.deepcopy(ctx.node.properties['auth']))
     return auth_config
 
 

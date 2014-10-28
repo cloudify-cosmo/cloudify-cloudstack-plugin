@@ -33,8 +33,8 @@ def create(ctx, **kwargs):
     }
 
     ctx.logger.debug('reading security-group configuration.')
-    rules_to_apply = ctx.properties['rules']
-    security_group.update(ctx.properties['security_group'])
+    rules_to_apply = ctx.node.properties['rules']
+    security_group.update(ctx.node.properties['security_group'])
 
     security_group_name = security_group['name']
     if not _sg_exists(cloud_driver, security_group_name):

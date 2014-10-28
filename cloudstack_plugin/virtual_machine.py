@@ -29,7 +29,7 @@ def _get_server_from_context(ctx):
     server = {
         'name': ctx.node_id.replace('_', '-')
     }
-    server.update(copy.deepcopy(ctx.properties['server']))
+    server.update(copy.deepcopy(ctx.node.properties['server']))
     return server
 
 @operation
@@ -41,7 +41,7 @@ def create(ctx, **kwargs):
     #Change to debug level
     ctx.logger.info('reading server config from context')
     server_config = _get_server_from_context(ctx)
-    network_config = ctx.properties['network']
+    network_config = ctx.node.properties['network']
 
     name = server_config['name']
     image_id = server_config['image_id']
@@ -350,7 +350,7 @@ def connect_floating_ip(ctx, **kwargs):
     #server_config = _get_server_from_context(ctx)
 
     ctx.logger.debug('reading portmap configuration.')
-    portmaps = ctx.properties['portmaps']
+    portmaps = ctx.node.properties['portmaps']
 
     if not portmaps:
         raise NonRecoverableError('Relation defined but no portmaps set'

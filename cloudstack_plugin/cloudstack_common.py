@@ -22,7 +22,7 @@ __author__ = 'uri1803, boul'
 
 def _get_auth_from_context(ctx):
     auth_config = {}
-    auth_config.update(copy.deepcopy(ctx.properties['cloudstack_config']))
+    auth_config.update(copy.deepcopy(ctx.node.properties['cloudstack_config']))
     return auth_config
 
 
