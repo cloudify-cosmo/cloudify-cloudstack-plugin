@@ -114,7 +114,7 @@ def create(ctx, **kwargs):
         net = get_network(cloud_driver, network_name)
 
     ctx.runtime_properties['network_id'] = net.id
-    ctx.runtime_properties.['network_name'] = net.name
+    ctx.runtime_properties['network_name'] = net.name
 
 
 @operation
