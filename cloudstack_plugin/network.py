@@ -51,7 +51,7 @@ def create(ctx, **kwargs):
 
     ctx.logger.info('Current node {0}{1}'.format(ctx.instance.id, ctx.node.properties))
 
-    ctx.runtime_properties['network_id'] = ctx.instance.id
+    ctx.instance.runtime_properties['network_id'] = ctx.instance.id
 
     if not _network_exists(cloud_driver, network_name):
 
@@ -113,14 +113,14 @@ def create(ctx, **kwargs):
                         format(network_name))
         net = get_network(cloud_driver, network_name)
 
-    ctx.runtime_properties['network_id'] = net.id
-    ctx.runtime_properties['network_name'] = net.name
+    ctx.instance.runtime_properties['network_id'] = net.id
+    ctx.instance.runtime_properties['network_name'] = net.name
 
 
 @operation
 def delete(ctx, **kwargs):
 
-    network_name = ctx.runtime_properties['network_name']
+    network_name = ctx.instance.runtime_properties['network_name']
     cloud_driver = get_cloud_driver(ctx)
     network = get_network(cloud_driver, network_name)
 
@@ -129,7 +129,7 @@ def delete(ctx, **kwargs):
         cloud_driver.ex_delete_network(network)
     except Exception as e:
         ctx.logger.warn('network {0} may not have been deleted: {1}'
-                        .format(ctx.runtime_properties['network_name'], str(e)))
+                        .format(ctx.instance.runtime_properties['network_name'], str(e)))
         return False
         pass
 

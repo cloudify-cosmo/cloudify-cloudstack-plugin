@@ -100,7 +100,7 @@ def stop(ctx, **kwargs):
     ctx.logger.info("initializing {0} cloud driver".format(Provider.EXOSCALE))
     cloud_driver = get_cloud_driver(ctx)
 
-    node_id = ctx.runtime_properties['node_id']
+    node_id = ctx.instance.runtime_properties['node_id']
     if node_id is None:
         raise RuntimeError(
             'could not find node ID in runtime context: ' + node_id)
@@ -130,7 +130,7 @@ def get_state(ctx, **kwargs):
     ctx.logger.info("initializing {0} cloud driver".format(Provider.EXOSCALE))
     cloud_driver = get_cloud_driver(ctx)
 
-    instance_id = ctx.runtime_properties['instance_id']
+    instance_id = ctx.instance.runtime_properties['instance_id']
 
     ctx.logger.info('getting node with ID {0}'.format(instance_id))
     node = _get_node_by_id(cloud_driver, instance_id)

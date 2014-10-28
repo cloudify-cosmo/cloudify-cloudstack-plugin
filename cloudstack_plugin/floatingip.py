@@ -49,9 +49,9 @@ def connect_network(ctx, **kwargs):
     else:
         raise NonRecoverableError('Cannot resolve network or vpc id')
 
-    ctx.runtime_properties['external_id'] = fip.id
-    ctx.runtime_properties['external_type'] = 'publicip'
-    ctx.runtime_properties['floating_ip_address'] = fip.address
+    ctx.instance.runtime_properties['external_id'] = fip.id
+    ctx.instance.runtime_properties['external_type'] = 'publicip'
+    ctx.instance.runtime_properties['floating_ip_address'] = fip.address
 
 
 @operation
@@ -59,7 +59,7 @@ def disconnect_network(ctx, **kwargs):
 
     cloud_driver = get_cloud_driver(ctx)
 
-    fip_id = ctx.runtime_properties['external_id']
+    fip_id = ctx.instance.runtime_properties['external_id']
     fip = get_floating_ip_by_id(ctx, cloud_driver, fip_id)
 
     ctx.logger.info('Deleting floating ip: {0}'.format(fip))

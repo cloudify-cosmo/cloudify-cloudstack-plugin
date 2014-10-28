@@ -68,7 +68,7 @@ def create(ctx, **kwargs):
 @operation
 def delete(ctx, **kwargs):
 
-    vpc_name = ctx.runtime_properties['vpc_name']
+    vpc_name = ctx.instance.runtime_properties['vpc_name']
     cloud_driver = get_cloud_driver(ctx)
     vpc = get_vpc(cloud_driver, vpc_name)
 
@@ -77,7 +77,7 @@ def delete(ctx, **kwargs):
     except:
         ctx.logger.warn(
             'vpc {0} may not have been deleted'
-                .format(ctx.runtime_properties['vpc_name']))
+                .format(ctx.instance.runtime_properties['vpc_name']))
         pass
 
 

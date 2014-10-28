@@ -68,11 +68,11 @@ def delete(ctx, **kwargs):
     try:
         cloud_driver = get_cloud_driver(ctx)
         cloud_driver.ex_delete_security_group(
-            ctx.runtime_properties['external_id'])
+            ctx.instance.runtime_properties['external_id'])
     except:
         ctx.logger.warn(
             'security-group {0} may not have been deleted'.format(
-                ctx.runtime_properties['external_id']))
+                ctx.instance.runtime_properties['external_id']))
         pass
 
 
