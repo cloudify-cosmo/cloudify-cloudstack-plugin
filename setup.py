@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     zip_safe=True,
-    name='cloudify-plugin',
+    name='cloudify-cloudstack-plugin',
     version='0.1.1',
     packages=[
         'cloudstack_plugin',
