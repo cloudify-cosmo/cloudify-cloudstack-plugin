@@ -23,7 +23,7 @@ from cloudstack_plugin.cloudstack_common import (
     COMMON_RUNTIME_PROPERTIES_KEYS,
     get_resource_id,
     network_exists, get_network, get_location, get_network_offering,
-    get_vpc_id, create_acl_list, create_acl)
+    get_vpc, create_acl_list, create_acl)
 
 __author__ = 'uri1803, boul'
 
@@ -56,7 +56,7 @@ def create(ctx, **kwargs):
 
     if 'vpc' in network:
         if network['vpc']:
-            vpc = get_vpc_id(cloud_driver, network['vpc'])
+            vpc = get_vpc(cloud_driver, network['vpc'])
             ctx.logger.info('DEBUG: VPC id: '.format(vpc.id))
     else:
         vpc = None

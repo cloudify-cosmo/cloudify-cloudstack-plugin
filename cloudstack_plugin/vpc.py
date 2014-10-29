@@ -15,7 +15,11 @@
 
 from cloudify.decorators import operation
 
-from cloudstack_plugin.cloudstack_common import get_cloud_driver
+from cloudstack_plugin.cloudstack_common import(
+    get_cloud_driver,
+    get_location,
+    get_vpc, vpc_exists)
+
 
 
 __author__ = 'jedeko, boul'
@@ -47,7 +51,7 @@ def create(ctx, **kwargs):
 
     ctx['vpc_id'] = ctx.node.properties
 
-    if not _vpc_exists(cloud_driver, vpc_name):
+    if not vpc_exists(cloud_driver, vpc_name):
         ctx.logger.info('creating vpc: {0}'.format(vpc_name))
 
         vpc = cloud_driver.ex_create_vpc(
@@ -81,29 +85,25 @@ def delete(ctx, **kwargs):
         pass
 
 
-def _vpc_exists(cloud_driver, vpc_name):
-    exists = get_vpc(cloud_driver, vpc_name)
-    if not exists:
-        return False
-    return True
 
 
-def get_vpc(cloud_driver, vpc_name):
-    vpcs = [vpc for vpc in cloud_driver
-        .ex_list_vpcs() if vpc.name == vpc_name]
 
-    if vpcs.__len__() == 0:
-        return None
-    return vpcs[0]
+# def get_vpc(cloud_driver, vpc_name):
+#     vpcs = [vpc for vpc in cloud_driver
+#         .ex_list_vpcs() if vpc.name == vpc_name]
+#
+#     if vpcs.__len__() == 0:
+#         return None
+#     return vpcs[0]
 
-
-def get_location(cloud_driver, location_name):
-
-    locations = [location for location in cloud_driver
-        .list_locations() if location.name == location_name]
-    if locations.__len__() == 0:
-        return None
-    return locations[0]
+# already in cloudify-comming
+# def get_location(cloud_driver, location_name):
+#
+#     locations = [location for location in cloud_driver
+#         .list_locations() if location.name == location_name]
+#     if locations.__len__() == 0:
+#         return None
+#     return locations[0]
 
 
 def get_vpc_offering(cloud_driver, vpcoffer_name):
@@ -113,7 +113,7 @@ def get_vpc_offering(cloud_driver, vpcoffer_name):
         return None
     return vpcoffers[0]
 
-@operation
+# TODO let's call this from operation directly, seems like double code.
 def _create_egr_rules(cloud_driver, network_id, cidr_list, protocol,
                       start_port, end_port):
 

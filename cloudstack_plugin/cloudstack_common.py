@@ -217,7 +217,7 @@ def get_network_offering(cloud_driver, netoffer_name):
     return netoffers[0]
 
 
-def get_vpc_id(cloud_driver, vpc_name):
+def get_vpc(cloud_driver, vpc_name):
     vpcs = [vpc for vpc in cloud_driver
         .ex_list_vpcs() if vpc.name == vpc_name]
     if vpcs.__len__() == 0:
@@ -249,3 +249,10 @@ def create_acl(cloud_driver, protocol, acl_id,
         end_port=end_port,
         traffic_type=traffic_type)
     return acl
+
+
+def vpc_exists(cloud_driver, vpc_name):
+    exists = get_vpc(cloud_driver, vpc_name)
+    if not exists:
+        return False
+    return True
