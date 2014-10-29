@@ -79,11 +79,12 @@ def connect_network(ctx, **kwargs):
                     rule_ports = rule.get('ports')
 
                     for port in rule_ports:
-                        ctx.logger.info('Creating fw rule: {3}:{0}:{1}-{2}' \
-                                        .format(rule.cidr_list,
-                                                rule.start_port,
-                                                rule.end_port,
-                                                rule.protocol))
+                        ctx.logger.info('Creating ingress fw rule:'
+                                        ' {3}:{0}:{1}-{2}'
+                                        .format(rule_cidr,
+                                                port,
+                                                port,
+                                                rule_protocol))
 
                         cloud_driver.ex_create_firewall_rule(
                             address=fip,
