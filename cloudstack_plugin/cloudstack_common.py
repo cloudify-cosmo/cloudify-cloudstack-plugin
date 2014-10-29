@@ -36,7 +36,7 @@ COMMON_RUNTIME_PROPERTIES_KEYS = [CLOUDSTACK_ID_PROPERTY,
 
 def _get_auth_from_context(ctx):
 
-    if ctx.type == ctx.NODE_INSTANCE:
+    if ctx.type == context.NODE_INSTANCE:
         config = ctx.node.properties.get('cloudstack_config')
     elif ctx.type == context.RELATIONSHIP_INSTANCE:
         config = ctx.source.node.properties.get('cloudstack_config')
