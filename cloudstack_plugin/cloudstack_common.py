@@ -184,3 +184,68 @@ def get_resource_id(ctx, type_name):
         return ctx.node.properties['resource_id']
     return "{0}_{1}_{2}".format(type_name, ctx.deployment.id, ctx.instance.id)
 
+
+def network_exists(cloud_driver, network_name):
+    exists = get_network(cloud_driver, network_name)
+    if not exists:
+        return False
+    return True
+
+
+def get_network(cloud_driver, network_name):
+    networks = [net for net in cloud_driver
+        .ex_list_networks() if net.name == network_name]
+
+    if networks.__len__() == 0:
+        return None
+    return networks[0]
+
+
+def get_location(cloud_driver, location_name):
+    locations = [location for location in cloud_driver
+        .list_locations() if location.name == location_name]
+    if locations.__len__() == 0:
+        return None
+    return locations[0]
+
+
+def get_network_offering(cloud_driver, netoffer_name):
+    netoffers = [offer for offer in cloud_driver
+        .ex_list_network_offerings() if offer.name == netoffer_name]
+    if netoffers.__len__() == 0:
+        return None
+    return netoffers[0]
+
+
+def get_vpc_id(cloud_driver, vpc_name):
+    vpcs = [vpc for vpc in cloud_driver
+        .ex_list_vpcs() if vpc.name == vpc_name]
+    if vpcs.__len__() == 0:
+        return None
+    return vpcs[0]
+
+
+def create_acl_list(cloud_driver, name, vpc_id, network_id):
+    acllist = cloud_driver.ex_create_network_acllist(
+        name=name,
+        vpc_id=vpc_id,
+        description=name)
+
+    # Replace the newly created ACL list on to the network
+    cloud_driver.ex_replace_network_acllist(
+        acl_id=acllist.id,
+        network_id=network_id)
+
+    return acllist
+
+
+def create_acl(cloud_driver, protocol, acl_id,
+               cidr_list, start_port, end_port, traffic_type):
+    acl = cloud_driver.ex_create_network_acl(
+        protocol=protocol,
+        acl_id=acl_id,
+        cidr_list=cidr_list,
+        start_port=start_port,
+        end_port=end_port,
+        traffic_type=traffic_type)
+    return acl
