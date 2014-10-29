@@ -121,9 +121,10 @@ def disconnect_network(ctx, **kwargs):
 
         cloud_driver.ex_delete_firewall_rule(rule)
 
-
-
     ctx.logger.info('Deleting floating ip: {0}'.format(fip))
 
-    cloud_driver.ex_release_public_ip(address=fip)
-
+    try:
+        cloud_driver.ex_release_public_ip(address=fip)
+    except Exception as e:
+        ctx.logger.warn('Floating IP: {0} may not have been deleted: {1}'
+                        .format(fip, str(e)))

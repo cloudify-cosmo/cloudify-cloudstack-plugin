@@ -107,7 +107,7 @@ def create(ctx, **kwargs):
                 network_offering=network_offering,
                 location=location)
 
-            ctx.logger.info('Created Network: {0}'.format(net))
+            ctx.logger.info('Created Network: {0}'.format(net.name))
 
             # Create egress rules only as they are part of a network,
             # ingress rules are bound to a floating/public_ip so,
