@@ -152,7 +152,7 @@ def create(ctx, **kwargs):
 @operation
 def delete(ctx, **kwargs):
 
-    network_name = ctx.instance.runtime_properties['network_name']
+    network_name = ctx.instance.runtime_properties[CLOUDSTACK_NAME_PROPERTY]
     cloud_driver = get_cloud_driver(ctx)
     network = get_network(cloud_driver, network_name)
 
@@ -161,7 +161,7 @@ def delete(ctx, **kwargs):
         cloud_driver.ex_delete_network(network)
     except Exception as e:
         ctx.logger.warn('network {0} may not have been deleted: {1}'
-                        .format(ctx.instance.runtime_properties['network_name'], str(e)))
+                        .format(network_name), str(e))
         return False
         pass
 
