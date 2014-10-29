@@ -207,7 +207,7 @@ def delete(ctx, **kwargs):
                     .format(Provider.CLOUDSTACK))
     cloud_driver = get_cloud_driver(ctx)
 
-    instance_id = ctx['instance_id']
+    instance_id = ctx.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY]
     if instance_id is None:
         raise NameError('could not find node ID in runtime context: {0} '
                         .format(instance_id))
