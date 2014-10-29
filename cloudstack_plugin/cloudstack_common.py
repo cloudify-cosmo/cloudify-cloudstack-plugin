@@ -16,14 +16,39 @@ import copy
 from libcloud.compute.types import Provider
 from libcloud.compute.providers import get_driver
 import libcloud.security
+from cloudify import context
 
 __author__ = 'uri1803, boul'
 
+# properties
+USE_EXTERNAL_RESOURCE_PROPERTY = 'use_external_resource'
+
+# runtime properties
+CLOUDSTACK_ID_PROPERTY = 'external_id'  # resource's cloudstack id
+CLOUDSTACK_TYPE_PROPERTY = 'external_type'  # resource's cloudstack type
+CLOUDSTACK_NAME_PROPERTY = 'external_name'  # resource's cloudstack name
+
+# runtime properties which all types use
+COMMON_RUNTIME_PROPERTIES_KEYS = [CLOUDSTACK_ID_PROPERTY,
+                                  CLOUDSTACK_TYPE_PROPERTY,
+                                  CLOUDSTACK_NAME_PROPERTY]
+
 
 def _get_auth_from_context(ctx):
-    auth_config = {}
-    auth_config.update(copy.deepcopy(ctx.node.properties['cloudstack_config']))
-    return auth_config
+
+    if ctx.type == ctx.NODE_INSTANCE:
+        config = ctx.node.properties.get('cloudstack_config')
+    elif ctx.type == context.RELATIONSHIP_INSTANCE:
+        config = ctx.source.node.properties.get('cloudstack_config')
+        if not config:
+            config = ctx.target.node.properties.get('cloudstack_config')
+    else:
+        config = None
+
+    #auth_config = config
+    #auth_config.update(copy.deepcopy(
+    #    ctx.node.properties['cloudstack_config']))
+    return config
 
 
 def get_cloud_driver(ctx):
