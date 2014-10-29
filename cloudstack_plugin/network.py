@@ -161,7 +161,7 @@ def delete(ctx, **kwargs):
         cloud_driver.ex_delete_network(network)
     except Exception as e:
         ctx.logger.warn('network {0} may not have been deleted: {1}'
-                        .format(network_name), str(e))
+                        .format(network_name, str(e)))
         return False
         pass
 
