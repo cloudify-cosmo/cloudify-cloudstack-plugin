@@ -110,7 +110,7 @@ def disconnect_network(ctx, **kwargs):
     for rule in firewall_rules:
 
         ctx.logger.info('Deleting fw rule: {0}'.format(rule))
-        cloud_driver.ex_delete_firewall_rule(rule.id)
+        cloud_driver.ex_delete_firewall_rule(rule)
 
 
 
