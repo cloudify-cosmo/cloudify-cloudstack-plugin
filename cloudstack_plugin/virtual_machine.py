@@ -357,15 +357,16 @@ def connect_floating_ip(ctx, **kwargs):
     #server_config = _get_server_from_context(ctx)
 
     ctx.logger.debug('reading portmap configuration.')
-    portmaps = ctx.node.properties['portmaps']
+    portmaps = ctx.source.node.properties['portmaps']
 
     if not portmaps:
         raise NonRecoverableError('Relation defined but no portmaps set'
                                   ' either remove relation or'
                                   ' define the portmaps')
 
-    server_id = ctx.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY]
-    floating_ip_id = ctx.related.runtime_properties[CLOUDSTACK_ID_PROPERTY]
+    server_id = ctx.source.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY]
+    floating_ip_id = ctx.target.instance.runtime_properties[
+        CLOUDSTACK_ID_PROPERTY]
 
     for portmap in portmaps:
 
