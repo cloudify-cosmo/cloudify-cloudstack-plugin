@@ -16,9 +16,30 @@
 from cloudify.decorators import operation
 from cloudify.exceptions import NonRecoverableError
 
-from cloudstack_plugin.cloudstack_common import get_cloud_driver, \
-     get_network_by_id, get_floating_ip_by_id
+from cloudstack_plugin.cloudstack_common import (
+    get_cloud_driver,
+    get_floating_ip_by_id,
+    get_node_by_id,
+    get_network_by_id,
+    create_ingress_firewall_rule,
+    get_nic_by_node_and_network_id,
+    get_public_ip_by_id,
+    get_portmaps_by_node_id,
+    USE_EXTERNAL_RESOURCE_PROPERTY,
+    CLOUDSTACK_ID_PROPERTY,
+    CLOUDSTACK_TYPE_PROPERTY,
+    CLOUDSTACK_NAME_PROPERTY,
+    COMMON_RUNTIME_PROPERTIES_KEYS,
+    get_resource_id
 
+)
+
+FLOATINGIP_CLOUDSTACK_TYPE = 'floatingip'
+
+# Runtime properties
+IP_ADDRESS_PROPERTY = 'floating_ip_address'
+RUNTIME_PROPERTIES_KEYS = COMMON_RUNTIME_PROPERTIES_KEYS + \
+    [IP_ADDRESS_PROPERTY]
 
 __author__ = 'boul'
 
@@ -28,8 +49,9 @@ def connect_network(ctx, **kwargs):
 
     cloud_driver = get_cloud_driver(ctx)
 
-    network_id = ctx.target.instance.runtime_properties['network_id']
+    network_id = ctx.target.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY]
     network = get_network_by_id(ctx, cloud_driver, network_id)
+    #firewall_rules = ctx.node.target.properties.get(['firewall'][0], None)
 
     if network.extra['vpc_id'] is not None:
 
@@ -46,12 +68,33 @@ def connect_network(ctx, **kwargs):
 
         fip = cloud_driver.ex_allocate_public_ip(network_id=network.id)
 
+        if 'firewall' in ctx.target.node.properties:
+                firewall_config = ctx.target.node.properties['firewall']
+
+                ingress_rules = [rule for rule in firewall_config if
+                                 rule['type'] == 'ingress']
+
+                for rule in ingress_rules:
+                    rule_cidr = rule.get('cidr')
+                    rule_protocol = rule.get('protocol')
+                    rule_ports = rule.get('ports')
+
+                    for port in rule_ports:
+                        cloud_driver.ex_create_firewall_rule(
+                            address=fip,
+                            cidr_list=rule_cidr,
+                            protocol=rule_protocol,
+                            start_port=port,
+                            end_port=port
+                        )
+
     else:
         raise NonRecoverableError('Cannot resolve network or vpc id')
 
-    ctx.source.instance.runtime_properties['external_id'] = fip.id
-    ctx.source.instance.runtime_properties['external_type'] = 'publicip'
-    ctx.source.instance.runtime_properties['floating_ip_address'] = fip.address
+    ctx.source.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY] = fip.id
+    ctx.source.instance.runtime_properties[CLOUDSTACK_TYPE_PROPERTY] = \
+        FLOATINGIP_CLOUDSTACK_TYPE
+    ctx.source.instance.runtime_properties[IP_ADDRESS_PROPERTY] = fip.address
 
 
 @operation
@@ -59,7 +102,7 @@ def disconnect_network(ctx, **kwargs):
 
     cloud_driver = get_cloud_driver(ctx)
 
-    fip_id = ctx.source.instance.runtime_properties['external_id']
+    fip_id = ctx.source.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY]
     fip = get_floating_ip_by_id(ctx, cloud_driver, fip_id)
 
     ctx.logger.info('Deleting floating ip: {0}'.format(fip))

@@ -112,6 +112,8 @@ def create(ctx, **kwargs):
                 network_offering=network_offering,
                 location=location)
 
+            ctx.logger.info('Created Network: {0}'.format(net))
+
             # Create egress rules only as they are part of a network,
             # ingress rules are bound to a floating/public_ip so,
             # this will get arranged on the floating ip relationship
@@ -128,10 +130,13 @@ def create(ctx, **kwargs):
                     rule_ports = rule.get('ports')
 
                     for port in rule_ports:
-                        _create_egress_rules(cloud_driver, net.id,
-                                             rule_cidr,
-                                             rule_protocol,
-                                             port, port)
+                        cloud_driver.ex_create_egress_firewall_rule(
+                            network_id=net.id,
+                            cidr_list=rule_cidr,
+                            protocol=rule_protocol,
+                            start_port=port,
+                            end_port=port
+                        )
 
     else:
         ctx.logger.info('using existing management network {0}'.
@@ -229,12 +234,3 @@ def create_acl(cloud_driver, protocol, acl_id,
     return acl
 
 
-def _create_egress_rules(cloud_driver, network_id, cidr_list, protocol,
-                         start_port, end_port):
-
-    cloud_driver.ex_create_egress_firewall_rule(
-        network_id=network_id,
-        cidr_list=cidr_list,
-        protocol=protocol,
-        start_port=start_port,
-        end_port=end_port)
