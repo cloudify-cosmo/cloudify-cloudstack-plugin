@@ -51,12 +51,10 @@ def create(ctx, **kwargs):
     }
     server_config.update(copy.deepcopy(ctx.node.properties['server']))
 
-    ctx.logger.info("initializing {0} cloud driver"
+    ctx.logger.info("Initializing {0} cloud driver"
                     .format(Provider.CLOUDSTACK))
     cloud_driver = get_cloud_driver(ctx)
-    #Change to debug level
-    ctx.logger.info('reading server config from context')
-    #server_config = _get_server_from_context(ctx)
+
     network_config = ctx.node.properties['network']
 
     name = server_config['name']
@@ -68,15 +66,15 @@ def create(ctx, **kwargs):
     default_network = network_config.get(['default_network'][0], None)
     ip_address = network_config.get(['ip_address'][0], None)
 
-    ctx.logger.info('getting required size {0}'.format(size_name))
+    ctx.logger.info('Getting service_offering: {0}'.format(size_name))
     sizes = [size for size in cloud_driver.list_sizes() if size.name
              == size_name]
     if sizes is None:
         raise RuntimeError(
-            'Could not find size with name {0}'.format(size_name))
+            'Could not find service_offering with name {0}'.format(size_name))
     size = sizes[0]
 
-    ctx.logger.info('getting required image with ID {0}'.format(image_id))
+    ctx.logger.info('Getting required image with ID {0}'.format(image_id))
     images = [template for template in cloud_driver.list_images()
               if image_id == template.id]
     if images is None:
@@ -96,10 +94,9 @@ def create(ctx, **kwargs):
                                "both are specified")
 
     if default_network is not None:
-        ctx.logger.info('Creating this VM in default_network: {0}'.
-                        format(default_network))
-        ctx.logger.info("Creating VM with the following details: {0}".format(
-            server_config))
+        ctx.logger.info('Creating VM: {0} in default_network: {1}'.
+                        format(default_network, name))
+
         _create_in_network(ctx=ctx,
                            cloud_driver=cloud_driver,
                            name=name,
@@ -132,9 +129,6 @@ def _create_in_network(ctx, cloud_driver, name, image, size, keypair_name,
 
     nets = [net for net in network_list if net.name == default_network_name]
 
-    for net in nets:
-        ctx.logger.info('id: {0} name: {1}'.format(net.id, net.name))
-
     node = cloud_driver.create_node(name=name,
                                     image=image,
                                     size=size,
@@ -143,7 +137,7 @@ def _create_in_network(ctx, cloud_driver, name, image, size, keypair_name,
                                     ex_ip_address=ip_address,
                                     ex_start_vm=False)
     ctx.logger.info(
-        'vm {0} was created successfully'.format(
+        'VM: {0} was created successfully'.format(
             node.name))
 
     ctx.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY] = node.id
@@ -168,7 +162,7 @@ def _create_in_security_group(ctx, cloud_driver, name, image, size,
                                     ex_ipaddress=ip_address)
 
     ctx.logger.info(
-        'vm {0} was created successfully'.format(
+        'VM: {0} was created successfully'.format(
             node.name))
 
     ctx.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY] = node.id
@@ -187,38 +181,36 @@ def start(ctx, **kwargs):
     instance_id = ctx.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY]
     if instance_id is None:
         raise RuntimeError(
-            'could not find node ID in runtime context: {0} '
+            'Could not find node ID in runtime context: {0} '
             .format(instance_id))
 
-    ctx.logger.info('getting node with ID: {0} '.format(instance_id))
     node = get_node_by_id(ctx, cloud_driver, instance_id)
     if node is None:
-        raise RuntimeError('could not find node with ID {0}'
+        raise RuntimeError('Could not find node with ID {0}'
                            .format(instance_id))
 
-    ctx.logger.info('starting node with details {0}'.format(node.name))
+    ctx.logger.info('Starting node: {0}'.format(node.name))
     cloud_driver.ex_start(node)
 
 
 @operation
 def delete(ctx, **kwargs):
 
-    ctx.logger.info("initializing {0} cloud driver"
+    ctx.logger.info("Initializing {0} cloud driver"
                     .format(Provider.CLOUDSTACK))
     cloud_driver = get_cloud_driver(ctx)
 
     instance_id = ctx.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY]
     if instance_id is None:
-        raise NameError('could not find node ID in runtime context: {0} '
+        raise NameError('Could not find node ID in runtime context: {0} '
                         .format(instance_id))
 
-    ctx.logger.info('getting node with ID: {0} '.format(instance_id))
     node = get_node_by_id(ctx, cloud_driver, instance_id)
     if node is None:
-        raise NameError('could not find node with ID: {0} '
+        raise NameError('Could not find node with ID: {0} '
                         .format(instance_id))
 
-    ctx.logger.info('destroying vm with details: {0}'.format(node.name))
+    ctx.logger.info('destroying vm: {0}'.format(node.name))
     cloud_driver.destroy_node(node)
 
 

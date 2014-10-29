@@ -66,15 +66,10 @@ def create(ctx, **kwargs):
     else:
         vpc = None
 
-    ctx.logger.info('Current node {0}{1}'.format(ctx.instance.id,
-                                                 ctx.node.properties))
-
-    #ctx.instance.runtime_properties['network_id'] = ctx.instance.id
-
     if not _network_exists(cloud_driver, network_name):
 
         if vpc:
-            ctx.logger.info('creating network: {0} in VPC with ID: {1}'.
+            ctx.logger.info('Creating network: {0} in VPC with ID: {1}'.
                             format(network_name, vpc.id))
 
             net = cloud_driver.ex_create_network(
@@ -104,7 +99,7 @@ def create(ctx, **kwargs):
                                    acl_cidr, port, port, acl_type)
 
         else:
-            ctx.logger.info('creating network: {0}'.format(network_name))
+            ctx.logger.info('Creating network: {0}'.format(network_name))
 
             net = cloud_driver.ex_create_network(
                 display_text=network_name,
@@ -146,7 +141,7 @@ def create(ctx, **kwargs):
                         )
 
     else:
-        ctx.logger.info('using existing management network {0}'.
+        ctx.logger.info('Using existing network: {0}'.
                         format(network_name))
         net = get_network(cloud_driver, network_name)
 
@@ -167,7 +162,7 @@ def delete(ctx, **kwargs):
 
         cloud_driver.ex_delete_network(network)
     except Exception as e:
-        ctx.logger.warn('network {0} may not have been deleted: {1}'
+        ctx.logger.warn('Network {0} may not have been deleted: {1}'
                         .format(network_name, str(e)))
         return False
         pass
