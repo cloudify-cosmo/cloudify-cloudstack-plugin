@@ -21,7 +21,6 @@ from cloudstack_plugin.cloudstack_common import (
     get_floating_ip_by_id,
     get_node_by_id,
     get_network_by_id,
-    create_ingress_firewall_rule,
     get_nic_by_node_and_network_id,
     get_public_ip_by_id,
     get_portmaps_by_node_id,
