@@ -105,7 +105,7 @@ def disconnect_network(ctx, **kwargs):
     fip = get_floating_ip_by_id(ctx, cloud_driver, fip_id)
 
     firewall_rules = [rule for rule in cloud_driver.ex_list_firewall_rules() if
-                      rule.address == fip]
+                      fip.id == rule.address.id]
 
     for rule in firewall_rules:
 
