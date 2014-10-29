@@ -130,6 +130,13 @@ def create(ctx, **kwargs):
                     rule_ports = rule.get('ports')
 
                     for port in rule_ports:
+                        ctx.logger.info('Creating egress fw rule:'
+                                        ' {3}:{0}:{1}-{2}'.format(
+                                        rule_cidr,
+                                        port,
+                                        port,
+                                        rule_protocol))
+
                         cloud_driver.ex_create_egress_firewall_rule(
                             network_id=net.id,
                             cidr_list=rule_cidr,

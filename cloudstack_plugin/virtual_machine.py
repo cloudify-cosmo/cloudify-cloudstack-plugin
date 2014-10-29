@@ -397,6 +397,10 @@ def connect_floating_ip(ctx, **kwargs):
         public_ip = get_public_ip_by_id(ctx, cloud_driver, floating_ip_id)
 
         try:
+            ctx.logger.info('Creating portmap for node: {0}:{1}-{2} on'
+                            ' {3}:{4}-{5}'.
+                            format(node.name, priv_port, priv_end_port,
+                                   public_ip.address, pub_port, pub_end_port))
 
             cloud_driver.ex_create_port_forwarding_rule(node=node,
                                                         address=public_ip,
@@ -427,6 +431,14 @@ def disconnect_floating_ip(ctx, **kwargs):
     for portmap in portmaps:
 
         try:
+
+            ctx.logger.info('Deleting portmap for node: {0}:{1}-{2} on'
+                            ' {3}:{4}-{5}'.
+                            format(node.name, portmap.private_port,
+                                   portmap.private_end_port,
+                                   portmap.address, portmap.public_port,
+                                   portmap.public_end_port))
+
             cloud_driver.ex_delete_port_forwarding_rule(node=node,
                                                         rule=portmap)
         except Exception as e:
