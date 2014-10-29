@@ -51,7 +51,6 @@ def create(ctx, **kwargs):
     }
     server_config.update(copy.deepcopy(ctx.node.properties['server']))
 
-
     ctx.logger.info("initializing {0} cloud driver"
                     .format(Provider.CLOUDSTACK))
     cloud_driver = get_cloud_driver(ctx)
@@ -110,7 +109,6 @@ def create(ctx, **kwargs):
                            default_network_name=default_network,
                            ip_address=ip_address)
 
-
     if default_security_group is not None:
         ctx.logger.info('Creating this VM in default_security_group.'.
                         format(default_security_group))
@@ -129,21 +127,6 @@ def create(ctx, **kwargs):
 
 def _create_in_network(ctx, cloud_driver, name, image, size, keypair_name,
                        default_network_name, ip_address=None):
-
-    # ctx.logger.info("initializing {0} cloud driver"
-    #                 .format(Provider.CLOUDSTACK))
-    # cloud_driver = get_cloud_driver(ctx)
-    # #Change to debug level
-    # ctx.logger.info('reading server config from context')
-    # server_config = _get_server_from_context(ctx)
-    #
-    # name = server_config['name']
-    # image_id = server_config['image_id']
-    # size_name = server_config['size']
-    # keypair_name = server_config['keypair_name']
-    # #security_groups = server_config['security_groups']
-    # networks = server_config['networks']
-    # ipaddress = server_config['ip_address']
 
     network_list = cloud_driver.ex_list_networks()
 
@@ -201,7 +184,7 @@ def start(ctx, **kwargs):
                     .format(Provider.CLOUDSTACK))
     cloud_driver = get_cloud_driver(ctx)
 
-    instance_id = ctx.instance.runtime_properties['instance_id']
+    instance_id = ctx.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY]
     if instance_id is None:
         raise RuntimeError(
             'could not find node ID in runtime context: {0} '
@@ -383,7 +366,6 @@ def connect_floating_ip(ctx, **kwargs):
 
     server_id = ctx.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY]
     floating_ip_id = ctx.related.runtime_properties[CLOUDSTACK_ID_PROPERTY]
-#    floating_ip_address = ctx.related.runtime_properties['floating_ip_address']
 
     for portmap in portmaps:
 
