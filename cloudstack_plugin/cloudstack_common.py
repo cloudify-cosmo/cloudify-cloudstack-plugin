@@ -224,7 +224,7 @@ def get_vpc_id(cloud_driver, vpc_name):
         return None
     return vpcs[0]
 
-
+# TODO Refactor this into operation?
 def create_acl_list(cloud_driver, name, vpc_id, network_id):
     acllist = cloud_driver.ex_create_network_acllist(
         name=name,
@@ -238,7 +238,7 @@ def create_acl_list(cloud_driver, name, vpc_id, network_id):
 
     return acllist
 
-
+# TODO Refactor this into operation?
 def create_acl(cloud_driver, protocol, acl_id,
                cidr_list, start_port, end_port, traffic_type):
     acl = cloud_driver.ex_create_network_acl(
