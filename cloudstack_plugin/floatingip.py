@@ -128,3 +128,4 @@ def disconnect_network(ctx, **kwargs):
     except Exception as e:
         ctx.logger.warn('Floating IP: {0} may not have been deleted: {1}'
                         .format(fip, str(e)))
+        pass

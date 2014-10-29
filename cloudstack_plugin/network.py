@@ -158,6 +158,19 @@ def delete(ctx, **kwargs):
     cloud_driver = get_cloud_driver(ctx)
     network = get_network(cloud_driver, network_name)
 
+    firewall_rules = [rule for rule in cloud_driver.
+                      ex_list_egress_firewall_rules() if
+                      network.id == rule.network_id]
+
+    for rule in firewall_rules:
+
+        ctx.logger.info('Deleting egress fw rule: {3}:{0}:{1}-{2} '
+                        'from network: {4}'.format(
+                        rule.cidr_list, rule.start_port, rule.end_port,
+                        rule.protocol, network_name))
+
+        cloud_driver.ex_delete_egress_firewall_rule(rule)
+
     try:
 
         cloud_driver.ex_delete_network(network)
