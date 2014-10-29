@@ -66,8 +66,8 @@ def create(ctx, **kwargs):
     else:
         vpc = None
 
-    #ctx.logger.info('Current node {0}{1}'.format(ctx.instance.id,
-       #                                          ctx.node.properties))
+    ctx.logger.info('Current node {0}{1}'.format(ctx.instance.id,
+                                                 ctx.node.properties))
 
     #ctx.instance.runtime_properties['network_id'] = ctx.instance.id
 
@@ -111,6 +111,8 @@ def create(ctx, **kwargs):
                 name=network_name,
                 network_offering=network_offering,
                 location=location)
+
+            ctx.logger.info('Created Network: {0}'.format(net))
 
             if 'firewall' in ctx.node.properties:
                 firewall_config = ctx.node.properties['firewall']
