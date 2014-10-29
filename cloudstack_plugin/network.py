@@ -15,11 +15,28 @@
 
 from cloudify.decorators import operation
 
-from cloudstack_plugin.cloudstack_common import get_cloud_driver
-
+from cloudstack_plugin.cloudstack_common import (
+    get_cloud_driver,
+    get_node_by_id,
+    get_network_by_id,
+    get_nic_by_node_and_network_id,
+    get_public_ip_by_id,
+    get_portmaps_by_node_id,
+    USE_EXTERNAL_RESOURCE_PROPERTY,
+    CLOUDSTACK_ID_PROPERTY,
+    CLOUDSTACK_TYPE_PROPERTY,
+    CLOUDSTACK_NAME_PROPERTY,
+    COMMON_RUNTIME_PROPERTIES_KEYS,
+    get_resource_id
+)
 
 __author__ = 'uri1803, boul'
 
+
+NETWORK_CLOUDSTACK_TYPE = 'network'
+
+# Runtime properties
+RUNTIME_PROPERTIES_KEYS = COMMON_RUNTIME_PROPERTIES_KEYS
 
 @operation
 def create(ctx, **kwargs):
@@ -30,7 +47,7 @@ def create(ctx, **kwargs):
 
     network = {
         'description': None,
-        'name': ctx.instance.id,
+        'name': get_resource_id(ctx, NETWORK_CLOUDSTACK_TYPE),
     }
 
     ctx.logger.debug('reading network configuration.')
@@ -49,9 +66,10 @@ def create(ctx, **kwargs):
     else:
         vpc = None
 
-    ctx.logger.info('Current node {0}{1}'.format(ctx.instance.id, ctx.node.properties))
+    #ctx.logger.info('Current node {0}{1}'.format(ctx.instance.id,
+       #                                          ctx.node.properties))
 
-    ctx.instance.runtime_properties['network_id'] = ctx.instance.id
+    #ctx.instance.runtime_properties['network_id'] = ctx.instance.id
 
     if not _network_exists(cloud_driver, network_name):
 
@@ -113,8 +131,10 @@ def create(ctx, **kwargs):
                         format(network_name))
         net = get_network(cloud_driver, network_name)
 
-    ctx.instance.runtime_properties['network_id'] = net.id
-    ctx.instance.runtime_properties['network_name'] = net.name
+    ctx.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY] = net.id
+    ctx.instance.runtime_properties[CLOUDSTACK_NAME_PROPERTY] = net.name
+    ctx.instance.runtime_properties[CLOUDSTACK_TYPE_PROPERTY] = \
+        NETWORK_CLOUDSTACK_TYPE
 
 
 @operation
