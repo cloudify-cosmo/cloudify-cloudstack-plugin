@@ -17,30 +17,47 @@ from cloudify.exceptions import NonRecoverableError
 from cloudify.decorators import operation
 
 from libcloud.compute.types import Provider
-from cloudstack_plugin.cloudstack_common import get_cloud_driver, \
-    get_node_by_id, get_network_by_id, get_nic_by_node_and_network_id, \
-    get_public_ip_by_id, get_portmaps_by_node_id
-
+from cloudstack_plugin.cloudstack_common import (
+    get_cloud_driver,
+    get_node_by_id,
+    get_network_by_id,
+    get_nic_by_node_and_network_id,
+    get_public_ip_by_id,
+    get_portmaps_by_node_id,
+    USE_EXTERNAL_RESOURCE_PROPERTY,
+    CLOUDSTACK_ID_PROPERTY,
+    CLOUDSTACK_TYPE_PROPERTY,
+    CLOUDSTACK_NAME_PROPERTY,
+    COMMON_RUNTIME_PROPERTIES_KEYS,
+    get_resource_id
+)
 
 __author__ = 'adaml, boul'
 
+SERVER_CLOUDSTACK_TYPE = 'virtualmachine'
+NETWORKINGTYPE_CLOUDSTACK_TYPE = 'networking_type'
 
-def _get_server_from_context(ctx):
-    server = {
-        'name': ctx.node_id.replace('_', '-')
-    }
-    server.update(copy.deepcopy(ctx.node.properties['server']))
-    return server
+# Runtime properties
+NETWORKS_PROPERTY = 'networks'  # all of the server's ips
+IP_PROPERTY = 'ip'  # the server's private ip
+RUNTIME_PROPERTIES_KEYS = COMMON_RUNTIME_PROPERTIES_KEYS + \
+    [NETWORKS_PROPERTY, IP_PROPERTY]
 
 @operation
 def create(ctx, **kwargs):
+
+    server_config = {
+        'name': get_resource_id(ctx, SERVER_CLOUDSTACK_TYPE)
+    }
+    server_config.update(copy.deepcopy(ctx.node.properties['server']))
+
 
     ctx.logger.info("initializing {0} cloud driver"
                     .format(Provider.CLOUDSTACK))
     cloud_driver = get_cloud_driver(ctx)
     #Change to debug level
     ctx.logger.info('reading server config from context')
-    server_config = _get_server_from_context(ctx)
+    #server_config = _get_server_from_context(ctx)
     network_config = ctx.node.properties['network']
 
     name = server_config['name']
@@ -146,8 +163,11 @@ def _create_in_network(ctx, cloud_driver, name, image, size, keypair_name,
         'vm {0} was created successfully'.format(
             node.name))
 
-    ctx['instance_id'] = node.id
-    ctx.instance.runtime_properties['networking_type'] = 'network'
+    ctx.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY] = node.id
+    ctx.instance.runtime_properties[CLOUDSTACK_TYPE_PROPERTY] = \
+        SERVER_CLOUDSTACK_TYPE
+    ctx.instance.runtime_properties[NETWORKINGTYPE_CLOUDSTACK_TYPE] = 'network'
+    ctx.instance.runtime_properties[CLOUDSTACK_NAME_PROPERTY] = node.name
 
 
 @operation
@@ -168,9 +188,12 @@ def _create_in_security_group(ctx, cloud_driver, name, image, size,
         'vm {0} was created successfully'.format(
             node.name))
 
-    ctx['instance_id'] = node.id
-    ctx.instance.runtime_properties['networking_type'] = 'security_group'
-
+    ctx.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY] = node.id
+    ctx.instance.runtime_properties[CLOUDSTACK_TYPE_PROPERTY] = \
+        SERVER_CLOUDSTACK_TYPE
+    ctx.instance.runtime_properties[NETWORKINGTYPE_CLOUDSTACK_TYPE] = \
+        'security_group'
+    ctx.instance.runtime_properties[CLOUDSTACK_NAME_PROPERTY] = node.name
 
 @operation
 def start(ctx, **kwargs):
@@ -247,8 +270,9 @@ def get_state(ctx, **kwargs):
                     .format(Provider.CLOUDSTACK))
     cloud_driver = get_cloud_driver(ctx)
 
-    instance_id = ctx.instance.runtime_properties['instance_id']
-    networking_type = ctx.instance.runtime_properties['networking_type']
+    instance_id = ctx.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY]
+    networking_type = ctx.instance.runtime_properties[
+        NETWORKINGTYPE_CLOUDSTACK_TYPE]
 
     ctx.logger.info('getting node with ID {0}'.format(instance_id))
     node = get_node_by_id(ctx, cloud_driver, instance_id)
@@ -256,31 +280,31 @@ def get_state(ctx, **kwargs):
         return False
 
     if networking_type == 'network':
-        ctx.instance.runtime_properties['ip'] = node.private_ips[0]
+        ctx.instance.runtime_properties[IP_PROPERTY] = node.private_ips[0]
         #ctx.instance.runtime_properties['ip_address'] = node.private_ips[0]
         ctx.logger.info('instance started successfully with IP {0}'
-                        .format(ctx.instance.runtime_properties['ip']))
+                        .format(ctx.instance.runtime_properties[IP_PROPERTY]))
         return True
 
     elif networking_type == 'security_group':
-        ctx.runtime.properties['ip'] = node.public_ips[0]
+        ctx.runtime.properties[IP_PROPERTY] = node.public_ips[0]
         ctx.logger.info('instance started successfully with IP {0}'
-                        .format(ctx.instance.runtime_properties['ip']))
+                        .format(ctx.instance.runtime_properties[IP_PROPERTY]))
         return True
 
     else:
-        ctx.instance.runtime_properties['ip'] = node.private_ips[0]
+        ctx.instance.runtime_properties[IP_PROPERTY] = node.private_ips[0]
         ctx.logger.info('Cannot determine networking type,'
                         ' using private_ip as {0} ip'
-                        .format(ctx.instance.runtime_properties['ip']))
+                        .format(ctx.instance.runtime_properties[IP_PROPERTY]))
         return True
 
 
 @operation
 def connect_network(ctx, **kwargs):
 
-    instance_id = ctx.instance.runtime_properties['instance_id']
-    network_id = ctx.related.runtime_properties['network_id']
+    instance_id = ctx.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY]
+    network_id = ctx.related.runtime_properties[CLOUDSTACK_ID_PROPERTY]
 
 
 
@@ -320,8 +344,8 @@ def connect_network(ctx, **kwargs):
 @operation
 def disconnect_network(ctx, **kwargs):
 
-    instance_id = ctx.instance.runtime_properties['instance_id']
-    network_id = ctx.related.runtime_properties['network_id']
+    instance_id = ctx.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY]
+    network_id = ctx.related.runtime_properties[CLOUDSTACK_ID_PROPERTY]
 
     ctx.logger.info('Removing a NIC from VM-ID {0} in Network-ID {1}'.
                     format(instance_id, network_id))
@@ -357,8 +381,8 @@ def connect_floating_ip(ctx, **kwargs):
                                   ' either remove relation or'
                                   ' define the portmaps')
 
-    server_id = ctx.instance.runtime_properties['instance_id']
-    floating_ip_id = ctx.related.runtime_properties['external_id']
+    server_id = ctx.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY]
+    floating_ip_id = ctx.related.runtime_properties[CLOUDSTACK_ID_PROPERTY]
 #    floating_ip_address = ctx.related.runtime_properties['floating_ip_address']
 
     for portmap in portmaps:
@@ -412,7 +436,7 @@ def connect_floating_ip(ctx, **kwargs):
 def disconnect_floating_ip(ctx, **kwargs):
 
     cloud_driver = get_cloud_driver(ctx)
-    node_id = ctx.instance.runtime_properties['instance_id']
+    node_id = ctx.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY]
     node = get_node_by_id(ctx, cloud_driver, node_id)
     portmaps = get_portmaps_by_node_id(ctx, cloud_driver, node_id)
 
