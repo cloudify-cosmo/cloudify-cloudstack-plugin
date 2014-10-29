@@ -13,6 +13,8 @@
 # * See the License for the specific language governing permissions and
 # * limitations under the License.
 import copy
+import os
+import json
 from libcloud.compute.types import Provider
 from libcloud.compute.providers import get_driver
 import libcloud.security
@@ -59,6 +61,47 @@ def get_cloud_driver(ctx):
     driver = get_driver(Provider.CLOUDSTACK)
     libcloud.security.VERIFY_SSL_CERT = False
     return driver(key=api_key, secret=api_secret_key,url=api_url)
+
+
+class Config(object):
+
+    CLOUDSTACK_CONFIG_PATH_ENV_VAR = 'CLOUDSTACK_CONFIG_PATH'
+    CLOUDSTACK_CONFIG_PATH_DEFAULT_PATH = '~/cloudstack_config.json'
+
+    def get(self):
+        static_config = self._build_config_from_env_variables()
+        env_name = self.CLOUDSTACK_CONFIG_PATH_ENV_VAR
+        default_location_tpl = self.CLOUDSTACK_CONFIG_PATH_DEFAULT_PATH
+        default_location = os.path.expanduser(default_location_tpl)
+        config_path = os.getenv(env_name, default_location)
+        try:
+            with open(config_path) as f:
+                Config.update_config(static_config, json.loads(f.read()))
+        except IOError:
+            pass
+        return static_config
+
+    @staticmethod
+    def _build_config_from_env_variables():
+        cfg = dict()
+
+        def take_env_var_if_exists(cfg_key, env_var):
+            if env_var in os.environ:
+                cfg[cfg_key] = os.environ[env_var]
+
+        take_env_var_if_exists('cs_api_key', 'CS_API_KEY')
+        take_env_var_if_exists('cs_api_secret', 'CS_API_SECRET')
+        take_env_var_if_exists('cs_api_url', 'CS_API_URL')
+
+        return cfg
+
+    @staticmethod
+    def update_config(overridden_cfg, overriding_cfg):
+        """ this method is like dict.update() only that it doesn't override
+        with (or set new) empty values (e.g. empty string) """
+        for k, v in overriding_cfg.iteritems():
+            if v:
+                overridden_cfg[k] = v
 
 
 def get_node_by_id(ctx, cloud_driver, instance_id):

@@ -230,7 +230,7 @@ def stop(ctx, **kwargs):
                     .format(Provider.CLOUDSTACK))
     cloud_driver = get_cloud_driver(ctx)
 
-    instance_id = ctx.instance.runtime_properties['instance_id']
+    instance_id = ctx.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY]
     if instance_id is None:
         raise RuntimeError(
             'could not find node ID in runtime context: {0} '
@@ -327,8 +327,9 @@ def connect_network(ctx, **kwargs):
 @operation
 def disconnect_network(ctx, **kwargs):
 
-    instance_id = ctx.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY]
-    network_id = ctx.related.runtime_properties[CLOUDSTACK_ID_PROPERTY]
+    instance_id = ctx.source.instance.runtime_properties[
+        CLOUDSTACK_ID_PROPERTY]
+    network_id = ctx.target.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY]
 
     ctx.logger.info('Removing a NIC from VM-ID {0} in Network-ID {1}'.
                     format(instance_id, network_id))
@@ -419,7 +420,7 @@ def connect_floating_ip(ctx, **kwargs):
 def disconnect_floating_ip(ctx, **kwargs):
 
     cloud_driver = get_cloud_driver(ctx)
-    node_id = ctx.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY]
+    node_id = ctx.source.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY]
     node = get_node_by_id(ctx, cloud_driver, node_id)
     portmaps = get_portmaps_by_node_id(ctx, cloud_driver, node_id)
 
