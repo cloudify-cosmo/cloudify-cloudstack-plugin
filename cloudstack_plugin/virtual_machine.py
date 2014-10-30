@@ -271,12 +271,13 @@ def get_state(ctx, **kwargs):
                 'management_network_name'])
 
             nics = cloud_driver.ex_list_nics(node)
-            mgmt_nic = [nic for nic in nics if nic.network_id == mgt_net.id][0]
+            mgmt_nic = [nic for nic in nics if nic.network_id == mgt_net.id]
 
             ctx.logger.info('CFY will use {0} for management'
                             .format(mgmt_nic.ip_address))
 
-            ctx.instance.runtime_properties[IP_PROPERTY] = mgmt_nic.ip_address
+            ctx.instance.runtime_properties[IP_PROPERTY] = mgmt_nic[0]\
+                .ip_address
 
         else:
 
