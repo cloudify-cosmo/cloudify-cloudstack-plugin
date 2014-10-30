@@ -55,6 +55,9 @@ def create(ctx, **kwargs):
                     .format(Provider.CLOUDSTACK))
     cloud_driver = get_cloud_driver(ctx)
 
+    # TODO Currently a generated network name (resource_id) \
+    #  is not support for the default network
+
     network_config = ctx.node.properties['network']
 
     name = server_config['name']
@@ -103,7 +106,7 @@ def create(ctx, **kwargs):
                            image=image,
                            size=size,
                            keypair_name=keypair_name,
-                           #default_network_name=default_network,
+                           default_network_name=default_network,
                            ip_address=ip_address)
 
     if default_security_group is not None:
@@ -123,7 +126,7 @@ def create(ctx, **kwargs):
 
 
 def _create_in_network(ctx, cloud_driver, name, image, size, keypair_name,
-                       default_network_name=None, ip_address=None):
+                       default_network_name, ip_address=None):
 
     network_list = cloud_driver.ex_list_networks()
 
