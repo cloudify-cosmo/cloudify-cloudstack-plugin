@@ -103,7 +103,7 @@ def create(ctx, **kwargs):
                            image=image,
                            size=size,
                            keypair_name=keypair_name,
-                           default_network_name=default_network,
+                           #default_network_name=default_network,
                            ip_address=ip_address)
 
     if default_security_group is not None:
@@ -279,7 +279,8 @@ def get_state(ctx, **kwargs):
 @operation
 def connect_network(ctx, **kwargs):
 
-    instance_id = ctx.source.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY]
+    instance_id = ctx.source.instance.runtime_properties[
+        CLOUDSTACK_ID_PROPERTY]
     network_id = ctx.target.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY]
 
     cloud_driver = get_cloud_driver(ctx)
