@@ -267,7 +267,7 @@ def get_state(ctx, **kwargs):
                             .format(ctx.node.properties[
                             'management_network_name']))
 
-            mgt_net = get_network(ctx.node.properties[
+            mgt_net = get_network(cloud_driver, ctx.node.properties[
                 'management_network_name'])
 
             nics = cloud_driver.ex_list_nics(node)
