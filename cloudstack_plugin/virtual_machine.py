@@ -267,11 +267,10 @@ def get_state(ctx, **kwargs):
                             .format(ctx.node.properties[
                             'management_network_name']))
 
-            instance = get_node_by_id(instance_id)
             mgt_net = get_network(ctx.node.properties[
                 'management_network_name'])
 
-            nics = cloud_driver.ex_list_nics(instance)
+            nics = cloud_driver.ex_list_nics(node)
             mgmt_nic = [nic for nic in nics if nic.network_id == mgt_net.id][0]
 
             ctx.logger.info('CFY will use {0} for management'
