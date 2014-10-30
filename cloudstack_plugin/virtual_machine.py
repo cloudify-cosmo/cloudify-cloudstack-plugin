@@ -142,7 +142,7 @@ def _create_in_network(ctx, cloud_driver, name, image, size, keypair_name,
                        network_ids, default_network, ip_address=None):
 
     network_list = cloud_driver.ex_list_networks()
-    nets = get_network(default_network)
+    nets = get_network(cloud_driver, default_network)
     nets.append = [net for net in network_list if net.id in network_ids
                    and not nets.id]
 
