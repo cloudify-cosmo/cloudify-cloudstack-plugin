@@ -287,10 +287,10 @@ def connect_network(ctx, **kwargs):
 
     node = get_node_by_id(ctx, cloud_driver, instance_id)
     network = get_network_by_id(ctx, cloud_driver, network_id)
-
-    ctx.logger.info('Checking if there is a nic for  '
-                    'vm: {0} with id: {1} in network {2} with id: {3}'
-                    .format(node.name, network.name, instance_id, network_id,))
+    #
+    # ctx.logger.info('Checking if there is a nic for  '
+    #                 'vm: {0} with id: {1} in network {2} with id: {3}'
+    #                 .format(node.name, network.name, instance_id, network_id,))
 
     nic_exists = get_nic_by_node_and_network_id(ctx, cloud_driver, node,
                                                 network_id)

@@ -137,7 +137,7 @@ def get_nic_by_node_and_network_id(ctx, cloud_driver, node, network_id):
             network_id == nic.network_id]
 
     if not nics:
-        ctx.logger.info('could not find nic by node_id {0} and network_id {1}'
+        ctx.logger.debug('could not find nic by node_id {0} and network_id {1}'
                         .format(node.id, network_id))
         return None
 
