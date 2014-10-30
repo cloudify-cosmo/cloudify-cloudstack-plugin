@@ -132,6 +132,9 @@ def _create_in_network(ctx, cloud_driver, name, image, size, keypair_name,
 
     nets = [net for net in network_list if net.name == default_network_name]
 
+    ctx.logger.info('Creating VM: {0} in '
+                    'found network: {1}'.format(name, nets.name))
+
     node = cloud_driver.create_node(name=name,
                                     image=image,
                                     size=size,
