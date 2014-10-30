@@ -25,6 +25,7 @@ from cloudstack_plugin.cloudstack_common import (
     get_public_ip_by_id,
     get_portmaps_by_node_id,
     get_network,
+    get_cloudstack_ids_of_connected_nodes_by_cloudstack_type,
     USE_EXTERNAL_RESOURCE_PROPERTY,
     CLOUDSTACK_ID_PROPERTY,
     CLOUDSTACK_TYPE_PROPERTY,
@@ -32,6 +33,7 @@ from cloudstack_plugin.cloudstack_common import (
     COMMON_RUNTIME_PROPERTIES_KEYS,
     get_resource_id
 )
+from cloudstack_plugin.network import NETWORK_CLOUDSTACK_TYPE
 
 __author__ = 'adaml, boul'
 
@@ -44,8 +46,15 @@ IP_PROPERTY = 'ip'  # the server's private ip
 RUNTIME_PROPERTIES_KEYS = COMMON_RUNTIME_PROPERTIES_KEYS + \
     [NETWORKS_PROPERTY, IP_PROPERTY]
 
+
+
 @operation
 def create(ctx, **kwargs):
+
+    network_ids = get_cloudstack_ids_of_connected_nodes_by_cloudstack_type(
+        ctx, NETWORK_CLOUDSTACK_TYPE)
+
+    ctx.logger.info('Network IDs: {0}'.format(network_ids))
 
     # Cloudstack does not support _underscore in vm-name
 

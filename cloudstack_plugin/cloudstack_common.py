@@ -256,3 +256,9 @@ def vpc_exists(cloud_driver, vpc_name):
     if not exists:
         return False
     return True
+
+
+def get_cloudstack_ids_of_connected_nodes_by_cloudstack_type(ctx, type_name):
+    type_caps = [caps for caps in ctx.capabilities.get_all().values() if
+                 caps.get(CLOUDSTACK_TYPE_PROPERTY) == type_name]
+    return [cap[CLOUDSTACK_ID_PROPERTY] for cap in type_caps]
