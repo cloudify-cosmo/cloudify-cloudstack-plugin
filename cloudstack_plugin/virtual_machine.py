@@ -146,7 +146,7 @@ def _create_in_network(ctx, cloud_driver, name, image, size, keypair_name,
     nets.append = [net for net in network_list if net.id in network_ids
                    and not nets.id]
     for net in nets:
-        ctx.logger.info(net.name)
+        ctx.logger.info('networks: {0}'.format(net.name))
 
     node = cloud_driver.create_node(name=name,
                                     image=image,
