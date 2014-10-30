@@ -261,28 +261,7 @@ def get_state(ctx, **kwargs):
 
     if networking_type == 'network':
 
-        if ctx.node.properties['management_network_name']:
-
-            ctx.logger.info('Management network defined: {0}'
-                            .format(ctx.node.properties[
-                            'management_network_name']))
-
-            mgt_net = get_network(cloud_driver, ctx.node.properties[
-                'management_network_name'])
-
-            nic = get_nic_by_node_and_network_id(ctx, cloud_driver, node,
-                                                 mgt_net.id)
-            # nics = cloud_driver.ex_list_nics(node)
-            # mgmt_nic = [nic for nic in nics if nic.network_id == mgt_net.id]
-
-            ctx.logger.info('CFY will use {0} for management'
-                            .format(nic.ip_address))
-
-            ctx.instance.runtime_properties[IP_PROPERTY] = nic.ip_address
-
-        else:
-
-            ctx.instance.runtime_properties[IP_PROPERTY] = node.private_ips[0]
+        ctx.instance.runtime_properties[IP_PROPERTY] = node.private_ips[0]
 
         ctx.logger.info('VM {1} started successfully with IP {0}'
                         .format(ctx.instance.runtime_properties[IP_PROPERTY],
@@ -333,6 +312,26 @@ def connect_network(ctx, **kwargs):
         return False
 
     cloud_driver.ex_attach_nic_to_node(node=node, network=network)
+
+    if ctx.source.node.properties['management_network_name']:
+
+            ctx.logger.info('Management network defined: {0}'
+                            .format(ctx.node.properties[
+                            'management_network_name']))
+
+            mgt_net = get_network(cloud_driver, ctx.node.properties[
+                'management_network_name'])
+
+            nic = get_nic_by_node_and_network_id(ctx, cloud_driver, node,
+                                                 mgt_net.id)
+            # nics = cloud_driver.ex_list_nics(node)
+            # mgmt_nic = [nic for nic in nics if nic.network_id == mgt_net.id]
+
+            ctx.logger.info('CFY will use {0} for management,'
+                            ' overwriting previously set value'
+                            .format(nic))
+
+            ctx.instance.runtime_properties[IP_PROPERTY] = nic.ip_address
 
     return True
 

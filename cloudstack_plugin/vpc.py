@@ -85,9 +85,6 @@ def delete(ctx, **kwargs):
         pass
 
 
-
-
-
 # def get_vpc(cloud_driver, vpc_name):
 #     vpcs = [vpc for vpc in cloud_driver
 #         .ex_list_vpcs() if vpc.name == vpc_name]
