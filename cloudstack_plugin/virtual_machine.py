@@ -294,8 +294,8 @@ def connect_network(ctx, **kwargs):
     nic_exists = get_nic_by_node_and_network_id(ctx, cloud_driver, node,
                                                 network_id)
 
-    #ctx.logger.info('Adding a NIC to VM {0} in Network {1}'.format(
-    # node.name, network.name))
+    ctx.logger.info('Adding a NIC to VM {0} in Network {1}'.format(
+                    node.name, network.name))
 
     if nic_exists is not None:
         ctx.logger.info('No need to connect network {0}, '
@@ -315,16 +315,14 @@ def disconnect_network(ctx, **kwargs):
         CLOUDSTACK_ID_PROPERTY]
     network_id = ctx.target.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY]
 
-    ctx.logger.info('Removing a NIC from VM-ID {0} in Network-ID {1}'.
-                    format(instance_id, network_id))
-
     cloud_driver = get_cloud_driver(ctx)
 
     node = get_node_by_id(ctx, cloud_driver, instance_id)
     nic = get_nic_by_node_and_network_id(ctx, cloud_driver, node, network_id)
 
-    #ctx.logger.info('Adding a NIC to VM {0} in Network with id {1}'.
-    # format(node.name, nic.network_id))
+
+    ctx.logger.info('Removing NIC from VM {0} in Network with: {1}'.
+                    format(node.name, nic.network_id))
 
     try:
         cloud_driver.ex_detach_nic_from_node(nic=nic, node=node)
