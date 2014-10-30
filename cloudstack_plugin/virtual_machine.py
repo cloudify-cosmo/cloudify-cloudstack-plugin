@@ -299,16 +299,16 @@ def connect_network(ctx, **kwargs):
     #                 'vm: {0} with id: {1} in network {2} with id: {3}'
     #                 .format(node.name, network.name, instance_id, network_id,))
 
-    nic_exists = get_nic_by_node_and_network_id(ctx, cloud_driver, node,
+    nic = get_nic_by_node_and_network_id(ctx, cloud_driver, node,
                                                 network_id)
 
     ctx.logger.info('Adding a NIC to VM {0} in Network {1}'.format(
                     node.name, network.name))
 
-    if nic_exists is not None:
+    if nic is not None:
         ctx.logger.info('No need to connect network {0}, '
                         'already connected to nic {1}'
-                        .format(network.name, nic_exists.id))
+                        .format(network.name, nic.id))
         return False
 
     cloud_driver.ex_attach_nic_to_node(node=node, network=network)
@@ -322,8 +322,8 @@ def connect_network(ctx, **kwargs):
             mgt_net = get_network(cloud_driver, ctx.node.properties[
                 'management_network_name'])
 
-            nic = get_nic_by_node_and_network_id(ctx, cloud_driver, node,
-                                                 mgt_net.id)
+            #nic = get_nic_by_node_and_network_id(ctx, cloud_driver, node,
+            #                                     mgt_net.id)
             # nics = cloud_driver.ex_list_nics(node)
             # mgmt_nic = [nic for nic in nics if nic.network_id == mgt_net.id]
 
