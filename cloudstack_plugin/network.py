@@ -72,8 +72,8 @@ def create(ctx, **kwargs):
                 name=network_name,
                 network_offering=network_offering,
                 location=location,
-                gateway=network['gateway'],
-                netmask=network['netmask'],
+                gateway=network.get(['gateway'][0], None),
+                netmask=network.get(['netmask'][0], None),
                 vpc_id=vpc.id)
 
             # Create ACL for the network if it's is part of a VPC
@@ -99,8 +99,8 @@ def create(ctx, **kwargs):
             net = cloud_driver.ex_create_network(
                 display_text=network_name,
                 name=network_name,
-                gateway=network['gateway'],
-                netmask=network['netmask'],
+                gateway=network.get(['gateway'][0], None),
+                netmask=network.get(['netmask'][0], None),
                 network_offering=network_offering,
                 location=location,
                 )
