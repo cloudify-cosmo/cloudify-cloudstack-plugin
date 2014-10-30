@@ -130,6 +130,8 @@ def _create_in_network(ctx, cloud_driver, name, image, size, keypair_name,
 
     network_list = cloud_driver.ex_list_networks()
 
+    ctx.logger.info('Default network name{0}'.format(default_network_name))
+
     nets = [net for net in network_list if net.name == default_network_name]
 
     for bla in nets:
