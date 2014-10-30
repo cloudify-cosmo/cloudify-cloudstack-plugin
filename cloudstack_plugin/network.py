@@ -48,7 +48,7 @@ def create(ctx, **kwargs):
 
     ctx.logger.debug('reading network configuration.')
     #network.update(ctx.node.properties['network'])
-    network.update(copy.deepcopy(ctx.node.properties['server']))
+    network.update(copy.deepcopy(ctx.node.properties['network']))
 
     network_name = network['name']
     zone = network['zone']
