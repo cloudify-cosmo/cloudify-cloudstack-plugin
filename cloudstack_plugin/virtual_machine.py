@@ -46,8 +46,10 @@ RUNTIME_PROPERTIES_KEYS = COMMON_RUNTIME_PROPERTIES_KEYS + \
 @operation
 def create(ctx, **kwargs):
 
+    # Cloudstack does not support _underscore in vm-name
+
     server_config = {
-        'name': get_resource_id(ctx, SERVER_CLOUDSTACK_TYPE)
+        'name': get_resource_id(ctx, SERVER_CLOUDSTACK_TYPE).replace('_', '-')
     }
     server_config.update(copy.deepcopy(ctx.node.properties['server']))
 
