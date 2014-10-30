@@ -34,7 +34,7 @@ from cloudstack_plugin.cloudstack_common import (
 
 __author__ = 'adaml, boul'
 
-SERVER_CLOUDSTACK_TYPE = 'virtualmachine'
+SERVER_CLOUDSTACK_TYPE = 'VM'
 NETWORKINGTYPE_CLOUDSTACK_TYPE = 'networking_type'
 
 # Runtime properties
@@ -132,13 +132,7 @@ def _create_in_network(ctx, cloud_driver, name, image, size, keypair_name,
 
     network_list = cloud_driver.ex_list_networks()
 
-    ctx.logger.info('Default network name{0}'.format(default_network_name))
-
     nets = [net for net in network_list if net.name == default_network_name]
-
-    for bla in nets:
-        ctx.logger.info('Creating VM: {0} in '
-                        'found network: {1}'.format(name, bla.name))
 
     node = cloud_driver.create_node(name=name,
                                     image=image,
