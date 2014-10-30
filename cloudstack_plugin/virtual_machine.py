@@ -279,13 +279,10 @@ def get_state(ctx, **kwargs):
 @operation
 def connect_network(ctx, **kwargs):
 
-    instance_id = ctx.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY]
-    network_id = ctx.related.runtime_properties[CLOUDSTACK_ID_PROPERTY]
-
-
+    instance_id = ctx.source.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY]
+    network_id = ctx.target.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY]
 
     cloud_driver = get_cloud_driver(ctx)
-
 
     node = get_node_by_id(ctx, cloud_driver, instance_id)
     network = get_network_by_id(ctx, cloud_driver, network_id)
