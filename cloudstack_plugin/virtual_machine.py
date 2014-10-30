@@ -118,7 +118,8 @@ def create(ctx, **kwargs):
                            image=image,
                            size=size,
                            keypair_name=keypair_name,
-                           default_network_name=default_network,
+                           network_ids=network_ids,
+                           default_network=default_network,
                            ip_address=ip_address)
 
     if default_security_group is not None:
@@ -138,11 +139,12 @@ def create(ctx, **kwargs):
 
 
 def _create_in_network(ctx, cloud_driver, name, image, size, keypair_name,
-                       default_network_name, ip_address=None):
+                       network_ids, default_network, ip_address=None):
 
     network_list = cloud_driver.ex_list_networks()
-
-    nets = [net for net in network_list if net.name == default_network_name]
+    nets = get_network(default_network)
+    nets.append = [net for net in network_list if net.id in network_ids
+                   and not nets.id]
 
     node = cloud_driver.create_node(name=name,
                                     image=image,
