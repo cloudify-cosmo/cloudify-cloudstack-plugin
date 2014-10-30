@@ -95,7 +95,7 @@ def create(ctx, **kwargs):
 
     if default_network is not None:
         ctx.logger.info('Creating VM: {0} in default_network: {1}'.
-                        format(default_network, name))
+                        format(name, default_network))
 
         _create_in_network(ctx=ctx,
                            cloud_driver=cloud_driver,
@@ -123,8 +123,7 @@ def create(ctx, **kwargs):
 
 
 def _create_in_network(ctx, cloud_driver, name, image, size, keypair_name,
-                       default_network_name, ip_address=None, gateway=None,
-                       netmask=None):
+                       default_network_name, ip_address=None):
 
     network_list = cloud_driver.ex_list_networks()
 
