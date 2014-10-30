@@ -99,8 +99,11 @@ def create(ctx, **kwargs):
             net = cloud_driver.ex_create_network(
                 display_text=network_name,
                 name=network_name,
+                gateway=network['gateway'],
+                netmask=network['netmask'],
                 network_offering=network_offering,
-                location=location)
+                location=location,
+                )
 
             ctx.logger.info('Created Network: {0}'.format(net.name))
 
