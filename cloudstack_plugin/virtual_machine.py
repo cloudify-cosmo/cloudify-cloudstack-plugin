@@ -102,6 +102,8 @@ def create(ctx, **kwargs):
                            name=name,
                            image=image,
                            size=size,
+                           gateway=network_config['gateway'],
+                           netmask=network_config['netmask'],
                            keypair_name=keypair_name,
                            default_network_name=default_network,
                            ip_address=ip_address)
@@ -123,7 +125,8 @@ def create(ctx, **kwargs):
 
 
 def _create_in_network(ctx, cloud_driver, name, image, size, keypair_name,
-                       default_network_name, ip_address=None):
+                       default_network_name, ip_address=None, gateway=None,
+                       netmask=None):
 
     network_list = cloud_driver.ex_list_networks()
 
@@ -132,6 +135,8 @@ def _create_in_network(ctx, cloud_driver, name, image, size, keypair_name,
     node = cloud_driver.create_node(name=name,
                                     image=image,
                                     size=size,
+                                    gateway=gateway,
+                                    netmask=netmask,
                                     ex_keyname=keypair_name,
                                     networks=nets,
                                     ex_ip_address=ip_address,
