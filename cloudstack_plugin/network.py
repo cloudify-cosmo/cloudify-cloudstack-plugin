@@ -13,6 +13,7 @@
 # * See the License for the specific language governing permissions and
 # * limitations under the License.
 
+import copy
 from cloudify.decorators import operation
 
 from cloudstack_plugin.cloudstack_common import (
