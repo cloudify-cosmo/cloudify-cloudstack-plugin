@@ -123,7 +123,7 @@ def create(ctx, **kwargs):
 
 
 def _create_in_network(ctx, cloud_driver, name, image, size, keypair_name,
-                       default_network_name, ip_address=None):
+                       default_network_name=None, ip_address=None):
 
     network_list = cloud_driver.ex_list_networks()
 
