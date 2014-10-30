@@ -24,6 +24,7 @@ from cloudstack_plugin.cloudstack_common import (
     get_nic_by_node_and_network_id,
     get_public_ip_by_id,
     get_portmaps_by_node_id,
+    get_network,
     USE_EXTERNAL_RESOURCE_PROPERTY,
     CLOUDSTACK_ID_PROPERTY,
     CLOUDSTACK_TYPE_PROPERTY,
@@ -259,8 +260,29 @@ def get_state(ctx, **kwargs):
         return False
 
     if networking_type == 'network':
-        ctx.instance.runtime_properties[IP_PROPERTY] = node.private_ips[0]
-        #ctx.instance.runtime_properties['ip_address'] = node.private_ips[0]
+
+        if ctx.node.properties['management_network_name']:
+
+            ctx.logger.info('Management network defined: {0}'
+                            .format(ctx.node.properties[
+                            'management_network_name']))
+
+            instance = get_node_by_id(instance_id)
+            mgt_net = get_network(ctx.node.properties[
+                'management_network_name'])
+
+            nics = cloud_driver.ex_list_nics(instance)
+            mgmt_nic = [nic for nic in nics if nic.network_id == mgt_net.id][0]
+
+            ctx.logger.info('CFY will use {0} for management'
+                            .format(mgmt_nic.ip_address))
+
+            ctx.instance.runtime_properties[IP_PROPERTY] = mgmt_nic.ip_address
+
+        else:
+
+            ctx.instance.runtime_properties[IP_PROPERTY] = node.private_ips[0]
+
         ctx.logger.info('VM {1} started successfully with IP {0}'
                         .format(ctx.instance.runtime_properties[IP_PROPERTY],
                                 ctx.instance.runtime_properties[
