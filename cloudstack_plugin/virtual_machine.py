@@ -288,7 +288,7 @@ def get_state(ctx, **kwargs):
 
     if networking_type == 'network':
 
-        if ctx.source.node.properties['management_network_name']:
+        if ctx.node.properties['management_network_name']:
 
             ctx.logger.info('Management network defined: {0}'
                             .format(ctx.node.properties[
