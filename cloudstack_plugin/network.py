@@ -256,6 +256,7 @@ def _create_egress_rules(ctx, cloud_driver, network_id):
                             )
 
                         except Exception as e:
-                            raise RecoverableError('Could not create egress'
+                            ctx.logger.warn('Could not create egress'
                                                    ' firewall rule: {0}'
                                                    .format(str(e)))
+                            return
