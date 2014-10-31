@@ -179,7 +179,7 @@ def _create_in_network(ctx, cloud_driver, name, image, size, keypair_name,
                                         ex_keyname=keypair_name,
                                         networks=dedup_nets,
                                         ex_ip_address=ip_address,
-                                        ex_start_vm=True)
+                                        ex_start_vm=False)
     except Exception as e:
         raise NonRecoverableError('VM creation failed: {0}'.format(str(e)))
 
@@ -221,24 +221,23 @@ def _create_in_security_group(ctx, cloud_driver, name, image, size,
 
 @operation
 def start(ctx, **kwargs):
-    # ctx.logger.info("initializing {0} cloud driver"
-    #                 .format(Provider.CLOUDSTACK))
-    # cloud_driver = get_cloud_driver(ctx)
-    #
-    # instance_id = ctx.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY]
-    # if instance_id is None:
-    #     raise RuntimeError(
-    #         'Could not find node ID in runtime context: {0} '
-    #         .format(instance_id))
-    #
-    # node = get_node_by_id(ctx, cloud_driver, instance_id)
-    # if node is None:
-    #     raise RuntimeError('Could not find node with ID {0}'
-    #                        .format(instance_id))
-    #
-    # ctx.logger.info('Starting node: {0}'.format(node.name))
-    # cloud_driver.ex_start(node)
-    return
+    ctx.logger.info("initializing {0} cloud driver"
+                    .format(Provider.CLOUDSTACK))
+    cloud_driver = get_cloud_driver(ctx)
+
+    instance_id = ctx.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY]
+    if instance_id is None:
+        raise RuntimeError(
+            'Could not find node ID in runtime context: {0} '
+            .format(instance_id))
+
+    node = get_node_by_id(ctx, cloud_driver, instance_id)
+    if node is None:
+        raise RuntimeError('Could not find node with ID {0}'
+                           .format(instance_id))
+
+    ctx.logger.info('Starting node: {0}'.format(node.name))
+    cloud_driver.ex_start(node)
 
 # TODO need to add option to immediately expunge a VM, needs implementation on
 # libcloud first
