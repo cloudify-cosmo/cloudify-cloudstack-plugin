@@ -109,8 +109,6 @@ def create(ctx, **kwargs):
                                "both are specified")
 
     if default_network is not None:
-        ctx.logger.info('Creating VM: {0} in default_network: {1}'.
-                        format(name, default_network))
 
         _create_in_network(ctx=ctx,
                            cloud_driver=cloud_driver,
@@ -156,11 +154,15 @@ def _create_in_network(ctx, cloud_driver, name, image, size, keypair_name,
             dedup_nets.append(obj)
             seen_nets.add(obj.id)
 
-    for net in range(len(dedup_nets)):
-        ctx.logger.info('Adding VM to network: (0)'.format(net[0].name))
+    for i in range(len(dedup_nets)):
+        if i == 0:
+            ctx.logger.info('Adding VM with default_network: {0}'
+                            .format(dedup_nets[i].name))
+        else:
+            ctx.logger.info('Adding VM to additional network: {0}'
+                            .format(dedup_nets[i].name))
 
-    ctx.logger.info('VM is created with default network: {0}'
-                    .format(dedup_nets[0].name))
+
 
     node = cloud_driver.create_node(name=name,
                                     image=image,
