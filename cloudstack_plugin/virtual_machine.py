@@ -318,6 +318,8 @@ def get_state(ctx, **kwargs):
 
             ctx.instance.runtime_properties[IP_PROPERTY] = nic.ip_address
 
+            return True
+
         else:
 
             ctx.instance.runtime_properties[IP_PROPERTY] = node.private_ips[0]
