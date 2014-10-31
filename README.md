@@ -14,7 +14,7 @@ Very condensed HOWTO, more to follow:
 * cd ~/cfy-demo
 * git clone https://github.com/schubergphilis/cloudify-cloudstack-plugin.git
 * git clone https://github.com/schubergphilis/cloudify-manager-blueprints.git
-* git clone https://github.com/schubergphilis/cloudify-nodecellar-example
+* git clone https://github.com/schubergphilis/cloudify-nodecellar-example.git
 * pip install -r cloudify-cloudstack-plugin/dev-requirements.txt
 * cp cloudify-manager-blueprints/cloudstack/inputs.json.template ~/cfy-demo/cloudify-config.json
 * vi cloudify-config.json - fill in your cloud specific details
