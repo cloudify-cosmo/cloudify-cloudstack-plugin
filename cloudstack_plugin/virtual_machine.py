@@ -15,16 +15,12 @@
 import copy
 from cloudify.exceptions import NonRecoverableError
 from cloudify.decorators import operation
+from cloudstack_plugin.floatingip import get_public_ip_by_id
 
 from libcloud.compute.types import Provider
 from cloudstack_plugin.cloudstack_common import (
     get_cloud_driver,
-    get_node_by_id,
-    get_network_by_id,
     get_nic_by_node_and_network_id,
-    get_public_ip_by_id,
-    get_portmaps_by_node_id,
-    get_network,
     delete_runtime_properties,
     get_cloudstack_ids_of_connected_nodes_by_cloudstack_type,
     USE_EXTERNAL_RESOURCE_PROPERTY,
@@ -34,7 +30,8 @@ from cloudstack_plugin.cloudstack_common import (
     COMMON_RUNTIME_PROPERTIES_KEYS,
     get_resource_id
 )
-from cloudstack_plugin.network import NETWORK_CLOUDSTACK_TYPE
+from cloudstack_plugin.network import NETWORK_CLOUDSTACK_TYPE, get_network, \
+    get_network_by_id
 
 __author__ = 'adaml, boul'
 
@@ -85,7 +82,7 @@ def create(ctx, **kwargs):
         [CLOUDSTACK_ID_PROPERTY][0], None)
 
     if external_id is not None:
-        if get_node_by_id(ctx.instance.runtime_properties[
+        if get_vm_by_id(ctx.instance.runtime_properties[
                 CLOUDSTACK_ID_PROPERTY]):
 
             ctx.logger.info('VM already created, skipping creation')
@@ -232,7 +229,7 @@ def start(ctx, **kwargs):
             'Could not find node ID in runtime context: {0} '
             .format(instance_id))
 
-    node = get_node_by_id(ctx, cloud_driver, instance_id)
+    node = get_vm_by_id(ctx, cloud_driver, instance_id)
     if node is None:
         raise RuntimeError('Could not find node with ID {0}'
                            .format(instance_id))
@@ -254,7 +251,7 @@ def delete(ctx, **kwargs):
         raise NameError('Could not find node ID in runtime context: {0} '
                         .format(instance_id))
 
-    node = get_node_by_id(ctx, cloud_driver, instance_id)
+    node = get_vm_by_id(ctx, cloud_driver, instance_id)
     if node is None:
         raise NameError('Could not find node with ID: {0} '
                         .format(instance_id))
@@ -279,7 +276,7 @@ def stop(ctx, **kwargs):
             'could not find node ID in runtime context: {0} '
             .format(instance_id))
 
-    node = get_node_by_id(ctx, cloud_driver, instance_id)
+    node = get_vm_by_id(ctx, cloud_driver, instance_id)
     if node is None:
         raise RuntimeError('could not find node with ID {0}'
                            .format(instance_id))
@@ -299,7 +296,7 @@ def get_state(ctx, **kwargs):
     networking_type = ctx.instance.runtime_properties[
         NETWORKINGTYPE_CLOUDSTACK_TYPE]
 
-    node = get_node_by_id(ctx, cloud_driver, instance_id)
+    node = get_vm_by_id(ctx, cloud_driver, instance_id)
     if node is None:
         return False
 
@@ -470,7 +467,7 @@ def connect_floating_ip(ctx, **kwargs):
         if protocol is None:
             raise NonRecoverableError('Please specify the protocol TCP or UDP')
 
-        node = get_node_by_id(ctx, cloud_driver, server_id)
+        node = get_vm_by_id(ctx, cloud_driver, server_id)
         public_ip = get_public_ip_by_id(ctx, cloud_driver, floating_ip_id)
 
         try:
@@ -502,8 +499,8 @@ def disconnect_floating_ip(ctx, **kwargs):
 
     cloud_driver = get_cloud_driver(ctx)
     node_id = ctx.source.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY]
-    node = get_node_by_id(ctx, cloud_driver, node_id)
-    portmaps = get_portmaps_by_node_id(ctx, cloud_driver, node_id)
+    node = get_vm_by_id(ctx, cloud_driver, node_id)
+    portmaps = get_portmaps_by_vm_id(ctx, cloud_driver, node_id)
 
     for portmap in portmaps:
 
@@ -530,3 +527,24 @@ def remove_duplicates(seq):
     seen = set()
     seen_add = seen.add
     return [ x for x in seq if not (x in seen or seen_add(x))]
+
+
+def get_vm_by_id(ctx, cloud_driver, instance_id):
+
+    nodes = [node for node in cloud_driver.list_nodes() if
+             instance_id == node.id]
+
+    if not nodes:
+        ctx.logger.info('could not find node by ID {0}'.format(instance_id))
+        return None
+
+    return nodes[0]
+
+
+def get_portmaps_by_vm_id(ctx, cloud_driver, node_id):
+
+    portmaps = [portmap for portmap in
+                cloud_driver.ex_list_port_forwarding_rules()
+                if node_id == portmap.node.id]
+
+    return portmaps

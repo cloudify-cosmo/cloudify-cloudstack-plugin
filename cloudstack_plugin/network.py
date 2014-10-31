@@ -25,8 +25,8 @@ from cloudstack_plugin.cloudstack_common import (
     delete_runtime_properties,
     USE_EXTERNAL_RESOURCE_PROPERTY,
     get_resource_id,
-    network_exists, get_network, get_location, get_network_offering,
-    get_vpc, create_acl_list, create_acl)
+    get_location)
+from cloudstack_plugin.vpc import get_vpc, create_acl_list, create_acl
 
 __author__ = 'uri1803, boul'
 
@@ -193,3 +193,37 @@ def delete(ctx, **kwargs):
     return True
 
 
+def get_network_offering(cloud_driver, netoffer_name):
+    netoffers = [offer for offer in cloud_driver
+        .ex_list_network_offerings() if offer.name == netoffer_name]
+    if netoffers.__len__() == 0:
+        return None
+    return netoffers[0]
+
+
+def get_network(cloud_driver, network_name):
+    networks = [net for net in cloud_driver
+        .ex_list_networks() if net.name == network_name]
+
+    if networks.__len__() == 0:
+        return None
+    return networks[0]
+
+
+def network_exists(cloud_driver, network_name):
+    exists = get_network(cloud_driver, network_name)
+    if not exists:
+        return False
+    return True
+
+
+def get_network_by_id(ctx, cloud_driver, network_id):
+
+    networks = [network for network in cloud_driver.ex_list_networks() if
+                network_id == network.id]
+
+    if not networks:
+        ctx.logger.info('could not find network by ID {0}'.format(network_id))
+        return None
+
+    return networks[0]

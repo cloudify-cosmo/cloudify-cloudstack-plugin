@@ -18,12 +18,7 @@ from cloudify.exceptions import NonRecoverableError
 
 from cloudstack_plugin.cloudstack_common import (
     get_cloud_driver,
-    get_floating_ip_by_id,
-    get_node_by_id,
-    get_network_by_id,
     get_nic_by_node_and_network_id,
-    get_public_ip_by_id,
-    get_portmaps_by_node_id,
     USE_EXTERNAL_RESOURCE_PROPERTY,
     CLOUDSTACK_ID_PROPERTY,
     CLOUDSTACK_TYPE_PROPERTY,
@@ -32,6 +27,9 @@ from cloudstack_plugin.cloudstack_common import (
     get_resource_id
 
 )
+from cloudstack_plugin.network import get_network_by_id
+from cloudstack_plugin.virtual_machine import get_vm_by_id, \
+    get_portmaps_by_vm_id
 
 FLOATINGIP_CLOUDSTACK_TYPE = 'floatingip'
 
@@ -129,3 +127,29 @@ def disconnect_network(ctx, **kwargs):
         ctx.logger.warn('Floating IP: {0} may not have been deleted: {1}'
                         .format(fip, str(e)))
         pass
+
+
+def get_floating_ip_by_id(ctx, cloud_driver, floating_ip_id):
+
+    fips = [fip for fip in cloud_driver.ex_list_public_ips() if
+            floating_ip_id == fip.id]
+
+    if not fips:
+        ctx.logger.info('could not find floating ip by ID {0}'.
+                        format(floating_ip_id))
+        return None
+
+    return fips[0]
+
+
+def get_public_ip_by_id(ctx, cloud_driver, public_ip_id):
+
+    public_ips = [pubip for pubip in cloud_driver.ex_list_public_ips() if
+                  public_ip_id == pubip.id]
+
+    if not public_ips:
+        ctx.logger.info('could not find public_ip by id {0}'
+                        .format(public_ip_id))
+        return None
+
+    return public_ips[0]

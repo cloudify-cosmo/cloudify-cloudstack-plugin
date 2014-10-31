@@ -12,13 +12,15 @@
 # * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # * See the License for the specific language governing permissions and
 # * limitations under the License.
-import copy
 import os
 import json
+
+from cloudify import context
+
 from libcloud.compute.types import Provider
 from libcloud.compute.providers import get_driver
 import libcloud.security
-from cloudify import context
+
 
 __author__ = 'uri1803, boul'
 
@@ -104,30 +106,6 @@ class Config(object):
                 overridden_cfg[k] = v
 
 
-def get_node_by_id(ctx, cloud_driver, instance_id):
-
-    nodes = [node for node in cloud_driver.list_nodes() if
-             instance_id == node.id]
-
-    if not nodes:
-        ctx.logger.info('could not find node by ID {0}'.format(instance_id))
-        return None
-
-    return nodes[0]
-
-
-def get_network_by_id(ctx, cloud_driver, network_id):
-
-    networks = [network for network in cloud_driver.ex_list_networks() if
-                network_id == network.id]
-
-    if not networks:
-        ctx.logger.info('could not find network by ID {0}'.format(network_id))
-        return None
-
-    return networks[0]
-
-
 def get_nic_by_node_and_network_id(ctx, cloud_driver, node, network_id):
 
     #node = _get_node_by_id(cloud_driver, node_id)
@@ -144,61 +122,10 @@ def get_nic_by_node_and_network_id(ctx, cloud_driver, node, network_id):
     return nics[0]
 
 
-def get_public_ip_by_id(ctx, cloud_driver, public_ip_id):
-
-    public_ips = [pubip for pubip in cloud_driver.ex_list_public_ips() if
-                  public_ip_id == pubip.id]
-
-    if not public_ips:
-        ctx.logger.info('could not find public_ip by id {0}'
-                        .format(public_ip_id))
-        return None
-
-    return public_ips[0]
-
-
-def get_portmaps_by_node_id(ctx, cloud_driver, node_id):
-
-    portmaps = [portmap for portmap in
-                cloud_driver.ex_list_port_forwarding_rules()
-                if node_id == portmap.node.id]
-
-    return portmaps
-
-
-def get_floating_ip_by_id(ctx, cloud_driver, floating_ip_id):
-
-    fips = [fip for fip in cloud_driver.ex_list_public_ips() if
-            floating_ip_id == fip.id]
-
-    if not fips:
-        ctx.logger.info('could not find floating ip by ID {0}'.
-                        format(floating_ip_id))
-        return None
-
-    return fips[0]
-
-
 def get_resource_id(ctx, type_name):
     if ctx.node.properties['resource_id']:
         return ctx.node.properties['resource_id']
     return "{0}_{1}_{2}".format(type_name, ctx.deployment.id, ctx.instance.id)
-
-
-def network_exists(cloud_driver, network_name):
-    exists = get_network(cloud_driver, network_name)
-    if not exists:
-        return False
-    return True
-
-
-def get_network(cloud_driver, network_name):
-    networks = [net for net in cloud_driver
-        .ex_list_networks() if net.name == network_name]
-
-    if networks.__len__() == 0:
-        return None
-    return networks[0]
 
 
 def get_location(cloud_driver, location_name):
@@ -209,59 +136,11 @@ def get_location(cloud_driver, location_name):
     return locations[0]
 
 
-def get_network_offering(cloud_driver, netoffer_name):
-    netoffers = [offer for offer in cloud_driver
-        .ex_list_network_offerings() if offer.name == netoffer_name]
-    if netoffers.__len__() == 0:
-        return None
-    return netoffers[0]
-
-
-def get_vpc(cloud_driver, vpc_name):
-    vpcs = [vpc for vpc in cloud_driver
-        .ex_list_vpcs() if vpc.name == vpc_name]
-    if vpcs.__len__() == 0:
-        return None
-    return vpcs[0]
-
-# TODO Refactor this into operation?
-def create_acl_list(cloud_driver, name, vpc_id, network_id):
-    acllist = cloud_driver.ex_create_network_acllist(
-        name=name,
-        vpc_id=vpc_id,
-        description=name)
-
-    # Replace the newly created ACL list on to the network
-    cloud_driver.ex_replace_network_acllist(
-        acl_id=acllist.id,
-        network_id=network_id)
-
-    return acllist
-
-# TODO Refactor this into operation?
-def create_acl(cloud_driver, protocol, acl_id,
-               cidr_list, start_port, end_port, traffic_type):
-    acl = cloud_driver.ex_create_network_acl(
-        protocol=protocol,
-        acl_id=acl_id,
-        cidr_list=cidr_list,
-        start_port=start_port,
-        end_port=end_port,
-        traffic_type=traffic_type)
-    return acl
-
-
-def vpc_exists(cloud_driver, vpc_name):
-    exists = get_vpc(cloud_driver, vpc_name)
-    if not exists:
-        return False
-    return True
-
-
 def get_cloudstack_ids_of_connected_nodes_by_cloudstack_type(ctx, type_name):
     type_caps = [caps for caps in ctx.capabilities.get_all().values() if
                  caps.get(CLOUDSTACK_TYPE_PROPERTY) == type_name]
     return [cap[CLOUDSTACK_ID_PROPERTY] for cap in type_caps]
+
 
 def delete_runtime_properties(ctx, runtime_properties_keys):
     for runtime_prop_key in runtime_properties_keys:

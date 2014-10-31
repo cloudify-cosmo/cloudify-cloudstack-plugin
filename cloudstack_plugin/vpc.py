@@ -17,8 +17,7 @@ from cloudify.decorators import operation
 
 from cloudstack_plugin.cloudstack_common import(
     get_cloud_driver,
-    get_location,
-    get_vpc, vpc_exists)
+    get_location)
 
 
 
@@ -120,3 +119,44 @@ def _create_egr_rules(cloud_driver, network_id, cidr_list, protocol,
         protocol=protocol,
         start_port=start_port,
         end_port=end_port)
+
+
+def get_vpc(cloud_driver, vpc_name):
+    vpcs = [vpc for vpc in cloud_driver
+        .ex_list_vpcs() if vpc.name == vpc_name]
+    if vpcs.__len__() == 0:
+        return None
+    return vpcs[0]
+
+
+def create_acl_list(cloud_driver, name, vpc_id, network_id):
+    acllist = cloud_driver.ex_create_network_acllist(
+        name=name,
+        vpc_id=vpc_id,
+        description=name)
+
+    # Replace the newly created ACL list on to the network
+    cloud_driver.ex_replace_network_acllist(
+        acl_id=acllist.id,
+        network_id=network_id)
+
+    return acllist
+
+
+def create_acl(cloud_driver, protocol, acl_id,
+               cidr_list, start_port, end_port, traffic_type):
+    acl = cloud_driver.ex_create_network_acl(
+        protocol=protocol,
+        acl_id=acl_id,
+        cidr_list=cidr_list,
+        start_port=start_port,
+        end_port=end_port,
+        traffic_type=traffic_type)
+    return acl
+
+
+def vpc_exists(cloud_driver, vpc_name):
+    exists = get_vpc(cloud_driver, vpc_name)
+    if not exists:
+        return False
+    return True
