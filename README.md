@@ -26,8 +26,14 @@ Very condensed HOWTO, more to follow:
 * cfy blueprints upload -p cloudify-nodecellar-example/cloudstack-blueprint.yaml b my-first-blueprint
 * surf to http://your-manager-ip
 * go to blueprints and click create deployment - fill in cs-api-url and keys
-* deploy!
+* workaround until libcloud accepted pulls:
+* cfy ssh
+* cd cloudify.<deployment-name/env/bin
+* source activate
+* ./python2.7 pip install https://github.com/schubergphilis/libcloud/archive/pending.zip --upgrade
+* start the install workflow in the webui
 * fingercrossed - if all ok - your sample app should be accessible on port :8080
+
 
 If you are here without problems, good for me :)
 If not: rkuipers@schubergphilis.com, cloudify dev-list, irc-channel or twitter @_BouL_
