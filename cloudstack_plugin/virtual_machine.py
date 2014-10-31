@@ -354,52 +354,52 @@ def get_state(ctx, **kwargs):
 @operation
 def connect_network(ctx, **kwargs):
 
-    instance_id = ctx.source.instance.runtime_properties[
-        CLOUDSTACK_ID_PROPERTY]
-    network_id = ctx.target.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY]
-
-    cloud_driver = get_cloud_driver(ctx)
-
-    node = get_node_by_id(ctx, cloud_driver, instance_id)
-    network = get_network_by_id(ctx, cloud_driver, network_id)
+    # instance_id = ctx.source.instance.runtime_properties[
+    #     CLOUDSTACK_ID_PROPERTY]
+    # network_id = ctx.target.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY]
     #
-    # ctx.logger.info('Checking if there is a nic for  '
-    #                 'vm: {0} with id: {1} in network {2} with id: {3}'
-    #                 .format(node.name, network.name, instance_id, network_id,))
-
-    nic = get_nic_by_node_and_network_id(ctx, cloud_driver, node,
-                                                network_id)
-
-    ctx.logger.info('Adding a NIC to VM {0} in Network {1}'.format(
-                    node.name, network.name))
-
-    if nic is not None:
-        ctx.logger.info('No need to connect network {0}, '
-                        'already connected to nic {1}'
-                        .format(network.name, nic.id))
-        return False
-
-    cloud_driver.ex_attach_nic_to_node(node=node, network=network)
-
-    if ctx.source.node.properties['management_network_name']:
-
-            ctx.logger.info('Management network defined: {0}'
-                            .format(ctx.node.properties[
-                            'management_network_name']))
-
-            mgt_net = get_network(cloud_driver, ctx.node.properties[
-                'management_network_name'])
-
-            #nic = get_nic_by_node_and_network_id(ctx, cloud_driver, node,
-            #                                     mgt_net.id)
-            # nics = cloud_driver.ex_list_nics(node)
-            # mgmt_nic = [nic for nic in nics if nic.network_id == mgt_net.id]
-
-            ctx.logger.info('CFY will use {0} for management,'
-                            ' overwriting previously set value'
-                            .format(nic))
-
-            ctx.instance.runtime_properties[IP_PROPERTY] = nic.ip_address
+    # cloud_driver = get_cloud_driver(ctx)
+    #
+    # node = get_node_by_id(ctx, cloud_driver, instance_id)
+    # network = get_network_by_id(ctx, cloud_driver, network_id)
+    # #
+    # # ctx.logger.info('Checking if there is a nic for  '
+    # #                 'vm: {0} with id: {1} in network {2} with id: {3}'
+    # #                 .format(node.name, network.name, instance_id, network_id,))
+    #
+    # nic = get_nic_by_node_and_network_id(ctx, cloud_driver, node,
+    #                                             network_id)
+    #
+    # ctx.logger.info('Adding a NIC to VM {0} in Network {1}'.format(
+    #                 node.name, network.name))
+    #
+    # if nic is not None:
+    #     ctx.logger.info('No need to connect network {0}, '
+    #                     'already connected to nic {1}'
+    #                     .format(network.name, nic.id))
+    #     return False
+    #
+    # cloud_driver.ex_attach_nic_to_node(node=node, network=network)
+    #
+    # if ctx.source.node.properties['management_network_name']:
+    #
+    #         ctx.logger.info('Management network defined: {0}'
+    #                         .format(ctx.node.properties[
+    #                         'management_network_name']))
+    #
+    #         mgt_net = get_network(cloud_driver, ctx.node.properties[
+    #             'management_network_name'])
+    #
+    #         #nic = get_nic_by_node_and_network_id(ctx, cloud_driver, node,
+    #         #                                     mgt_net.id)
+    #         # nics = cloud_driver.ex_list_nics(node)
+    #         # mgmt_nic = [nic for nic in nics if nic.network_id == mgt_net.id]
+    #
+    #         ctx.logger.info('CFY will use {0} for management,'
+    #                         ' overwriting previously set value'
+    #                         .format(nic))
+    #
+    #         ctx.instance.runtime_properties[IP_PROPERTY] = nic.ip_address
 
     return True
 
@@ -407,24 +407,24 @@ def connect_network(ctx, **kwargs):
 @operation
 def disconnect_network(ctx, **kwargs):
 
-    instance_id = ctx.source.instance.runtime_properties[
-        CLOUDSTACK_ID_PROPERTY]
-    network_id = ctx.target.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY]
-
-    cloud_driver = get_cloud_driver(ctx)
-
-    node = get_node_by_id(ctx, cloud_driver, instance_id)
-    nic = get_nic_by_node_and_network_id(ctx, cloud_driver, node, network_id)
-
-
-    ctx.logger.info('Removing NIC from VM {0} in Network with: {1}'.
-                    format(node.name, nic.network_id))
-
-    try:
-        cloud_driver.ex_detach_nic_from_node(nic=nic, node=node)
-    except Exception as e:
-        ctx.logger.warn('NIC may not have been removed: {0}'.format(str(e)))
-        return False
+    # instance_id = ctx.source.instance.runtime_properties[
+    #     CLOUDSTACK_ID_PROPERTY]
+    # network_id = ctx.target.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY]
+    #
+    # cloud_driver = get_cloud_driver(ctx)
+    #
+    # node = get_node_by_id(ctx, cloud_driver, instance_id)
+    # nic = get_nic_by_node_and_network_id(ctx, cloud_driver, node, network_id)
+    #
+    #
+    # ctx.logger.info('Removing NIC from VM {0} in Network with: {1}'.
+    #                 format(node.name, nic.network_id))
+    #
+    # try:
+    #     cloud_driver.ex_detach_nic_from_node(nic=nic, node=node)
+    # except Exception as e:
+    #     ctx.logger.warn('NIC may not have been removed: {0}'.format(str(e)))
+    #     return False
 
     return True
 
