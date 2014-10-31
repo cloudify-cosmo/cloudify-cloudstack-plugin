@@ -80,8 +80,10 @@ def create(ctx, **kwargs):
                                                 None)
     default_network = network_config.get(['default_network'][0], None)
     ip_address = network_config.get(['ip_address'][0], None)
+    external_id = ctx.instance.runtime_properties.get(
+        [CLOUDSTACK_ID_PROPERTY][0], None)
 
-    if ctx.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY]:
+    if external_id is not None:
         if get_node_by_id(ctx.instance.runtime_properties[
                 CLOUDSTACK_ID_PROPERTY]):
 
