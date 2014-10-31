@@ -15,7 +15,7 @@
 
 import copy
 from cloudify.decorators import operation
-
+from cloudify.exceptions import NonRecoverableError
 from cloudstack_plugin.cloudstack_common import (
     get_cloud_driver,
     CLOUDSTACK_ID_PROPERTY,
@@ -23,6 +23,7 @@ from cloudstack_plugin.cloudstack_common import (
     CLOUDSTACK_NAME_PROPERTY,
     COMMON_RUNTIME_PROPERTIES_KEYS,
     delete_runtime_properties,
+    USE_EXTERNAL_RESOURCE_PROPERTY,
     get_resource_id,
     network_exists, get_network, get_location, get_network_offering,
     get_vpc, create_acl_list, create_acl)
@@ -56,6 +57,7 @@ def create(ctx, **kwargs):
     location = get_location(cloud_driver, zone)
     netoffer = network['service_offering']
     network_offering = get_network_offering(cloud_driver, netoffer)
+    existing_net = network_exists(cloud_driver, network_name)
 
     if 'vpc' in network:
         if network['vpc']:
@@ -64,7 +66,8 @@ def create(ctx, **kwargs):
     else:
         vpc = None
 
-    if not network_exists(cloud_driver, network_name):
+    if not existing_net and ctx.node.properties[
+            USE_EXTERNAL_RESOURCE_PROPERTY] is False:
 
         if vpc:
             ctx.logger.info('Creating network: {0} in VPC with ID: {1}'.
@@ -159,28 +162,33 @@ def delete(ctx, **kwargs):
     cloud_driver = get_cloud_driver(ctx)
     network = get_network(cloud_driver, network_name)
 
-    firewall_rules = [rule for rule in cloud_driver.
-                      ex_list_egress_firewall_rules() if
-                      network.id == rule.network_id]
+    if not ctx.node.properties[USE_EXTERNAL_RESOURCE_PROPERTY] is True:
 
-    for rule in firewall_rules:
+        firewall_rules = [rule for rule in cloud_driver.
+                          ex_list_egress_firewall_rules() if
+                          network.id == rule.network_id]
 
-        ctx.logger.info('Deleting egress fw rule: {3}:{0}:{1}-{2} '
-                        'from network: {4}'.format(
-                        rule.cidr_list, rule.start_port, rule.end_port,
-                        rule.protocol, network_name))
+        for rule in firewall_rules:
 
-        cloud_driver.ex_delete_egress_firewall_rule(rule)
+            ctx.logger.info('Deleting egress fw rule: {3}:{0}:{1}-{2} '
+                            'from network: {4}'.format(
+                            rule.cidr_list, rule.start_port, rule.end_port,
+                            rule.protocol, network_name))
 
-    try:
+            cloud_driver.ex_delete_egress_firewall_rule(rule)
 
-        cloud_driver.ex_delete_network(network)
-    except Exception as e:
-        ctx.logger.warn('Network {0} may not have been deleted: {1}'
-                        .format(network_name, str(e)))
-        return False
-        pass
+        try:
 
+            cloud_driver.ex_delete_network(network)
+        except Exception as e:
+            ctx.logger.warn('Network {0} may not have been deleted: {1}'
+                            .format(network_name, str(e)))
+            return False
+            pass
+    else:
+
+        ctx.logger.info('This is an external resource only removing '
+                        'runtime props')
     delete_runtime_properties(ctx, RUNTIME_PROPERTIES_KEYS)
     return True
 
