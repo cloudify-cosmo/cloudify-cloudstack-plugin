@@ -142,17 +142,30 @@ def _create_in_network(ctx, cloud_driver, name, image, size, keypair_name,
                        network_ids, default_network, ip_address=None):
 
     network_list = cloud_driver.ex_list_networks()
+
+    # Set default network as first network in the list
     nets = [get_network(cloud_driver, default_network)]
-    nets.append = [net for net in network_list if net.id in network_ids
-                   and not nets.id]
-    for net in nets:
-        ctx.logger.info('networks: {0}'.format(net.name))
+    nets.extend([net for net in network_list if net.id in network_ids])
+
+    #Remove duplicates this results in non-default networks e.g. without
+    #default gateway
+    seen_nets = set()
+    dedup_nets = []
+    for obj in nets:
+        if obj.id not in seen_nets:
+            dedup_nets.append(obj)
+            seen_nets.add(obj.id)
+
+    for net in dedup_nets:
+        ctx.logger.info('Adding VM to network: (0)'.format(net[0].name))
+    ctx.logger.info('VM is created with default network: {0}'
+                    .format(dedup_nets[0].name))
 
     node = cloud_driver.create_node(name=name,
                                     image=image,
                                     size=size,
                                     ex_keyname=keypair_name,
-                                    networks=nets,
+                                    networks=dedup_nets,
                                     ex_ip_address=ip_address,
                                     ex_start_vm=False)
     ctx.logger.info(
@@ -469,3 +482,9 @@ def disconnect_floating_ip(ctx, **kwargs):
         return False
 
     return True
+
+
+def remove_duplicates(seq):
+    seen = set()
+    seen_add = seen.add
+    return [ x for x in seq if not (x in seen or seen_add(x))]
