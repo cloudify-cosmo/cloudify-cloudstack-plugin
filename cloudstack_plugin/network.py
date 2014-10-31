@@ -15,7 +15,7 @@
 
 import copy
 from cloudify.decorators import operation
-from cloudify.exceptions import NonRecoverableError
+from cloudify.exceptions import NonRecoverableError, RecoverableError
 from cloudstack_plugin.cloudstack_common import (
     get_cloud_driver,
     CLOUDSTACK_ID_PROPERTY,
@@ -128,7 +128,7 @@ def create(ctx, **kwargs):
     elif existing_net and ctx.node.properties[
             USE_EXTERNAL_RESOURCE_PROPERTY] is False:
 
-            net = get_network(cloud_driver,network_name)
+            net = get_network(cloud_driver, network_name)
 
             ctx.logger.info('Using existing network: {0}'.
                             format(network_name))
@@ -159,18 +159,18 @@ def delete(ctx, **kwargs):
 
     if not ctx.node.properties[USE_EXTERNAL_RESOURCE_PROPERTY] is True:
 
-        firewall_rules = [rule for rule in cloud_driver.
-                          ex_list_egress_firewall_rules() if
-                          network.id == rule.network_id]
-
-        for rule in firewall_rules:
-
-            ctx.logger.info('Deleting egress fw rule: {3}:{0}:{1}-{2} '
-                            'from network: {4}'.format(
-                            rule.cidr_list, rule.start_port, rule.end_port,
-                            rule.protocol, network_name))
-
-            cloud_driver.ex_delete_egress_firewall_rule(rule)
+        # firewall_rules = [rule for rule in cloud_driver.
+        #                   ex_list_egress_firewall_rules() if
+        #                   network.id == rule.network_id]
+        #
+        # for rule in firewall_rules:
+        #
+        #     ctx.logger.info('Deleting egress fw rule: {3}:{0}:{1}-{2} '
+        #                     'from network: {4}'.format(
+        #                     rule.cidr_list, rule.start_port, rule.end_port,
+        #                     rule.protocol, network_name))
+        #
+        #     cloud_driver.ex_delete_egress_firewall_rule(rule)
 
         try:
 
@@ -245,10 +245,17 @@ def _create_egress_rules(ctx, cloud_driver, network_id):
                                         port,
                                         rule_protocol))
 
-                        cloud_driver.ex_create_egress_firewall_rule(
-                            network_id=network_id,
-                            cidr_list=rule_cidr,
-                            protocol=rule_protocol,
-                            start_port=port,
-                            end_port=port
-                        )
+                        try:
+
+                            cloud_driver.ex_create_egress_firewall_rule(
+                                network_id=network_id,
+                                cidr_list=rule_cidr,
+                                protocol=rule_protocol,
+                                start_port=port,
+                                end_port=port
+                            )
+
+                        except Exception as e:
+                            raise RecoverableError('Could not create egress'
+                                                   ' firewall rule: {0}')\
+                                .__format__(str(e))

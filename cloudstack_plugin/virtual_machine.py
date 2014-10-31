@@ -205,6 +205,14 @@ def _create_in_security_group(ctx, cloud_driver, name, image, size,
                                     ex_start_vm=False,
                                     ex_ipaddress=ip_address)
 
+    # Creating VM in stopped state, starting it in start_phase, this seems
+    # quite a bit slower tough (vs starting on creation).
+    # Starting immediatly could lead to interesting
+    # condition where Cloudstack is acquire a SourceNAT address for the network
+    # , while the connect_to_floating_ip relationship is acquireing an address
+    # at the same time, resulting in a 'corrupt' network with two SNAT
+    # addresses.
+
     ctx.logger.info(
         'VM: {0} was created successfully'.format(
             node.name))
@@ -312,8 +320,6 @@ def get_state(ctx, **kwargs):
 
             nic = get_nic_by_node_and_network_id(ctx, cloud_driver, node,
                                                  mgt_net.id)
-            # nics = cloud_driver.ex_list_nics(node)
-            #mgmt_nic = [nic for nic in nics if nic.network_id == mgt_net.id]
 
             ctx.logger.info('CFY will use {0} for management,'
                             ' overwriting previously set value'
