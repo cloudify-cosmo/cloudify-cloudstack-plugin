@@ -162,8 +162,6 @@ def _create_in_network(ctx, cloud_driver, name, image, size, keypair_name,
             ctx.logger.info('Adding VM to additional network: {0}'
                             .format(dedup_nets[i].name))
 
-
-
     node = cloud_driver.create_node(name=name,
                                     image=image,
                                     size=size,
@@ -290,13 +288,35 @@ def get_state(ctx, **kwargs):
 
     if networking_type == 'network':
 
-        ctx.instance.runtime_properties[IP_PROPERTY] = node.private_ips[0]
+        if ctx.source.node.properties['management_network_name']:
 
-        ctx.logger.info('VM {1} started successfully with IP {0}'
-                        .format(ctx.instance.runtime_properties[IP_PROPERTY],
-                                ctx.instance.runtime_properties[
-                                    CLOUDSTACK_NAME_PROPERTY]))
-        return True
+            ctx.logger.info('Management network defined: {0}'
+                            .format(ctx.node.properties[
+                            'management_network_name']))
+
+            mgt_net = get_network(cloud_driver, ctx.node.properties[
+                'management_network_name'])
+
+            nic = get_nic_by_node_and_network_id(ctx, cloud_driver, node,
+                                                 mgt_net.id)
+            # nics = cloud_driver.ex_list_nics(node)
+            #mgmt_nic = [nic for nic in nics if nic.network_id == mgt_net.id]
+
+            ctx.logger.info('CFY will use {0} for management,'
+                            ' overwriting previously set value'
+                            .format(nic))
+
+            ctx.instance.runtime_properties[IP_PROPERTY] = nic.ip_address
+
+        else:
+
+            ctx.instance.runtime_properties[IP_PROPERTY] = node.private_ips[0]
+
+            ctx.logger.info('VM {1} started successfully with IP {0}'
+                            .format(ctx.instance.runtime_properties[IP_PROPERTY],
+                                    ctx.instance.runtime_properties[
+                                        CLOUDSTACK_NAME_PROPERTY]))
+            return True
 
     elif networking_type == 'security_group':
         ctx.runtime.properties[IP_PROPERTY] = node.public_ips[0]
