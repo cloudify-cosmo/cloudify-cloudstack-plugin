@@ -18,18 +18,13 @@ from cloudify.exceptions import NonRecoverableError
 
 from cloudstack_plugin.cloudstack_common import (
     get_cloud_driver,
-    get_nic_by_node_and_network_id,
-    USE_EXTERNAL_RESOURCE_PROPERTY,
     CLOUDSTACK_ID_PROPERTY,
     CLOUDSTACK_TYPE_PROPERTY,
-    CLOUDSTACK_NAME_PROPERTY,
-    COMMON_RUNTIME_PROPERTIES_KEYS,
-    get_resource_id
+    COMMON_RUNTIME_PROPERTIES_KEYS
 
 )
 from cloudstack_plugin.network import get_network_by_id
-from cloudstack_plugin.virtual_machine import get_vm_by_id, \
-    get_portmaps_by_vm_id
+
 
 FLOATINGIP_CLOUDSTACK_TYPE = 'floatingip'
 
@@ -142,14 +137,3 @@ def get_floating_ip_by_id(ctx, cloud_driver, floating_ip_id):
     return fips[0]
 
 
-def get_public_ip_by_id(ctx, cloud_driver, public_ip_id):
-
-    public_ips = [pubip for pubip in cloud_driver.ex_list_public_ips() if
-                  public_ip_id == pubip.id]
-
-    if not public_ips:
-        ctx.logger.info('could not find public_ip by id {0}'
-                        .format(public_ip_id))
-        return None
-
-    return public_ips[0]

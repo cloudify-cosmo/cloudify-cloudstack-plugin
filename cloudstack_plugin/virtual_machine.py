@@ -15,7 +15,6 @@
 import copy
 from cloudify.exceptions import NonRecoverableError
 from cloudify.decorators import operation
-from cloudstack_plugin.floatingip import get_public_ip_by_id
 
 from libcloud.compute.types import Provider
 from cloudstack_plugin.cloudstack_common import (
@@ -548,3 +547,16 @@ def get_portmaps_by_vm_id(ctx, cloud_driver, node_id):
                 if node_id == portmap.node.id]
 
     return portmaps
+
+
+def get_public_ip_by_id(ctx, cloud_driver, public_ip_id):
+
+    public_ips = [pubip for pubip in cloud_driver.ex_list_public_ips() if
+                  public_ip_id == pubip.id]
+
+    if not public_ips:
+        ctx.logger.info('could not find public_ip by id {0}'
+                        .format(public_ip_id))
+        return None
+
+    return public_ips[0]
