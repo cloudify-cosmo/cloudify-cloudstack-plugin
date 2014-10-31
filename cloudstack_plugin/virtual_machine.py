@@ -81,6 +81,14 @@ def create(ctx, **kwargs):
     default_network = network_config.get(['default_network'][0], None)
     ip_address = network_config.get(['ip_address'][0], None)
 
+    if ctx.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY]:
+        if get_node_by_id(ctx.instance.runtime_properties[
+                CLOUDSTACK_ID_PROPERTY]):
+
+            ctx.logger.info('VM already created, skipping creation')
+
+            return
+
     ctx.logger.info('Getting service_offering: {0}'.format(size_name))
     sizes = [size for size in cloud_driver.list_sizes() if size.name
              == size_name]
