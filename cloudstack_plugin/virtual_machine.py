@@ -25,6 +25,7 @@ from cloudstack_plugin.cloudstack_common import (
     get_public_ip_by_id,
     get_portmaps_by_node_id,
     get_network,
+    delete_runtime_properties,
     get_cloudstack_ids_of_connected_nodes_by_cloudstack_type,
     USE_EXTERNAL_RESOURCE_PROPERTY,
     CLOUDSTACK_ID_PROPERTY,
@@ -44,7 +45,7 @@ NETWORKINGTYPE_CLOUDSTACK_TYPE = 'networking_type'
 NETWORKS_PROPERTY = 'networks'  # all of the server's ips
 IP_PROPERTY = 'ip'  # the server's private ip
 RUNTIME_PROPERTIES_KEYS = COMMON_RUNTIME_PROPERTIES_KEYS + \
-    [NETWORKS_PROPERTY, IP_PROPERTY]
+    [NETWORKS_PROPERTY, IP_PROPERTY, ]
 
 
 
@@ -260,6 +261,8 @@ def delete(ctx, **kwargs):
 
     ctx.logger.info('destroying vm: {0}'.format(node.name))
     cloud_driver.destroy_node(node)
+
+    delete_runtime_properties(ctx, RUNTIME_PROPERTIES_KEYS)
 
 
 

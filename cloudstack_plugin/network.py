@@ -22,6 +22,7 @@ from cloudstack_plugin.cloudstack_common import (
     CLOUDSTACK_TYPE_PROPERTY,
     CLOUDSTACK_NAME_PROPERTY,
     COMMON_RUNTIME_PROPERTIES_KEYS,
+    delete_runtime_properties,
     get_resource_id,
     network_exists, get_network, get_location, get_network_offering,
     get_vpc, create_acl_list, create_acl)
@@ -180,6 +181,7 @@ def delete(ctx, **kwargs):
         return False
         pass
 
+    delete_runtime_properties(ctx, RUNTIME_PROPERTIES_KEYS)
     return True
 
 
