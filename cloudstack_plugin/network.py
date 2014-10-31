@@ -117,42 +117,37 @@ def create(ctx, **kwargs):
             # ingress rules are bound to a floating/public_ip so,
             # this will get arranged on the floating ip relationship
 
-            if 'firewall' in ctx.node.properties:
-                firewall_config = ctx.node.properties['firewall']
+            _create_egress_rules(ctx, cloud_driver, net.id)
 
-                egress_rules = [rule for rule in firewall_config if
-                                rule['type'] == 'egress']
+            ctx.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY] = net.id
+            ctx.instance.runtime_properties[CLOUDSTACK_NAME_PROPERTY] = \
+                net.name
+            ctx.instance.runtime_properties[CLOUDSTACK_TYPE_PROPERTY] = \
+                NETWORK_CLOUDSTACK_TYPE
 
-                for rule in egress_rules:
-                    rule_cidr = rule.get('cidr')
-                    rule_protocol = rule.get('protocol')
-                    rule_ports = rule.get('ports')
+    elif existing_net and ctx.node.properties[
+            USE_EXTERNAL_RESOURCE_PROPERTY] is False:
 
-                    for port in rule_ports:
-                        ctx.logger.info('Creating egress fw rule:'
-                                        ' {3}:{0}:{1}-{2}'.format(
-                                        rule_cidr,
-                                        port,
-                                        port,
-                                        rule_protocol))
+            net = get_network(cloud_driver,network_name)
 
-                        cloud_driver.ex_create_egress_firewall_rule(
-                            network_id=net.id,
-                            cidr_list=rule_cidr,
-                            protocol=rule_protocol,
-                            start_port=port,
-                            end_port=port
-                        )
+            ctx.logger.info('Using existing network: {0}'.
+                            format(network_name))
 
-    else:
-        ctx.logger.info('Using existing network: {0}'.
-                        format(network_name))
-        net = get_network(cloud_driver, network_name)
+            _create_egress_rules(ctx, cloud_driver, net.id)
 
-    ctx.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY] = net.id
-    ctx.instance.runtime_properties[CLOUDSTACK_NAME_PROPERTY] = net.name
-    ctx.instance.runtime_properties[CLOUDSTACK_TYPE_PROPERTY] = \
-        NETWORK_CLOUDSTACK_TYPE
+            ctx.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY] = net.id
+            ctx.instance.runtime_properties[CLOUDSTACK_NAME_PROPERTY] = \
+                net.name
+            ctx.instance.runtime_properties[CLOUDSTACK_TYPE_PROPERTY] = \
+                NETWORK_CLOUDSTACK_TYPE
+
+    # else:
+    #     ctx.logger.info('Using existing network: {0}'.
+    #                     format(network_name))
+    #
+    # #net = get_network(cloud_driver, network_name)
+
+
 
 
 @operation
@@ -227,3 +222,33 @@ def get_network_by_id(ctx, cloud_driver, network_id):
         return None
 
     return networks[0]
+
+
+def _create_egress_rules(ctx, cloud_driver, network_id):
+
+    if 'firewall' in ctx.node.properties:
+                firewall_config = ctx.node.properties['firewall']
+
+                egress_rules = [rule for rule in firewall_config if
+                                rule['type'] == 'egress']
+
+                for rule in egress_rules:
+                    rule_cidr = rule.get('cidr')
+                    rule_protocol = rule.get('protocol')
+                    rule_ports = rule.get('ports')
+
+                    for port in rule_ports:
+                        ctx.logger.info('Creating egress fw rule:'
+                                        ' {3}:{0}:{1}-{2}'.format(
+                                        rule_cidr,
+                                        port,
+                                        port,
+                                        rule_protocol))
+
+                        cloud_driver.ex_create_egress_firewall_rule(
+                            network_id=network_id,
+                            cidr_list=rule_cidr,
+                            protocol=rule_protocol,
+                            start_port=port,
+                            end_port=port
+                        )
