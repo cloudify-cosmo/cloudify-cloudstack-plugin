@@ -172,13 +172,17 @@ def _create_in_network(ctx, cloud_driver, name, image, size, keypair_name,
             ctx.logger.info('Adding VM to additional network: {0}'
                             .format(dedup_nets[i].name))
 
-    node = cloud_driver.create_node(name=name,
-                                    image=image,
-                                    size=size,
-                                    ex_keyname=keypair_name,
-                                    networks=dedup_nets,
-                                    ex_ip_address=ip_address,
-                                    ex_start_vm=True)
+    try:
+        node = cloud_driver.create_node(name=name,
+                                        image=image,
+                                        size=size,
+                                        ex_keyname=keypair_name,
+                                        networks=dedup_nets,
+                                        ex_ip_address=ip_address,
+                                        ex_start_vm=True)
+    except Exception as e:
+        raise NonRecoverableError('VM creation failed: {0}'.format(str(e)))
+
     ctx.logger.info(
         'VM: {0} was created successfully'.format(
             node.name))
