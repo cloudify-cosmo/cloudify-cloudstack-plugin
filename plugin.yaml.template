@@ -203,7 +203,7 @@ relationships:
         source_interfaces:
             cloudify.interfaces.relationship_lifecycle:
                 establish: 
-                    implementation: cloudstack.cloudstack_plugin.floatingip.connect_network
+                    implementation: cloudstack.cloudstack_plugin.floatingip.connect_vpc
                     inputs: {}
                 unlink:
                     implementation: cloudstack.cloudstack_plugin.floatingip.disconnect_network

@@ -123,6 +123,21 @@ def disconnect_network(ctx, **kwargs):
                         .format(fip, str(e)))
         pass
 
+@operation
+def connect_vpc(ctx, **kwargs):
+
+    cloud_driver = get_cloud_driver(ctx)
+
+    vpc_id = ctx.target.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY]
+    #etwork = get_network_by_id(ctx, cloud_driver, network_id)
+    #firewall_rules = ctx.node.target.properties.get(['firewall'][0], None)
+
+
+    ctx.logger.info('Acquiring IP for VPC with id: {0}'
+                     .format(network.extra['vpc_id']))
+
+    fip = cloud_driver.ex_allocate_public_ip(vpc_id=vpc_id)
+
 
 def get_floating_ip_by_id(ctx, cloud_driver, floating_ip_id):
 
