@@ -36,7 +36,7 @@ Very condensed HOWTO, more to follow:
 
 
 If you are here without problems, good for me :)
-If not: rkuipers@schubergphilis.com, cloudify dev-list, irc-channel or twitter @_BouL_
+If not: rkuipers@schubergphilis.com, cloudify dev-list, irc-channel or twitter @\_BouL\_
 
 
 ##Disclaimer
