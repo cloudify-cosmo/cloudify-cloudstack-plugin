@@ -17,9 +17,18 @@ from cloudify.decorators import operation
 
 from cloudstack_plugin.cloudstack_common import(
     get_cloud_driver,
-    get_location)
+    get_location,
+    get_resource_id,
+    COMMON_RUNTIME_PROPERTIES_KEYS,
+    CLOUDSTACK_ID_PROPERTY,
+    CLOUDSTACK_TYPE_PROPERTY,
+    CLOUDSTACK_NAME_PROPERTY
+    )
 
+VPC_CLOUDSTACK_TYPE = 'vpc'
 
+# Runtime properties
+RUNTIME_PROPERTIES_KEYS = COMMON_RUNTIME_PROPERTIES_KEYS
 
 __author__ = 'jedeko, boul'
 
@@ -33,7 +42,7 @@ def create(ctx, **kwargs):
 
     vpc = {
         'description': None,
-        'name': ctx.node_id,
+        'name': get_resource_id(ctx, VPC_CLOUDSTACK_TYPE),
     }
 
     ctx.logger.debug('reading vpc configuration.')
@@ -46,9 +55,9 @@ def create(ctx, **kwargs):
     vpcoffer = vpc['service_offering']
     vpc_offering = get_vpc_offering(cloud_driver, vpcoffer)
 
-    ctx.logger.info('Current node {0}{1}'.format(ctx.node_id, ctx.node.properties))
+    ctx.logger.info('Creating VPC {0}'.format(vpc_name))
 
-    ctx['vpc_id'] = ctx.node.properties
+    #ctx.runtime_properties['vpc_id'] = ctx.node.properties
 
     if not vpc_exists(cloud_driver, vpc_name):
         ctx.logger.info('creating vpc: {0}'.format(vpc_name))
@@ -60,12 +69,15 @@ def create(ctx, **kwargs):
             vpc_offering=vpc_offering,
             zone_id=location.id)
     else:
-        ctx.logger.info('using existing vpc network {0}'.
+        ctx.logger.info('Using existing vpc network {0}'.
                         format(vpc_name))
         vpc = get_vpc(cloud_driver, vpc_name)
 
-    ctx['vpc_id'] = vpc.id
-    ctx['vpc_name'] = vpc.name
+    ctx.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY] = vpc.id
+    ctx.instance.runtime_properties[CLOUDSTACK_NAME_PROPERTY] = \
+        vpc.name
+    ctx.instance.runtime_properties[CLOUDSTACK_TYPE_PROPERTY] = \
+        VPC_CLOUDSTACK_TYPE
 
 
 @operation

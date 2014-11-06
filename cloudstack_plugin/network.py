@@ -190,7 +190,7 @@ def delete(ctx, **kwargs):
 
 def get_network_offering(cloud_driver, netoffer_name):
     netoffers = [offer for offer in cloud_driver
-        .ex_list_network_offerings() if offer.name == netoffer_name]
+                 .ex_list_network_offerings() if offer.name == netoffer_name]
     if netoffers.__len__() == 0:
         return None
     return netoffers[0]
@@ -198,7 +198,7 @@ def get_network_offering(cloud_driver, netoffer_name):
 
 def get_network(cloud_driver, network_name):
     networks = [net for net in cloud_driver
-        .ex_list_networks() if net.name == network_name]
+                .ex_list_networks() if net.name == network_name]
 
     if networks.__len__() == 0:
         return None

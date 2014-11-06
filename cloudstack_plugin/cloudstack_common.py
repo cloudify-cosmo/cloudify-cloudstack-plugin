@@ -16,6 +16,7 @@ import os
 import json
 
 from cloudify import context
+from cloudify.exceptions import NonRecoverableError
 
 from libcloud.compute.types import Provider
 from libcloud.compute.providers import get_driver
@@ -130,9 +131,10 @@ def get_resource_id(ctx, type_name):
 
 def get_location(cloud_driver, location_name):
     locations = [location for location in cloud_driver
-        .list_locations() if location.name == location_name]
+                 .list_locations() if location.name == location_name]
     if locations.__len__() == 0:
-        return None
+        raise NonRecoverableError("Zone/Location: {0} cannot be found!"
+                                  .format(location_name))
     return locations[0]
 
 

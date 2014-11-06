@@ -198,6 +198,17 @@ relationships:
                     implementation: cloudstack.cloudstack_plugin.floatingip.disconnect_network
                     inputs: {}
 
+    cloudify.cloudstack.floating_ip_connected_to_vpc:
+        derived_from: cloudify.relationships.connected_to
+        source_interfaces:
+            cloudify.interfaces.relationship_lifecycle:
+                establish: 
+                    implementation: cloudstack.cloudstack_plugin.floatingip.connect_network
+                    inputs: {}
+                unlink:
+                    implementation: cloudstack.cloudstack_plugin.floatingip.disconnect_network
+                    inputs: {}
+
     # cloudify.cloudstack.server_connected_to_security_group:
     #     derived_from: cloudify.relationships.connected_to
     #     source_interfaces:
