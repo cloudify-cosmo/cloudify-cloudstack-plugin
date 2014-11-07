@@ -62,7 +62,7 @@ def create(ctx, **kwargs):
     if 'vpc' in network:
         if network['vpc']:
             vpc = get_vpc(cloud_driver, network['vpc'])
-            ctx.logger.info('DEBUG: VPC id: '.format(vpc.id))
+            ctx.logger.info('DEBUG: VPC id: {0} '.format(vpc.id))
     else:
         vpc = None
 
@@ -119,12 +119,6 @@ def create(ctx, **kwargs):
 
             _create_egress_rules(ctx, cloud_driver, net.id)
 
-            ctx.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY] = net.id
-            ctx.instance.runtime_properties[CLOUDSTACK_NAME_PROPERTY] = \
-                net.name
-            ctx.instance.runtime_properties[CLOUDSTACK_TYPE_PROPERTY] = \
-                NETWORK_CLOUDSTACK_TYPE
-
     elif existing_net and ctx.node.properties[
             USE_EXTERNAL_RESOURCE_PROPERTY] is False:
 
@@ -135,19 +129,11 @@ def create(ctx, **kwargs):
 
             _create_egress_rules(ctx, cloud_driver, net.id)
 
-            ctx.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY] = net.id
-            ctx.instance.runtime_properties[CLOUDSTACK_NAME_PROPERTY] = \
-                net.name
-            ctx.instance.runtime_properties[CLOUDSTACK_TYPE_PROPERTY] = \
-                NETWORK_CLOUDSTACK_TYPE
-
-    # else:
-    #     ctx.logger.info('Using existing network: {0}'.
-    #                     format(network_name))
-    #
-    # #net = get_network(cloud_driver, network_name)
-
-
+    ctx.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY] = net.id
+    ctx.instance.runtime_properties[CLOUDSTACK_NAME_PROPERTY] = \
+        net.name
+    ctx.instance.runtime_properties[CLOUDSTACK_TYPE_PROPERTY] = \
+        NETWORK_CLOUDSTACK_TYPE
 
 
 @operation

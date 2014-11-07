@@ -83,16 +83,16 @@ def create(ctx, **kwargs):
 @operation
 def delete(ctx, **kwargs):
 
-    vpc_name = ctx.instance.runtime_properties['vpc_name']
+    vpc_name = ctx.instance.runtime_properties[CLOUDSTACK_NAME_PROPERTY]
     cloud_driver = get_cloud_driver(ctx)
     vpc = get_vpc(cloud_driver, vpc_name)
 
     try:
         cloud_driver.ex_delete_vpc(vpc)
-    except:
+    except Exception as e:
         ctx.logger.warn(
-            'vpc {0} may not have been deleted'
-                .format(ctx.instance.runtime_properties['vpc_name']))
+            'vpc {0} may not have been deleted: {1}'
+            .format(ctx.instance.runtime_properties['vpc_name'], str(e)))
         pass
 
 

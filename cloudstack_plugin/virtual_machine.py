@@ -435,6 +435,8 @@ def disconnect_network(ctx, **kwargs):
 def connect_floating_ip(ctx, **kwargs):
 
     cloud_driver = get_cloud_driver(ctx)
+    network_ids = get_cloudstack_ids_of_connected_nodes_by_cloudstack_type(
+        ctx, NETWORK_CLOUDSTACK_TYPE)
 
     ctx.logger.debug('reading portmap configuration.')
     portmaps = ctx.source.node.properties['portmaps']
@@ -490,7 +492,9 @@ def connect_floating_ip(ctx, **kwargs):
                                                         private_port=priv_port,
                                                         private_end_port=
                                                         priv_end_port,
-                                                        openfirewall=open_fw)
+                                                        openfirewall=open_fw,
+                                                        network_id=
+                                                        network_ids[0])
         except Exception as e:
             ctx.logger.warn('Port forward creation failed: '
                             '{0}'.format(str(e)))
