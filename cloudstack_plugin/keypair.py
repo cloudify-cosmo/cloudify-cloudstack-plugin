@@ -40,7 +40,7 @@ PRIVATE_KEY_PATH_PROP = 'private_key_path'
 
 
 @operation
-def create(nova_client, **kwargs):
+def create(ctx, **kwargs):
 
     private_key_path = _get_private_key_path()
     pk_exists = _check_private_key_exists(private_key_path)
@@ -71,8 +71,11 @@ def create(nova_client, **kwargs):
     keypair.update(ctx.node.properties['keypair'])
     #transform_resource_name(ctx, keypair)
 
-    keypair = cloud_driver.create_keypair(keypair['name'])
-    ctx.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY] = keypair.id
+    keypair = cloud_driver.create_key_pair(keypair['name'])
+
+    # Cloudstack does not have an ID on keypair, so using name instead,
+    # which is unique
+    ctx.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY] = keypair.name
     ctx.instance.runtime_properties[CLOUDSTACK_TYPE_PROPERTY] = \
         KEYPAIR_CLOUDSTACK_TYPE
     ctx.instance.runtime_properties[CLOUDSTACK_NAME_PROPERTY] = keypair.name
@@ -90,7 +93,7 @@ def create(nova_client, **kwargs):
 
 
 @operation
-def delete(nova_client, **kwargs):
+def delete(ctx, **kwargs):
     if not ctx.node.properties[USE_EXTERNAL_RESOURCE_PROPERTY]:
         ctx.logger.info('deleting keypair')
 
@@ -100,10 +103,10 @@ def delete(nova_client, **kwargs):
                         .format(Provider.CLOUDSTACK))
         cloud_driver = get_cloud_driver(ctx)
 
-        key = get_key_pair_by_id(ctx, cloud_driver,
+        key = get_key_pair(ctx, cloud_driver,
                                  ctx.instance.runtime_properties
                                  [CLOUDSTACK_ID_PROPERTY])
-        cloud_driver.delete_keypair(key_pair=key)
+        cloud_driver.delete_key_pair(key_pair=key)
     else:
         ctx.logger.info('not deleting keypair since an external keypair is '
                         'being used')
@@ -112,7 +115,7 @@ def delete(nova_client, **kwargs):
 
 
 @operation
-def creation_validation(nova_client, **kwargs):
+def creation_validation(ctx, **kwargs):
 
     def validate_private_key_permissions(private_key_path):
         ctx.logger.debug('checking whether private key file {0} has the '
@@ -199,9 +202,8 @@ def _mkdir_p(path):
         raise
 
 
-def get_key_pair_by_id(ctx, cloud_driver, key_id):
+def get_key_pair(ctx, cloud_driver, key_name):
 
-    keys = [key for key in cloud_driver.list_key_pairs()
-            if key_id == key.id]
+    key = cloud_driver.get_key(key_name)
 
-    return keys[0]
+    return key
