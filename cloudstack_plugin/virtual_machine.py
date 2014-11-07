@@ -15,6 +15,7 @@
 import copy
 from cloudify.exceptions import NonRecoverableError
 from cloudify.decorators import operation
+from time import sleep
 
 from libcloud.compute.types import Provider
 from cloudstack_plugin.cloudstack_common import (
@@ -251,6 +252,12 @@ def delete(ctx, **kwargs):
 
     ctx.logger.info("Initializing {0} cloud driver"
                     .format(Provider.CLOUDSTACK))
+    if ctx.node.properties['server']['expunge']:
+        expunge = ctx.node.properties['server']['expunge']
+
+    else:
+        expunge = False
+
     cloud_driver = get_cloud_driver(ctx)
 
     instance_id = ctx.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY]
@@ -263,8 +270,9 @@ def delete(ctx, **kwargs):
         raise NameError('Could not find node with ID: {0} '
                         .format(instance_id))
 
-    ctx.logger.info('destroying vm: {0}'.format(node.name))
-    cloud_driver.destroy_node(node)
+    ctx.logger.info('destroying vm: {0} expunge {1}'.format(node.name,
+                                                            expunge))
+    cloud_driver.destroy_node(node, expunge)
 
     delete_runtime_properties(ctx, RUNTIME_PROPERTIES_KEYS)
 
@@ -450,6 +458,10 @@ def connect_floating_ip(ctx, **kwargs):
     floating_ip_id = ctx.target.instance.runtime_properties[
         CLOUDSTACK_ID_PROPERTY]
 
+    sleep(15)
+    ctx.logger.info('Sleeping for 15 secs so router can stabilize, '
+                    'so we wont have to wait for ARP timeouts ')
+
     for portmap in portmaps:
 
         protocol = portmap.get(['protocol'][0], None)
@@ -530,12 +542,6 @@ def disconnect_floating_ip(ctx, **kwargs):
         return False
 
     return True
-
-
-def remove_duplicates(seq):
-    seen = set()
-    seen_add = seen.add
-    return [ x for x in seq if not (x in seen or seen_add(x))]
 
 
 def get_vm_by_id(ctx, cloud_driver, instance_id):

@@ -57,8 +57,6 @@ def create(ctx, **kwargs):
 
     ctx.logger.info('Creating VPC {0}'.format(vpc_name))
 
-    #ctx.runtime_properties['vpc_id'] = ctx.node.properties
-
     if not vpc_exists(cloud_driver, vpc_name):
         ctx.logger.info('creating vpc: {0}'.format(vpc_name))
 
@@ -92,26 +90,8 @@ def delete(ctx, **kwargs):
     except Exception as e:
         ctx.logger.warn(
             'vpc {0} may not have been deleted: {1}'
-            .format(ctx.instance.runtime_properties['vpc_name'], str(e)))
+            .format(vpc.name, str(e)))
         pass
-
-
-# def get_vpc(cloud_driver, vpc_name):
-#     vpcs = [vpc for vpc in cloud_driver
-#         .ex_list_vpcs() if vpc.name == vpc_name]
-#
-#     if vpcs.__len__() == 0:
-#         return None
-#     return vpcs[0]
-
-# already in cloudify-comming
-# def get_location(cloud_driver, location_name):
-#
-#     locations = [location for location in cloud_driver
-#         .list_locations() if location.name == location_name]
-#     if locations.__len__() == 0:
-#         return None
-#     return locations[0]
 
 
 def get_vpc_offering(cloud_driver, vpcoffer_name):
@@ -120,17 +100,6 @@ def get_vpc_offering(cloud_driver, vpcoffer_name):
     if vpcoffers.__len__() == 0:
         return None
     return vpcoffers[0]
-
-# TODO let's call this from operation directly, seems like double code.
-def _create_egr_rules(cloud_driver, network_id, cidr_list, protocol,
-                      start_port, end_port):
-
-    cloud_driver.ex_create_egress_firewall_rule(
-        network_id=network_id,
-        cidr_list=cidr_list,
-        protocol=protocol,
-        start_port=start_port,
-        end_port=end_port)
 
 
 def get_vpc(cloud_driver, vpc_name):
