@@ -152,6 +152,9 @@ def create(ctx, **kwargs):
     elif existing_net and ctx.node.properties[
             USE_EXTERNAL_RESOURCE_PROPERTY] is False:
 
+        ctx.logger.info('{0} {1}'.format(existing_net, ctx.node.properties[
+            USE_EXTERNAL_RESOURCE_PROPERTY]))
+
         raise NonRecoverableError('This network does already exists and '
                                   'using an external resource was not'
                                   ' specified')
