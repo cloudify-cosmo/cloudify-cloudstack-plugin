@@ -158,6 +158,7 @@ def _create_in_network(ctx, cloud_driver, name, image, size, keypair_name,
     seen_nets = set()
     dedup_nets = []
     for obj in nets:
+        print str(obj)
         if obj.id not in seen_nets:
             dedup_nets.append(obj)
             seen_nets.add(obj.id)
