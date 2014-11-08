@@ -283,11 +283,8 @@ def delete(ctx, **kwargs):
 
     ctx.logger.info("Initializing {0} cloud driver"
                     .format(Provider.CLOUDSTACK))
-    if ctx.node.properties['server']['expunge']:
-        expunge = ctx.node.properties['server']['expunge']
 
-    else:
-        expunge = False
+    expunge = ctx.node.properties.get(['server']['expunge'][0], False)
 
     cloud_driver = get_cloud_driver(ctx)
 
