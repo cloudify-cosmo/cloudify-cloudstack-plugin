@@ -112,7 +112,7 @@ def get_cloud_driver(ctx):
     auth_config = Config().get()
     #auth_config = _get_auth_from_context(ctx)
     api_key = auth_config['cs_api_key']
-    api_secret_key = auth_config['cs_secret_key']
+    api_secret_key = auth_config['cs_api_secret']
     api_url = auth_config['cs_api_url']
     driver = get_driver(Provider.CLOUDSTACK)
     libcloud.security.VERIFY_SSL_CERT = False
