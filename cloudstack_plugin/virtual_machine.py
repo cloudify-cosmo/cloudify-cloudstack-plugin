@@ -21,7 +21,7 @@ from cloudify import context
 from libcloud.compute.types import Provider
 from cloudstack_plugin.cloudstack_common import (
     get_cloud_driver,
-    Provider,
+    provider,
     get_nic_by_node_and_network_id,
     delete_runtime_properties,
     get_cloudstack_ids_of_connected_nodes_by_cloudstack_type,
