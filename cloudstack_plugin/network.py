@@ -59,6 +59,8 @@ def create(ctx, **kwargs):
     network_offering = get_network_offering(cloud_driver, netoffer)
     existing_net = network_exists(cloud_driver, network_name)
 
+    # TODO, bit messy below, should be reviewed.
+
     if 'vpc' in network:
         if network['vpc']:
             vpc = get_vpc(cloud_driver, network['vpc'])
@@ -81,6 +83,12 @@ def create(ctx, **kwargs):
                 gateway=network.get(['gateway'][0], None),
                 netmask=network.get(['netmask'][0], None),
                 vpc_id=vpc.id)
+
+            ctx.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY] = net.id
+            ctx.instance.runtime_properties[CLOUDSTACK_NAME_PROPERTY] = \
+                net.name
+            ctx.instance.runtime_properties[CLOUDSTACK_TYPE_PROPERTY] = \
+                NETWORK_CLOUDSTACK_TYPE
 
             # Create ACL for the network if it's is part of a VPC
             acl_list = create_acl_list(cloud_driver, network_name,
@@ -119,6 +127,12 @@ def create(ctx, **kwargs):
 
             _create_egress_rules(ctx, cloud_driver, net.id)
 
+            ctx.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY] = net.id
+            ctx.instance.runtime_properties[CLOUDSTACK_NAME_PROPERTY] = \
+                net.name
+            ctx.instance.runtime_properties[CLOUDSTACK_TYPE_PROPERTY] = \
+                NETWORK_CLOUDSTACK_TYPE
+
     elif existing_net and ctx.node.properties[
             USE_EXTERNAL_RESOURCE_PROPERTY] is False:
 
@@ -129,11 +143,11 @@ def create(ctx, **kwargs):
 
             _create_egress_rules(ctx, cloud_driver, net.id)
 
-    ctx.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY] = net.id
-    ctx.instance.runtime_properties[CLOUDSTACK_NAME_PROPERTY] = \
-        net.name
-    ctx.instance.runtime_properties[CLOUDSTACK_TYPE_PROPERTY] = \
-        NETWORK_CLOUDSTACK_TYPE
+            ctx.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY] = net.id
+            ctx.instance.runtime_properties[CLOUDSTACK_NAME_PROPERTY] = \
+                net.name
+            ctx.instance.runtime_properties[CLOUDSTACK_TYPE_PROPERTY] = \
+                NETWORK_CLOUDSTACK_TYPE
 
 
 @operation
