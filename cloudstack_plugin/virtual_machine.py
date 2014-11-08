@@ -17,9 +17,11 @@ from cloudify.exceptions import NonRecoverableError
 from cloudify.decorators import operation
 from time import sleep
 
+from cloudify import context
 from libcloud.compute.types import Provider
 from cloudstack_plugin.cloudstack_common import (
     get_cloud_driver,
+    Provider,
     get_nic_by_node_and_network_id,
     delete_runtime_properties,
     get_cloudstack_ids_of_connected_nodes_by_cloudstack_type,
@@ -32,6 +34,7 @@ from cloudstack_plugin.cloudstack_common import (
 )
 from cloudstack_plugin.network import NETWORK_CLOUDSTACK_TYPE, get_network, \
     get_network_by_id
+from cloudstack_plugin.keypair import KEYPAIR_CLOUDSTACK_TYPE, get_key_pair
 
 __author__ = 'adaml, boul'
 
@@ -52,6 +55,8 @@ def create(ctx, **kwargs):
     network_ids = get_cloudstack_ids_of_connected_nodes_by_cloudstack_type(
         ctx, NETWORK_CLOUDSTACK_TYPE)
 
+    provider_context = provider(ctx)
+
     ctx.logger.info('Network IDs: {0}'.format(network_ids))
 
     # Cloudstack does not support _underscore in vm-name
@@ -66,14 +71,37 @@ def create(ctx, **kwargs):
     cloud_driver = get_cloud_driver(ctx)
 
     # TODO Currently a generated network name (resource_id) \
-    #  is not support for the default network
+    # TODO is not support for the default network
 
     network_config = ctx.node.properties['network']
-
     name = server_config['name']
     image_id = server_config['image_id']
     size_name = server_config['size']
-    keypair_name = server_config['keypair_name']
+
+    # server keypair handling
+    keypair_id = get_cloudstack_ids_of_connected_nodes_by_cloudstack_type(
+        ctx, KEYPAIR_CLOUDSTACK_TYPE)
+
+    if 'key_name' in server_config:
+        if keypair_id:
+            raise NonRecoverableError("server can't both have the "
+                                      '"key_name" nested property and be '
+                                      'connected to a keypair via a '
+                                      'relationship at the same time')
+        #server_config['key_name'] = rename(server_config['key_name'])
+    elif keypair_id:
+        server_config['key_name'] = get_key_pair(ctx, cloud_driver, keypair_id)
+    elif provider_context.agents_keypair:
+        server_config['key_name'] = provider_context.agents_keypair['name']
+    else:
+        raise NonRecoverableError(
+            'server must have a keypair, yet no keypair was connected to the '
+            'server node, the "key_name" nested property'
+            "wasn't used, and there is no agent keypair in the provider "
+            "context")
+
+   #keypair_name = server_config['keypair_name']
+    keypair_name = server_config['key_name']
     default_security_group = network_config.get(['default_security_group'][0],
                                                 None)
     default_network = network_config.get(['default_network'][0], None)
@@ -103,6 +131,8 @@ def create(ctx, **kwargs):
     if images is None:
         raise RuntimeError('Could not find image with ID {0}'.format(image_id))
     image = images[0]
+
+    # TODO add check if default network is really existing!
 
     if default_network is None:
         if default_security_group is None:
@@ -459,9 +489,12 @@ def connect_floating_ip(ctx, **kwargs):
     floating_ip_id = ctx.target.instance.runtime_properties[
         CLOUDSTACK_ID_PROPERTY]
 
-    sleep(15)
+    # TODO Needs more elegant solution, problem only seen on VPC with CS4.3
+    # TODO Should be fixed in Cloudstack
     ctx.logger.info('Sleeping for 15 secs so router can stabilize, '
-                    'so we wont have to wait for ARP timeouts ')
+                    'so we wont have to wait for ARP timeouts '
+                    'when reusing public IPs')
+    sleep(15)
 
     for portmap in portmaps:
 

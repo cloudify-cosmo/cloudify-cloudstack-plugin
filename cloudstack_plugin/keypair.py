@@ -204,6 +204,6 @@ def _mkdir_p(path):
 
 def get_key_pair(ctx, cloud_driver, key_name):
 
-    key = cloud_driver.get_key(key_name)
+    key = cloud_driver.get_key_pair(key_name)
 
     return key

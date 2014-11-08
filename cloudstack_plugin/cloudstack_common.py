@@ -39,6 +39,61 @@ COMMON_RUNTIME_PROPERTIES_KEYS = [CLOUDSTACK_ID_PROPERTY,
                                   CLOUDSTACK_NAME_PROPERTY]
 
 
+class ProviderContext(object):
+
+    def __init__(self, provider_context):
+        self._provider_context = provider_context or {}
+        self._resources = self._provider_context.get('resources', {})
+
+    @property
+    def agents_keypair(self):
+        return self._resources.get('agents_keypair')
+
+    @property
+    def agents_security_group(self):
+        return self._resources.get('agents_security_group')
+
+    @property
+    def ext_network(self):
+        return self._resources.get('ext_network')
+
+    @property
+    def floating_ip(self):
+        return self._resources.get('floating_ip')
+
+    @property
+    def int_network(self):
+        return self._resources.get('int_network')
+
+    @property
+    def management_keypair(self):
+        return self._resources.get('management_keypair')
+
+    @property
+    def management_security_group(self):
+        return self._resources.get('management_security_group')
+
+    @property
+    def management_server(self):
+        return self._resources.get('management_server')
+
+    @property
+    def router(self):
+        return self._resources.get('router')
+
+    @property
+    def subnet(self):
+        return self._resources.get('subnet')
+
+    def __repr__(self):
+        info = json.dumps(self._provider_context)
+        return '<' + self.__class__.__name__ + ' ' + info + '>'
+
+
+def provider(ctx):
+    return ProviderContext(ctx.provider_context)
+
+
 def _get_auth_from_context(ctx):
 
     if ctx.type == context.NODE_INSTANCE:
