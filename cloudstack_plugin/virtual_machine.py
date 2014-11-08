@@ -121,6 +121,7 @@ def create(ctx, **kwargs):
         _create_in_network(ctx=ctx,
                            cloud_driver=cloud_driver,
                            name=name,
+                           display_name=name,
                            image=image,
                            size=size,
                            keypair_name=keypair_name,
@@ -245,8 +246,7 @@ def start(ctx, **kwargs):
     ctx.logger.info('Starting node: {0}'.format(node.name))
     cloud_driver.ex_start(node)
 
-# TODO need to add option to immediately expunge a VM, needs implementation on
-# libcloud first
+
 @operation
 def delete(ctx, **kwargs):
 
