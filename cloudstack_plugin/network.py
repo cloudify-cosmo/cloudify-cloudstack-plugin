@@ -134,7 +134,7 @@ def create(ctx, **kwargs):
                 NETWORK_CLOUDSTACK_TYPE
 
     elif existing_net and ctx.node.properties[
-            USE_EXTERNAL_RESOURCE_PROPERTY] is True:
+            USE_EXTERNAL_RESOURCE_PROPERTY] is False:
 
             net = get_network(cloud_driver, network_name)
 
@@ -150,14 +150,21 @@ def create(ctx, **kwargs):
                 NETWORK_CLOUDSTACK_TYPE
 
     elif existing_net and ctx.node.properties[
-            USE_EXTERNAL_RESOURCE_PROPERTY] is False:
+            USE_EXTERNAL_RESOURCE_PROPERTY] is True:
 
-        ctx.logger.info('{0} {1}'.format(existing_net, ctx.node.properties[
-            USE_EXTERNAL_RESOURCE_PROPERTY]))
+        net = get_network(cloud_driver, network_name)
 
-        raise NonRecoverableError('This network does already exists and '
-                                  'using an external resource was not'
-                                  ' specified')
+        ctx.logger.warn('Using existing network: {0} while use'
+                        '_external_resource'
+                        ' is set to False, no egress rules will '
+                        'be configured'.format(network_name))
+
+
+        ctx.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY] = net.id
+        ctx.instance.runtime_properties[CLOUDSTACK_NAME_PROPERTY] = \
+            net.name
+        ctx.instance.runtime_properties[CLOUDSTACK_TYPE_PROPERTY] = \
+            NETWORK_CLOUDSTACK_TYPE
 
 
 @operation
