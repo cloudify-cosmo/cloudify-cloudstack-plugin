@@ -159,7 +159,6 @@ def create(ctx, **kwargs):
                         ' is set to False, no egress rules will '
                         'be configured'.format(network_name))
 
-
         ctx.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY] = net.id
         ctx.instance.runtime_properties[CLOUDSTACK_NAME_PROPERTY] = \
             net.name
