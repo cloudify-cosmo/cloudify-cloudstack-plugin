@@ -24,10 +24,7 @@ node_types:
             management_network_name:
                 default: ''
             cloudstack_config:
-                default:
-                    cs_api_key: { get_input: cloudstack_key }
-                    cs_secret_key: { get_input: cloudstack_secret }
-                    cs_api_url: { get_input: cloudstack_api_url }
+                default: {}
         interfaces:
             cloudify.interfaces.lifecycle:
                 create: 
@@ -82,10 +79,7 @@ node_types:
             resource_id:
                 default: ''
             cloudstack_config:
-                default:
-                    cs_api_key: { get_input: cloudstack_key }
-                    cs_secret_key: { get_input: cloudstack_secret }
-                    cs_api_url: { get_input: cloudstack_api_url }
+                default: {}
         interfaces:
              cloudify.interfaces.lifecycle:
                   create:
@@ -107,10 +101,7 @@ node_types:
             resource_id:
                 default: ''
             cloudstack_config:
-                default:
-                    cs_api_key: { get_input: cloudstack_key }
-                    cs_secret_key: { get_input: cloudstack_secret }
-                    cs_api_url: { get_input: cloudstack_api_url }
+                default: {}
         interfaces:
              cloudify.interfaces.lifecycle:
                 create:
@@ -130,10 +121,7 @@ node_types:
             resource_id:
                 default: ''
             cloudstack_config:
-                default:
-                    cs_api_key: { get_input: cloudstack_key }
-                    cs_secret_key: { get_input: cloudstack_secret }
-                    cs_api_url: { get_input: cloudstack_api_url }
+                default: {}
             rules:
                 default: []
             disable_default_egress_rules:
@@ -157,10 +145,7 @@ node_types:
             resource_id:
                 default: ''
             cloudstack_config:
-                default:
-                    cs_api_key: { get_input: cloudstack_key }
-                    cs_secret_key: { get_input: cloudstack_secret }
-                    cs_api_url: { get_input: cloudstack_api_url }
+                default: {}
 
     cloudify.cloudstack.keypair:
         derived_from: cloudify.types.base
@@ -194,10 +179,7 @@ node_types:
                     value (without any prefixes applied) will be looked for
                     as either the name or id of an existing keypair to be used.
             cloudstack_config:
-                default:
-                    cs_api_key: { get_input: cloudstack_key }
-                    cs_secret_key: { get_input: cloudstack_secret }
-                    cs_api_url: { get_input: cloudstack_api_url }
+                default: {}
         interfaces:
             cloudify.interfaces.lifecycle:
                 create:
