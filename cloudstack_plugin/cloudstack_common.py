@@ -96,8 +96,6 @@ def provider(ctx):
 
 def _get_auth_from_context(ctx):
 
-    if
-
     if ctx.type == context.NODE_INSTANCE:
         config = ctx.node.properties.get('cloudstack_config')
     elif ctx.type == context.RELATIONSHIP_INSTANCE:
