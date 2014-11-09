@@ -79,6 +79,8 @@ def create(ctx, **kwargs):
     size_name = server_config['size']
 
     # server keypair handling
+    # Cloudstack does not have id's for keys, just unique names which we store
+    # as id.
     keypair_id = get_cloudstack_ids_of_connected_nodes_by_cloudstack_type(
         ctx, KEYPAIR_CLOUDSTACK_TYPE)
 
@@ -90,9 +92,15 @@ def create(ctx, **kwargs):
                                       'relationship at the same time')
         #server_config['key_name'] = rename(server_config['key_name'])
     elif keypair_id:
-        server_config['key_name'] = get_key_pair(ctx, cloud_driver, keypair_id)
+
+        # TODO pointfix, this must be UTF8, otherwise cloudstack interface breaks
+
+        keyname = keypair_id[0].encode('UTF8')
+        server_config['key_name'] = keyname
+
     elif provider_context.agents_keypair:
         server_config['key_name'] = provider_context.agents_keypair['name']
+        print ('provider ')
     else:
         raise NonRecoverableError(
             'server must have a keypair, yet no keypair was connected to the '
@@ -188,7 +196,7 @@ def _create_in_network(ctx, cloud_driver, name, image, size, keypair_name,
     seen_nets = set()
     dedup_nets = []
     for obj in nets:
-        print str(obj)
+
         if obj.id not in seen_nets:
             dedup_nets.append(obj)
             seen_nets.add(obj.id)

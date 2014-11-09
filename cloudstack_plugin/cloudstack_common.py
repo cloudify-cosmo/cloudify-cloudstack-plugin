@@ -96,6 +96,8 @@ def provider(ctx):
 
 def _get_auth_from_context(ctx):
 
+    if
+
     if ctx.type == context.NODE_INSTANCE:
         config = ctx.node.properties.get('cloudstack_config')
     elif ctx.type == context.RELATIONSHIP_INSTANCE:
@@ -103,14 +105,14 @@ def _get_auth_from_context(ctx):
         if not config:
             config = ctx.target.node.properties.get('cloudstack_config')
     else:
-        config = None
+        config = Config().get()
 
     return config
 
 
 def get_cloud_driver(ctx):
-    auth_config = Config().get()
-    #auth_config = _get_auth_from_context(ctx)
+    #auth_config = Config().get()
+    auth_config = _get_auth_from_context(ctx)
     api_key = auth_config['cs_api_key']
     api_secret_key = auth_config['cs_api_secret']
     api_url = auth_config['cs_api_url']
