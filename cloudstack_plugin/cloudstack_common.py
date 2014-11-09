@@ -96,14 +96,19 @@ def provider(ctx):
 
 def _get_auth_from_context(ctx):
 
-    if ctx.type == context.NODE_INSTANCE:
-        config = ctx.node.properties.get('cloudstack_config')
-    elif ctx.type == context.RELATIONSHIP_INSTANCE:
-        config = ctx.source.node.properties.get('cloudstack_config')
-        if not config:
-            config = ctx.target.node.properties.get('cloudstack_config')
-    else:
-        config = Config().get()
+    config = Config().get()
+    secret_probe = config.get(['cs_api_secret'][0], None)
+
+    if secret_probe is None:
+
+        if ctx.type == context.NODE_INSTANCE:
+            config = ctx.node.properties.get('cloudstack_config')
+        elif ctx.type == context.RELATIONSHIP_INSTANCE:
+            config = ctx.source.node.properties.get('cloudstack_config')
+            if not config:
+                config = ctx.target.node.properties.get('cloudstack_config')
+        else:
+            config = Config().get()
 
     return config
 
