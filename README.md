@@ -21,7 +21,7 @@ Very condensed HOWTO, more to follow:
 * pip install -r cloudify-cloudstack-plugin/dev-requirements.txt
 * cp cloudify-manager-blueprints/cloudstack/inputs.json.template ~/cfy-demo/cloudify-config.json
 * vi cloudify-config.json - fill in your cloud specific details
-* vi cloudify-nodecellar-example/cloudstack-vpc-blueprint.yaml - should not need much editing, check firewall:
+* vi cloudify-nodecellar-example/cloudstack-vpc-blueprint.yaml - edit it with your specifics (service offerings , fw settings and such)
 * cfy init -r
 * cfy bootstrap -p cloudify-manager-blueprints/cloudstack.yaml -i cloudify-config.json
 * at this stage your manager will be deployed fingers crossed :)
