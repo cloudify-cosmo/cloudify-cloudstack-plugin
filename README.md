@@ -21,14 +21,13 @@ Very condensed HOWTO, more to follow:
 * pip install -r cloudify-cloudstack-plugin/dev-requirements.txt
 * cp cloudify-manager-blueprints/cloudstack/inputs.json.template ~/cfy-demo/cloudify-config.json
 * vi cloudify-config.json - fill in your cloud specific details
-* vi cloudify-nodecellar-example/cloudstack-blueprint.yaml - should not need much editing, check firewall:
+* vi cloudify-nodecellar-example/cloudstack-vpc-blueprint.yaml - should not need much editing, check firewall:
 * cfy init -r
 * cfy bootstrap -p cloudify-manager-blueprints/cloudstack.yaml -i cloudify-config.json
 * at this stage your manager will be deployed fingers crossed :)
 * look at the returned public ip - should be accessible in your browser
-* cfy blueprints upload -p cloudify-nodecellar-example/cloudstack-blueprint.yaml b my-first-blueprint
+* cfy blueprints upload -p cloudify-nodecellar-example/cloudstack-vpc-blueprint.yaml b my-first-blueprint
 * surf to http://your-manager-ip
-* go to blueprints and click create deployment - fill in cs-api-url and keys
 * start the install workflow in the webui
 * fingercrossed - if all ok - your sample app should be accessible on port :8080
 
