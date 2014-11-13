@@ -13,6 +13,9 @@ Very condensed HOWTO, more to follow:
 * virtualenv cfy-demo
 * cd ~/cfy-demo
 * git clone https://github.com/schubergphilis/cloudify-cloudstack-plugin.git
+* cd cloudify-cloudstack-plugin
+* git checkout 3.1m5
+* cd ..
 * git clone https://github.com/schubergphilis/cloudify-manager-blueprints.git
 * git clone https://github.com/schubergphilis/cloudify-nodecellar-example.git
 * pip install -r cloudify-cloudstack-plugin/dev-requirements.txt
