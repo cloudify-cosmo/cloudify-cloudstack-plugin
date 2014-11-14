@@ -16,6 +16,7 @@ Very condensed HOWTO, more to follow:
 * cd cloudify-cloudstack-plugin
 * git checkout 3.1m5
 * cd ..
+* pip install cloudify-cloudstack-plugin/
 * git clone https://github.com/schubergphilis/cloudify-manager-blueprints.git
 * git clone https://github.com/schubergphilis/cloudify-nodecellar-example.git
 * pip install -r cloudify-cloudstack-plugin/dev-requirements.txt
