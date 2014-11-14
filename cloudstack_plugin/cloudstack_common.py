@@ -97,10 +97,10 @@ def provider(ctx):
 def _get_auth_from_context(ctx):
 
     config = Config().get()
-    alt_config = config = ctx.node.properties.get('cloudstack_config')
-    secret_probe = alt_config.get(['cs_api_secret'][0], None)
+    secret_probe = config.get(['cs_api_secret'][0], None)
 
-    if config is None:
+    # TODO a hack to distinguish auth code-path (mgr blueprint vs mgr.json)
+    if secret_probe is None:
 
         if ctx.type == context.NODE_INSTANCE:
             config = ctx.node.properties.get('cloudstack_config')
