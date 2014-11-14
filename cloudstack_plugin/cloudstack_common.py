@@ -97,7 +97,8 @@ def provider(ctx):
 def _get_auth_from_context(ctx):
 
     config = Config().get()
-    secret_probe = config.get(['cs_api_secret'][0], None)
+    alt_config = config = ctx.node.properties.get('cloudstack_config')
+    secret_probe = alt_config.get(['cs_api_secret'][0], None)
 
     if secret_probe is None:
 
