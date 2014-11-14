@@ -13,6 +13,6 @@ git clone https://github.com/schubergphilis/cloudify-nodecellar-example.git
 pip install -r cloudify-cloudstack-plugin/dev-requirements.txt
 cp cloudify-manager-blueprints/cloudstack/inputs.json.template cloudify-config.json
 vi cloudify-config.json
-vi cloudify-nodecellar-example/cloudstack-blueprint.yaml
+vi cloudify-manager-blueprints/cloudstack/cloudstack.yaml
 cfy init -r
 cfy bootstrap -p cloudify-manager-blueprints/cloudstack/cloudstack.yaml -i cloudify-config.json
