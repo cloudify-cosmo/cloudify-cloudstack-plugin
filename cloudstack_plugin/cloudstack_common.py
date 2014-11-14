@@ -100,7 +100,7 @@ def _get_auth_from_context(ctx):
     alt_config = config = ctx.node.properties.get('cloudstack_config')
     secret_probe = alt_config.get(['cs_api_secret'][0], None)
 
-    if secret_probe is None:
+    if config is None:
 
         if ctx.type == context.NODE_INSTANCE:
             config = ctx.node.properties.get('cloudstack_config')
