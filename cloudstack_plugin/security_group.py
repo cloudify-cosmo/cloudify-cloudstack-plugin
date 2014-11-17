@@ -20,7 +20,7 @@ from cloudstack_plugin.cloudstack_common import get_cloud_driver
 
 __author__ = 'uri1803'
 
-
+# TODO - Security_group implementation must be reviewed and tested.
 @operation
 def create(ctx, **kwargs):
     """ Create security group with rules.
@@ -34,8 +34,8 @@ def create(ctx, **kwargs):
     }
 
     ctx.logger.debug('reading security-group configuration.')
-    rules_to_apply = ctx.properties['rules']
-    security_group.update(ctx.properties['security_group'])
+    rules_to_apply = ctx.node.properties['rules']
+    security_group.update(ctx.node.properties['security_group'])
 
     security_group_name = security_group['name']
     if not _sg_exists(cloud_driver, security_group_name):
@@ -68,11 +68,11 @@ def delete(ctx, **kwargs):
     try:
         cloud_driver = get_cloud_driver(ctx)
         cloud_driver.ex_delete_security_group(
-            ctx.runtime_properties['external_id'])
+            ctx.instance.runtime_properties['external_id'])
     except:
         ctx.logger.warn(
             'security-group {0} may not have been deleted'.format(
-                ctx.runtime_properties['external_id']))
+                ctx.instance.runtime_properties['external_id']))
         pass
 
 
