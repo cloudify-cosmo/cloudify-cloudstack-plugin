@@ -4,7 +4,7 @@ from setuptools import setup
 setup(
     zip_safe=True,
     name='cloudify-cloudstack-plugin',
-    version='3.1ga',
+    version='3.1',
     packages=[
         'cloudstack_plugin',
         'cloudstack_exoscale_plugin'
