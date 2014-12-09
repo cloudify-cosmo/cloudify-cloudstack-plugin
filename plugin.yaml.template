@@ -5,12 +5,12 @@
 plugins:
     cloudstack:
         executor: central_deployment_agent
-        source: https://github.com/schubergphilis/cloudify-cloudstack-plugin/archive/3.1m5.zip
+        source: https://github.com/cloudify-cosmo/cloudify-cloudstack-plugin/archive/1.1rc1.zip
 
 
 node_types:
     cloudify.cloudstack.virtual_machine:
-        derived_from: cloudify.types.host
+        derived_from: cloudify.nodes.Compute
         properties:
             server: {}
             portmaps: 
@@ -68,7 +68,7 @@ node_types:
                     inputs: {}
 
     cloudify.cloudstack.network:
-        derived_from: cloudify.types.subnet
+        derived_from: cloudify.nodes.Subnet
         properties:
             network: 
                 default: {}
@@ -90,7 +90,7 @@ node_types:
                     inputs: {}
 
     cloudify.cloudstack.vpc:
-        derived_from: cloudify.types.network
+        derived_from: cloudify.nodes.Network
         properties:
             network:
                 default: {}
@@ -112,7 +112,7 @@ node_types:
                     inputs: {}
 
     cloudify.cloudstack.security_group:
-        derived_from: cloudify.types.base
+        derived_from: cloudify.nodes.SecurityGroup
         properties:
             security_group:
                 default: {}
@@ -136,7 +136,7 @@ node_types:
                     inputs: {}
 
     cloudify.cloudstack.floatingip:
-        derived_from: cloudify.types.base
+        derived_from: cloudify.nodes.VirtualIP
         properties:
             floatingip:
                 default: {}
@@ -148,7 +148,7 @@ node_types:
                 default: {}
 
     cloudify.cloudstack.keypair:
-        derived_from: cloudify.types.base
+        derived_from: cloudify.nodes.Root
         properties:
             keypair:
                 default: {}
