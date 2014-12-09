@@ -77,6 +77,7 @@ def create(ctx, **kwargs):
     name = server_config['name']
     image_id = server_config['image_id']
     size_name = server_config['size']
+    zone = server_config['zone']
 
     # server keypair handling
     # Cloudstack does not have id's for keys, just unique names which we store
@@ -164,7 +165,8 @@ def create(ctx, **kwargs):
                            keypair_name=keypair_name,
                            network_ids=network_ids,
                            default_network=default_network,
-                           ip_address=ip_address)
+                           ip_address=ip_address,
+                           location=zone)
 
     if default_security_group is not None:
         ctx.logger.info('Creating this VM in default_security_group.'.
@@ -183,7 +185,8 @@ def create(ctx, **kwargs):
 
 
 def _create_in_network(ctx, cloud_driver, name, image, size, keypair_name,
-                       network_ids, default_network, ip_address=None):
+                       network_ids, default_network, ip_address=None,
+                       location=None):
 
     network_list = cloud_driver.ex_list_networks()
 
@@ -217,7 +220,8 @@ def _create_in_network(ctx, cloud_driver, name, image, size, keypair_name,
                                         ex_displayname=name,
                                         networks=dedup_nets,
                                         ex_ip_address=ip_address,
-                                        ex_start_vm=False)
+                                        ex_start_vm=False,
+                                        location=location)
     except Exception as e:
         raise NonRecoverableError('VM creation failed: {0}'.format(str(e)))
 
@@ -235,7 +239,8 @@ def _create_in_network(ctx, cloud_driver, name, image, size, keypair_name,
 @operation
 def _create_in_security_group(ctx, cloud_driver, name, image, size,
                               keypair_name,
-                              default_security_group_name, ip_address=None):
+                              default_security_group_name, ip_address=None,
+                              location=None):
 
     node = cloud_driver.create_node(name=name,
                                     image=image,
@@ -244,7 +249,8 @@ def _create_in_security_group(ctx, cloud_driver, name, image, size,
                                     ex_security_groups=
                                     default_security_group_name,
                                     ex_start_vm=False,
-                                    ex_ipaddress=ip_address)
+                                    ex_ipaddress=ip_address,
+                                    location=location)
 
     # Creating VM in stopped state, starting it in start_phase, this seems
     # quite a bit slower tough (vs starting on creation).
