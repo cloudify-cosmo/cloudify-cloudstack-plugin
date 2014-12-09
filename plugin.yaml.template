@@ -5,7 +5,7 @@
 plugins:
     cloudstack:
         executor: central_deployment_agent
-        source: https://github.com/cloudify-cosmo/cloudify-cloudstack-plugin/archive/1.1rc1.zip
+        source: https://github.com/schubergphilis/cloudify-cloudstack-plugin/archive/3.1GA.zip
 
 
 node_types:
