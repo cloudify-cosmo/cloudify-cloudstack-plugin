@@ -45,7 +45,7 @@ node_types:
                     inputs: {}
 
     cloudify.cloudstack.nodes.WindowsServer:
-        derived_from: cloudify.cloudstack.nodes.Virtual_Machine
+        derived_from: cloudify.cloudstack.nodes.VirtualMachine
         interfaces:
             cloudify.interfaces.worker_installer:
                 install:
