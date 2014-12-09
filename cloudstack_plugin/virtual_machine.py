@@ -78,8 +78,12 @@ def create(ctx, **kwargs):
     name = server_config['name']
     image_id = server_config['image_id']
     size_name = server_config['size']
-    zone = server_config['zone']
-    location = get_location(cloud_driver, zone)
+    zone = server_config.get(['zone'][0], None)
+
+    if zone is not None:
+        location = get_location(cloud_driver, zone)
+    else:
+        location = None
 
     # server keypair handling
     # Cloudstack does not have id's for keys, just unique names which we store
