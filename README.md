@@ -19,7 +19,7 @@ Very condensed HOWTO, more to follow:
 * pip install https://github.com/cloudify-cosmo/cloudify-rest-client/archive/master.zip
 * pip install https://github.com/cloudify-cosmo/cloudify-plugins-common/archive/master.zip
 * pip install https://github.com/cloudify-cosmo/cloudify-script-plugin/archive/master.zip
-*pip install https://github.com/cloudify-cosmo/cloudify-cli/archive/master.zip
+* pip install https://github.com/cloudify-cosmo/cloudify-cli/archive/master.zip
 * git clone https://github.com/schubergphilis/cloudify-manager-blueprints.git
 * git clone https://github.com/schubergphilis/cloudify-nodecellar-example.git
 * cp cloudify-manager-blueprints/cloudstack/inputs.json.template cloudify-config.json
