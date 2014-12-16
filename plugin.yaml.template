@@ -5,11 +5,11 @@
 plugins:
     cloudstack:
         executor: central_deployment_agent
-        source: https://github.com/cloudify-cosmo/cloudify-cloudstack-plugin/archive/1.1rc1.zip
+        source: https://github.com/cloudify-cosmo/cloudify-cloudstack-plugin/archive/master.zip
 
 
 node_types:
-    cloudify.cloudstack.virtual_machine:
+    cloudify.cloudstack.nodes.VirtualMachine:
         derived_from: cloudify.nodes.Compute
         properties:
             server: {}
@@ -44,8 +44,8 @@ node_types:
                     implementation: cloudstack.cloudstack_plugin.virtual_machine.get_state
                     inputs: {}
 
-    cloudify.cloudstack.windows_server:
-        derived_from: cloudify.cloudstack.virtual_machine
+    cloudify.cloudstack.nodes.WindowsServer:
+        derived_from: cloudify.cloudstack.nodes.VirtualMachine
         interfaces:
             cloudify.interfaces.worker_installer:
                 install:
@@ -67,7 +67,7 @@ node_types:
                     implementation: windows_plugin_installer.windows_plugin_installer.tasks.install
                     inputs: {}
 
-    cloudify.cloudstack.network:
+    cloudify.cloudstack.nodes.Network:
         derived_from: cloudify.nodes.Subnet
         properties:
             network: 
@@ -89,7 +89,7 @@ node_types:
                     implementation: cloudstack.cloudstack_plugin.network.delete
                     inputs: {}
 
-    cloudify.cloudstack.vpc:
+    cloudify.cloudstack.nodes.VPC:
         derived_from: cloudify.nodes.Network
         properties:
             network:
@@ -111,7 +111,7 @@ node_types:
                     implementation: cloudstack.cloudstack_plugin.vpc.delete
                     inputs: {}
 
-    cloudify.cloudstack.security_group:
+    cloudify.cloudstack.nodes.SecurityGroup:
         derived_from: cloudify.nodes.SecurityGroup
         properties:
             security_group:
@@ -135,7 +135,7 @@ node_types:
                     implementation: cloudstack.cloudstack_plugin.security_group.delete
                     inputs: {}
 
-    cloudify.cloudstack.floatingip:
+    cloudify.cloudstack.nodes.FloatingIP:
         derived_from: cloudify.nodes.VirtualIP
         properties:
             floatingip:
@@ -147,7 +147,7 @@ node_types:
             cloudstack_config:
                 default: {}
 
-    cloudify.cloudstack.keypair:
+    cloudify.cloudstack.nodes.KeyPair:
         derived_from: cloudify.nodes.Root
         properties:
             keypair:
