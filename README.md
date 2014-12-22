@@ -1,6 +1,10 @@
 Cloudify CloudStack Plugin
 ==========================
 
+* Master Branch [![Build Status](https://travis-ci.org/cloudify-cosmo/cloudify-cloudstack-plugin.svg?branch=master)](https://travis-ci.org/cloudify-cosmo/cloudify-cloudstack-plugin)
+* PyPI [![PyPI](http://img.shields.io/pypi/dm/cloudify-cloudstack-plugin.svg)](http://img.shields.io/pypi/dm/cloudify-cloudstack-plugin.svg)
+* Version [![PypI](http://img.shields.io/pypi/v/cloudify-cloudstack-plugin.svg)](http://img.shields.io/pypi/v/cloudify-cloudstack-plugin.svg)
+
 Cloudify's CloudStack plugin provides the ability to create [CloudStack](http://cloudstack.apache.org/) resources using Cloudify.
 
 # Get started
