@@ -1,6 +1,8 @@
 Cloudify CloudStack Plugin
 ==========================
 
+* Master Branch [![Build Status](https://travis-ci.org/cloudify-cosmo/cloudify-cloudstack-plugin.svg?branch=master)](https://travis-ci.org/cloudify-cosmo/cloudify-cloudstack-plugin)
+
 Cloudify's CloudStack plugin provides the ability to create [CloudStack](http://cloudstack.apache.org/) resources using Cloudify.
 
 # Get started
