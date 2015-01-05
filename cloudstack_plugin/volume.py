@@ -12,7 +12,8 @@
 # * See the License for the specific language governing permissions and
 # * limitations under the License.
 
-
+import copy
+from cloudify import ctx
 from cloudify.decorators import operation
 from cloudify.exceptions import NonRecoverableError
 
@@ -22,74 +23,104 @@ from cloudstack_plugin.cloudstack_common import (
     CLOUDSTACK_ID_PROPERTY,
     CLOUDSTACK_NAME_PROPERTY,
     CLOUDSTACK_TYPE_PROPERTY,
-    COMMON_RUNTIME_PROPERTIES_KEYS
-
+    COMMON_RUNTIME_PROPERTIES_KEYS,
+    USE_EXTERNAL_RESOURCE_PROPERTY,
 )
-from cloudstack_plugin.virtual_machine import get_vm_by_id
 
 VOLUME_CLOUDSTACK_TYPE = 'volume'
 
 RUNTIME_PROPERTIES_KEYS = COMMON_RUNTIME_PROPERTIES_KEYS
 
-__author__ = 'jedeko'
+
+@operation
+def create(**kwargs):
+    """ Create a volume
+    """
+
+    cloud_driver = get_cloud_driver(ctx)
+    volume = {}
+
+    if ctx.node.properties[USE_EXTERNAL_RESOURCE_PROPERTY] is False:
+
+        ctx.logger.debug('reading volume attributes.')
+        volume.update(copy.deepcopy(ctx.node.properties['volume']))
+
+        if 'name' in volume:
+            volume_name = volume['name']
+        else:
+            raise NonRecoverableError("To create a volume, the name of the "
+                                      "volume is needed")
+
+        if 'size' in volume:
+            volume_size = volume['size']
+        else:
+            raise NonRecoverableError("To create a volume, the size of the "
+                                      "volume is needed")
+
+        volume = cloud_driver.create_volume(name=volume_name,
+                                            size=volume_size)
+
+        if volume_exists(cloud_driver, volume.id):
+
+            ctx.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY] = volume.id
+            ctx.instance.runtime_properties[CLOUDSTACK_TYPE_PROPERTY] = \
+                VOLUME_CLOUDSTACK_TYPE
+        else:
+            raise NonRecoverableError("Volume not created")
+
+    elif ctx.node.properties[USE_EXTERNAL_RESOURCE_PROPERTY] is True:
+
+        if ctx.node.properties['resource_id']:
+            resource_id = ctx.node.properties['resource_id']
+
+            volume = get_volume_by_id(cloud_driver, resource_id)
+
+            if volume is not None:
+                ctx.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY] = \
+                    volume.id
+                ctx.instance.runtime_properties[CLOUDSTACK_NAME_PROPERTY] = \
+                    volume.name
+                ctx.instance.runtime_properties[CLOUDSTACK_TYPE_PROPERTY] = \
+                    VOLUME_CLOUDSTACK_TYPE
+            else:
+                raise NonRecoverableError("Could not find volume with id {0}".
+                                          format(resource_id))
+        else:
+            raise NonRecoverableError("Resource_id for volume is not supplied")
+
+        return
 
 
 @operation
-def attach_volume(ctx, **kwargs):
-    """ Create volume and attach to virtual machine.
+def delete(**kwargs):
+    """ Delete a volume
     """
 
     cloud_driver = get_cloud_driver(ctx)
 
-    vm_id = ctx.target.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY]
-    vm = get_vm_by_id(ctx, cloud_driver, vm_id)
+    volume_id = ctx.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY]
+    volume = get_volume_by_id(cloud_driver, volume_id)
 
-    volume_name = ctx.source.node.properties['name']
-    volume_size = ctx.source.node.properties['size']
+    if volume is None:
+        raise NonRecoverableError('Volume with id {0} not found'
+                                  .format(volume_id))
 
-    volume = cloud_driver.create_volume(name=volume_name,
-                                        size=volume_size)
-
-    cloud_driver.attach_volume(node=vm,
-                               volume=volume)
-
-    ctx.source.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY] = volume.id
-    ctx.source.instance.runtime_properties[CLOUDSTACK_TYPE_PROPERTY] = \
-        VOLUME_CLOUDSTACK_TYPE
-    
-
-@operation
-def detach_volume(ctx, **kwargs):
-    """ Detaches a volume and delete if expunge is requested.
-    """
-
-    cloud_driver = get_cloud_driver(ctx)
-
-    volume_id = ctx.source.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY]
-    volume = get_volume_by_id(ctx, cloud_driver, volume_id)
-
-    # Detach the volume from the vm
-    try:
-        cloud_driver.detach_volume(volume=volume)
-    except Exception as e:
-        ctx.logger.warn('Volume {0} may not have been detached: {1}'
-                        .format(volume, str(e)))
-        pass
-
-    # Expunge the volume if true in blueprint configuration
-    volume_expunge = ctx.source.node.properties['expunge']
-
-    if volume_expunge:
-        try:
-            cloud_driver.destroy_volume(volume=volume)
-        except Exception as e:
-            ctx.logger.warn('Volume {0} may not have been destroyed: {1}'
-                            .format(volume, str(e)))
-            pass
+    if not ctx.node.properties[USE_EXTERNAL_RESOURCE_PROPERTY]:
+        ctx.logger.info('Trying to destroy volume {0}'.format(volume))
+        cloud_driver.destroy_volume(volume=volume)
+    else:
+        ctx.logger.info('Volume {0} does not need to be destroyed'.format(
+            volume))
 
 
-def get_volume_by_id(ctx, cloud_driver, volume_id):
+def volume_exists(cloud_driver, volume_id):
+    exists = get_volume_by_id(cloud_driver, volume_id)
+    if not exists:
+        return False
+    return True
 
+
+def get_volume_by_id(cloud_driver, volume_id):
     volumes = [volume for volume in cloud_driver.list_volumes() if
                volume_id == volume.id]
 
@@ -97,5 +128,4 @@ def get_volume_by_id(ctx, cloud_driver, volume_id):
         ctx.logger.info('Could not find volume with ID {0}'.
                         format(volume_id))
         return None
-
     return volumes[0]

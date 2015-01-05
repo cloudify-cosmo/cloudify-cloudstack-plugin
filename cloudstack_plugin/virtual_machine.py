@@ -13,31 +13,37 @@
 # * See the License for the specific language governing permissions and
 # * limitations under the License.
 import copy
-from cloudify.exceptions import NonRecoverableError
-from cloudify.decorators import operation
 from time import sleep
 
 from cloudify import context
-from libcloud.compute.types import Provider
+from cloudify.decorators import operation
+from cloudify.exceptions import NonRecoverableError
 from cloudstack_plugin.cloudstack_common import (
-    get_cloud_driver,
-    provider,
-    get_nic_by_node_and_network_id,
-    delete_runtime_properties,
-    get_cloudstack_ids_of_connected_nodes_by_cloudstack_type,
-    USE_EXTERNAL_RESOURCE_PROPERTY,
     CLOUDSTACK_ID_PROPERTY,
-    CLOUDSTACK_TYPE_PROPERTY,
     CLOUDSTACK_NAME_PROPERTY,
+    CLOUDSTACK_TYPE_PROPERTY,
     COMMON_RUNTIME_PROPERTIES_KEYS,
+    USE_EXTERNAL_RESOURCE_PROPERTY,
+    delete_runtime_properties,
+    get_cloud_driver,
+    get_cloudstack_ids_of_connected_nodes_by_cloudstack_type,
+    get_location,
+    get_nic_by_node_and_network_id,
     get_resource_id,
-    get_location
+    provider
 )
-from cloudstack_plugin.network import NETWORK_CLOUDSTACK_TYPE, get_network, \
-    get_network_by_id
 from cloudstack_plugin.keypair import KEYPAIR_CLOUDSTACK_TYPE, get_key_pair
+from cloudstack_plugin.network import (
+    NETWORK_CLOUDSTACK_TYPE,
+    get_network,
+    get_network_by_id
+)
+from cloudstack_plugin.volume import get_volume_by_id
+from libcloud.compute.types import Provider
+
 
 __author__ = 'adaml, boul'
+
 
 SERVER_CLOUDSTACK_TYPE = 'VM'
 NETWORKINGTYPE_CLOUDSTACK_TYPE = 'networking_type'
@@ -125,7 +131,7 @@ def create(ctx, **kwargs):
         [CLOUDSTACK_ID_PROPERTY][0], None)
 
     if external_id is not None:
-        if get_vm_by_id(ctx.instance.runtime_properties[
+        if get_vm_by_id(ctx, cloud_driver, ctx.instance.runtime_properties[
                 CLOUDSTACK_ID_PROPERTY]):
 
             ctx.logger.info('VM already created, skipping creation')
@@ -322,7 +328,7 @@ def delete(ctx, **kwargs):
 
     ctx.logger.info('destroying vm: {0} expunge {1}'.format(node.name,
                                                             expunge))
-    cloud_driver.destroy_node(node, expunge)
+    cloud_driver.destroy_node(node)
 
     delete_runtime_properties(ctx, RUNTIME_PROPERTIES_KEYS)
 
@@ -600,6 +606,48 @@ def disconnect_floating_ip(ctx, **kwargs):
         return False
 
     return True
+
+
+@operation
+def attach_volume(ctx, **kwargs):
+    """ Attach a volume to virtual machine.
+    """
+
+    cloud_driver = get_cloud_driver(ctx)
+
+    server_id = ctx.source.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY]
+    volume_id = ctx.target.instance.runtime_properties.get(
+        CLOUDSTACK_ID_PROPERTY, None)
+
+    server = get_vm_by_id(ctx, cloud_driver, server_id)
+    volume = get_volume_by_id(cloud_driver, volume_id)
+
+    if server is None:
+        raise NonRecoverableError('Server with id {0} not found'
+                                  .format(server_id))
+
+    if volume is None:
+        raise NonRecoverableError('Volume with id {0} not found'
+                                  .format(volume_id))
+
+    cloud_driver.attach_volume(node=server,
+                               volume=volume)
+
+
+@operation
+def detach_volume(ctx, **kwargs):
+    '''Detaches a volume and deletes if expunge is requested.'''
+    cloud_driver = get_cloud_driver(ctx)
+
+    volume_id = ctx.target.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY]
+    volume = get_volume_by_id(cloud_driver, volume_id)
+
+    if not volume:
+        raise NonRecoverableError('Volume with id {0} not found'.format(
+            volume_id))
+
+    ctx.logger.info('Detaching volume {0}'.format(volume))
+    cloud_driver.detach_volume(volume=volume)
 
 
 def get_vm_by_id(ctx, cloud_driver, instance_id):
