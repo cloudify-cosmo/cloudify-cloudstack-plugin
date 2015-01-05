@@ -53,6 +53,10 @@ def attach_volume(ctx, **kwargs):
     cloud_driver.attach_volume(node=vm,
                                volume=volume)
 
+    ctx.source.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY] = volume.id
+    ctx.source.instance.runtime_properties[CLOUDSTACK_TYPE_PROPERTY] = \
+        VOLUME_CLOUDSTACK_TYPE
+    
 
 @operation
 def detach_volume(ctx, **kwargs):
