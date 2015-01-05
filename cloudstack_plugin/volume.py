@@ -52,3 +52,46 @@ def attach_volume(ctx, **kwargs):
 
     cloud_driver.attach_volume(node=vm,
                                volume=volume)
+
+
+@operation
+def detach_volume(ctx, **kwargs):
+    """ Detaches a volume and delete if expunge is requested.
+    """
+
+    cloud_driver = get_cloud_driver(ctx)
+
+    volume_id = ctx.source.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY]
+    volume = get_volume_by_id(ctx, cloud_driver, volume_id)
+
+    # Detach the volume from the vm
+    try:
+        cloud_driver.detach_volume(volume=volume)
+    except Exception as e:
+        ctx.logger.warn('Volume {0} may not have been detached: {1}'
+                        .format(volume, str(e)))
+        pass
+
+    # Expunge the volume if true in blueprint configuration
+    volume_expunge = ctx.source.node.properties['expunge']
+
+    if volume_expunge:
+        try:
+            cloud_driver.destroy_volume(volume=volume)
+        except Exception as e:
+            ctx.logger.warn('Volume {0} may not have been destroyed: {1}'
+                            .format(volume, str(e)))
+            pass
+
+
+def get_volume_by_id(ctx, cloud_driver, volume_id):
+
+    volumes = [volume for volume in cloud_driver.list_volumes() if
+               volume_id == volume.id]
+
+    if not volumes:
+        ctx.logger.info('Could not find volume with ID {0}'.
+                        format(volume_id))
+        return None
+
+    return volumes[0]

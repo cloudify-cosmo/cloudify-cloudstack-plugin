@@ -154,6 +154,8 @@ node_types:
                     default: ''
                 size:
                     default: ''
+                expunge:
+                    default: false
                 use_external_resource:
                     default: false
                 resource_id:
