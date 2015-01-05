@@ -147,6 +147,20 @@ node_types:
             cloudstack_config:
                 default: {}
 
+    cloudify.cloudstack.nodes.Volume:
+            derived_from: cloudify.nodes.Volume
+            properties:
+                name:
+                    default: ''
+                size:
+                    default: ''
+                use_external_resource:
+                    default: false
+                resource_id:
+                    default: ''
+                cloudstack_config:
+                    default: {}
+
     cloudify.cloudstack.nodes.KeyPair:
         derived_from: cloudify.nodes.Root
         properties:
@@ -206,6 +220,17 @@ relationships:
 #             cloudify.interfaces.relationship_lifecycle:
 #                 - establish: cloudstack.neutron_plugin.router.connect_subnet
 #                 - unlink: cloudstack.neutron_plugin.router.disconnect_subnet
+
+    cloudify.cloudstack.volume_contained_in_vm:
+            derived_from: cloudify.relationships.contained_in
+            source_interfaces:
+                cloudify.interfaces.relationship_lifecycle:
+                    establish:
+                        implementation: cloudstack.cloudstack_plugin.volume.attach_volume
+                        inputs: {}
+                    unlink:
+                        implementation: cloudstack.cloudstack_plugin.volume.detach_volume
+                        inputs: {}
 
     cloudify.cloudstack.virtual_machine_connected_to_floating_ip:
         derived_from: cloudify.relationships.connected_to
