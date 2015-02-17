@@ -7,13 +7,12 @@ plugins:
         executor: central_deployment_agent
         source: https://github.com/cloudify-cosmo/cloudify-cloudstack-plugin/archive/1.2m5.zip
 
-
 node_types:
     cloudify.cloudstack.nodes.VirtualMachine:
         derived_from: cloudify.nodes.Compute
         properties:
             server: {}
-            portmaps: 
+            portmaps:
                 default: {}
             network:
                 default: {}
@@ -27,7 +26,7 @@ node_types:
                 default: {}
         interfaces:
             cloudify.interfaces.lifecycle:
-                create: 
+                create:
                     implementation: cloudstack.cloudstack_plugin.virtual_machine.create
                     inputs: {}
                 start:
@@ -36,11 +35,11 @@ node_types:
                 stop:
                     implementation: cloudstack.cloudstack_plugin.virtual_machine.stop
                     inputs: {}
-                delete: 
+                delete:
                     implementation: cloudstack.cloudstack_plugin.virtual_machine.delete
                     inputs: {}
             cloudify.interfaces.host:
-                get_state: 
+                get_state:
                     implementation: cloudstack.cloudstack_plugin.virtual_machine.get_state
                     inputs: {}
 
@@ -59,7 +58,7 @@ node_types:
                 uninstall:
                     implementation: windows_agent_installer.windows_agent_installer.tasks.uninstall
                     inputs: {}
-                restart: 
+                restart:
                     implementation: windows_agent_installer.windows_agent_installer.tasks.restart
                     inputs: {}
             cloudify.interfaces.plugin_installer:
@@ -70,9 +69,9 @@ node_types:
     cloudify.cloudstack.nodes.Network:
         derived_from: cloudify.nodes.Subnet
         properties:
-            network: 
+            network:
                 default: {}
-            firewall: 
+            firewall:
                 default: {}
             use_external_resource:
                 default: false
@@ -147,6 +146,21 @@ node_types:
             cloudstack_config:
                 default: {}
 
+    cloudify.cloudstack.nodes.Volume:
+            derived_from: cloudify.nodes.Volume
+            properties:
+                volume: {}
+                use_external_resource:
+                    default: false
+                resource_id:
+                    default: ''
+                cloudstack_config:
+                    default: {}
+            interfaces:
+                cloudify.interfaces.lifecycle:
+                    create: cloudstack.cloudstack_plugin.volume.create
+                    delete: cloudstack.cloudstack_plugin.volume.delete
+
     cloudify.cloudstack.nodes.KeyPair:
         derived_from: cloudify.nodes.Root
         properties:
@@ -207,14 +221,21 @@ relationships:
 #                 - establish: cloudstack.neutron_plugin.router.connect_subnet
 #                 - unlink: cloudstack.neutron_plugin.router.disconnect_subnet
 
+    cloudify.cloudstack.volume_connected_to_vm:
+            derived_from: cloudify.relationships.connected_to
+            source_interfaces:
+                cloudify.interfaces.relationship_lifecycle:
+                    establish: cloudstack.cloudstack_plugin.virtual_machine.attach_volume
+                    unlink: cloudstack.cloudstack_plugin.virtual_machine.detach_volume
+
     cloudify.cloudstack.virtual_machine_connected_to_floating_ip:
         derived_from: cloudify.relationships.connected_to
         source_interfaces:
             cloudify.interfaces.relationship_lifecycle:
-                establish: 
+                establish:
                     implementation: cloudstack.cloudstack_plugin.virtual_machine.connect_floating_ip
                     inputs: {}
-                unlink: 
+                unlink:
                     implementation: cloudstack.cloudstack_plugin.virtual_machine.disconnect_floating_ip
                     inputs: {}
 
@@ -222,7 +243,7 @@ relationships:
         derived_from: cloudify.relationships.connected_to
         source_interfaces:
             cloudify.interfaces.relationship_lifecycle:
-                establish: 
+                establish:
                     implementation: cloudstack.cloudstack_plugin.floatingip.connect_network
                     inputs: {}
                 unlink:
@@ -233,7 +254,7 @@ relationships:
         derived_from: cloudify.relationships.connected_to
         source_interfaces:
             cloudify.interfaces.relationship_lifecycle:
-                establish: 
+                establish:
                     implementation: cloudstack.cloudstack_plugin.floatingip.connect_vpc
                     inputs: {}
                 unlink:
@@ -251,10 +272,10 @@ relationships:
         derived_from: cloudify.relationships.connected_to
         source_interfaces:
             cloudify.interfaces.relationship_lifecycle:
-                establish: 
+                establish:
                     implementation: cloudstack.cloudstack_plugin.virtual_machine.connect_network
                     inputs: {}
-                unlink: 
+                unlink:
                     implementation: cloudstack.cloudstack_plugin.virtual_machine.disconnect_network
                     inputs: {}
 
