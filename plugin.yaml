@@ -1,6 +1,6 @@
-##################################################################################
+###############################################################################
 # Cloudify cloudstack built in types and plugins definitions.
-##################################################################################
+###############################################################################
 
 plugins:
     cloudstack:
@@ -161,6 +161,67 @@ node_types:
                     create: cloudstack.cloudstack_plugin.volume.create
                     delete: cloudstack.cloudstack_plugin.volume.delete
 
+    cloudify.cloudstack.nodes.VpnGateway:
+        derived_from: cloudify.nodes.Root
+        properties:
+            use_external_resource:
+                default: false
+                description: >
+                    A boolean describing whether this resource should be
+                    created or rather that it already exists on CloudStack
+                    and should be used as-is.
+
+    cloudify.cloudstack.nodes.VpnCustomerGateway:
+        derived_from: cloudify.nodes.Root
+        properties:
+            use_external_resource:
+                default: false
+                description: >
+                    A boolean describing whether this resource should be
+                    created or rather that it already exists on CloudStack
+                    and should be used as-is.
+            resource_id:
+                default: ''
+            cidr_list:
+                default: ''
+            ipsec_psk:
+                default: ''
+            esp_policy:
+                default: '3des-md5'
+            ike_policy:
+                default: '3des-md5'
+            ike_lifetime:
+                default: 86400
+            esp_lifetime:
+                default: 3600
+            dpd:
+                default: false
+
+    cloudify.cloudstack.nodes.VpnConnection:
+        derived_from: cloudify.nodes.Root
+        properties:
+            use_external_resource:
+                default: false
+                description: >
+                    A boolean describing whether this resource should be
+                    created or rather that it already exists on CloudStack
+                    and should be used as-is.
+            resource_id:
+                default: ''
+            passive:
+                default: true
+        interfaces:
+            cloudify.interfaces.lifecycle:
+                create:
+                    implementation: cloudstack.cloudstack_plugin.vpn.create_vpn_connection
+                    inputs:
+                        vpn_gateway_id:
+                            default: ''
+                        vpn_customer_gateway_id:
+                            default: ''
+                delete:
+                    implementation: cloudstack.cloudstack_plugin.vpn.delete_vpn_connection
+
     cloudify.cloudstack.nodes.KeyPair:
         derived_from: cloudify.nodes.Root
         properties:
@@ -220,6 +281,20 @@ relationships:
 #             cloudify.interfaces.relationship_lifecycle:
 #                 - establish: cloudstack.neutron_plugin.router.connect_subnet
 #                 - unlink: cloudstack.neutron_plugin.router.disconnect_subnet
+
+    cloudify.cloudstack.vpn_gateway_connected_to_vpc:
+            derived_from: cloudify.relationships.connected_to
+            source_interfaces:
+                cloudify.interfaces.relationship_lifecycle:
+                    establish: cloudstack.cloudstack_plugin.vpn.create_vpn_gateway
+                    unlink: cloudstack.cloudstack_plugin.vpn.delete_vpn_gateway
+
+    cloudify.cloudstack.vpn_customer_gateway_connected_to_vpn_gateway:
+        derived_from: cloudify.relationships.connected_to
+        source_interfaces:
+            cloudify.interfaces.relationship_lifecycle:
+                establish: cloudstack.cloudstack_plugin.vpn.create_vpn_customer_gateway
+                unlink: cloudstack.cloudstack_plugin.vpn.delete_vpn_customer_gateway
 
     cloudify.cloudstack.volume_connected_to_vm:
             derived_from: cloudify.relationships.connected_to
