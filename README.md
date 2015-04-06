@@ -26,7 +26,7 @@ Very condensed HOWTO, more to follow:
 * vi cloudify-config.json - fill in your cloud specific details
 * vi cloudify-nodecellar-example/cloudstack-vpc-blueprint.yaml - edit it with your specifics (service offerings , fw settings and such)
 * cfy init -r
-* cfy bootstrap -p cloudify-manager-blueprints/cloudstack/cloudstack.yaml -i cloudify-config.json --install-plugins
+* cfy bootstrap -p cloudify-manager-blueprints/cloudstack/cloudstack-manager-blueprint.yaml -i cloudify-config.json --install-plugins
 * at this stage your manager will be deployed fingers crossed :)
 * look at the returned public ip - should be accessible in your browser
 * cfy blueprints upload -p cloudify-nodecellar-example/cloudstack-vpc-blueprint.yaml b my-first-blueprint

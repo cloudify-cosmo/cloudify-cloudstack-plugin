@@ -12,6 +12,6 @@ git clone https://github.com/schubergphilis/cloudify-manager-blueprints.git
 git clone https://github.com/schubergphilis/cloudify-nodecellar-example.git
 cp cloudify-manager-blueprints/cloudstack/inputs.json.template cloudify-config.json
 vi cloudify-config.json
-vi cloudify-manager-blueprints/cloudstack/cloudstack.yaml
+vi cloudify-manager-blueprints/cloudstack/cloudstack-manager-blueprint.yaml
 cfy init -r
-cfy bootstrap -p cloudify-manager-blueprints/cloudstack/cloudstack.yaml -i cloudify-config.json --install-plugins
+cfy bootstrap -p cloudify-manager-blueprints/cloudstack/cloudstack-manager-blueprint.yaml -i cloudify-config.json --install-plugins
