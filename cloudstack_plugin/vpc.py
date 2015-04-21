@@ -22,8 +22,9 @@ from cloudstack_plugin.cloudstack_common import(
     COMMON_RUNTIME_PROPERTIES_KEYS,
     CLOUDSTACK_ID_PROPERTY,
     CLOUDSTACK_TYPE_PROPERTY,
-    CLOUDSTACK_NAME_PROPERTY
+    CLOUDSTACK_NAME_PROPERTY,
     )
+
 
 VPC_CLOUDSTACK_TYPE = 'vpc'
 
@@ -96,7 +97,7 @@ def delete(ctx, **kwargs):
 
 def get_vpc_offering(cloud_driver, vpcoffer_name):
     vpcoffers = [offer for offer in cloud_driver
-        .ex_list_vpc_offerings() if offer.name == vpcoffer_name]
+                 .ex_list_vpc_offerings() if offer.name == vpcoffer_name]
     if vpcoffers.__len__() == 0:
         return None
     return vpcoffers[0]
@@ -104,10 +105,20 @@ def get_vpc_offering(cloud_driver, vpcoffer_name):
 
 def get_vpc(cloud_driver, vpc_name):
     vpcs = [vpc for vpc in cloud_driver
-        .ex_list_vpcs() if vpc.name == vpc_name]
+            .ex_list_vpcs() if vpc.name == vpc_name]
     if vpcs.__len__() == 0:
         return None
     return vpcs[0]
+
+
+def get_vpc_by_id(cloud_driver, id_):
+    vpcs = cloud_driver.ex_list_vpcs()
+
+    for vpc in vpcs:
+        if id_ == vpc.id:
+            return vpc
+
+    return None
 
 
 def create_acl_list(cloud_driver, name, vpc_id, network_id):
