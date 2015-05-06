@@ -4,7 +4,7 @@ from setuptools import setup
 setup(
     zip_safe=True,
     name='cloudify-cloudstack-plugin',
-    version='1.2rc1',
+    version='1.2',
     packages=[
         'cloudstack_plugin',
         'cloudstack_exoscale_plugin'
@@ -14,7 +14,7 @@ setup(
 
     install_requires=[
         "cloudify-plugins-common",
-        "cloudify-plugins-common>=3.2rc1",
+        "cloudify-plugins-common>=3.2",
         "apache-libcloud>=0.16"
     ]
 )
