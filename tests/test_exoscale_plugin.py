@@ -15,7 +15,6 @@
 
 import unittest
 
-__author__ = 'adaml'
 
 from cloudstack_exoscale_plugin.virtual_machine import start
 from cloudstack_exoscale_plugin.virtual_machine import stop

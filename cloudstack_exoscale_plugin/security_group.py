@@ -18,9 +18,6 @@ from cloudify.decorators import operation
 from cloudstack_exoscale_plugin.cloudstack_common import get_cloud_driver
 
 
-__author__ = 'uri1803'
-
-
 @operation
 def create(ctx, **kwargs):
     """ Create security group with rules.
@@ -73,7 +70,6 @@ def delete(ctx, **kwargs):
         ctx.logger.warn(
             'security-group {0} may not have been deleted'
             .format(ctx.instance.runtime_properties['external_id']))
-        pass
 
 
 def _sg_exists(cloud_driver, security_group_name):
@@ -84,9 +80,9 @@ def _sg_exists(cloud_driver, security_group_name):
 
 
 def get_security_group(cloud_driver, security_group_name):
-    security_groups = [sg for sg in cloud_driver
-                       .ex_list_security_groups() if sg['name']
-                       == security_group_name]
+    security_groups = [
+        sg for sg in cloud_driver.ex_list_security_groups()
+        if sg['name'] == security_group_name]
     if security_groups.__len__() == 0:
         return None
     return security_groups[0]

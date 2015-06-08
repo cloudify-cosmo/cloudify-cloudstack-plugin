@@ -33,8 +33,6 @@ IP_ADDRESS_PROPERTY = 'floating_ip_address'
 RUNTIME_PROPERTIES_KEYS = COMMON_RUNTIME_PROPERTIES_KEYS + \
     [IP_ADDRESS_PROPERTY]
 
-__author__ = 'boul'
-
 
 @operation
 def connect_network(ctx, **kwargs):
@@ -43,7 +41,6 @@ def connect_network(ctx, **kwargs):
 
     network_id = ctx.target.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY]
     network = get_network_by_id(ctx, cloud_driver, network_id)
-    # firewall_rules = ctx.node.target.properties.get(['firewall'][0], None)
 
     if network.extra['vpc_id'] is not None:
 
@@ -63,8 +60,8 @@ def connect_network(ctx, **kwargs):
         if 'firewall' in ctx.target.node.properties:
                 firewall_config = ctx.target.node.properties['firewall']
 
-                ingress_rules = [rule for rule in firewall_config if
-                                 rule['type'] == 'ingress']
+                ingress_rules = [rule for rule in firewall_config
+                                 if rule['type'] == 'ingress']
 
                 for rule in ingress_rules:
                     rule_cidr = rule.get('cidr')
@@ -104,8 +101,8 @@ def disconnect_network(ctx, **kwargs):
     fip_id = ctx.source.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY]
     fip = get_floating_ip_by_id(ctx, cloud_driver, fip_id)
 
-    firewall_rules = [rule for rule in cloud_driver.ex_list_firewall_rules() if
-                      fip.id == rule.address.id]
+    firewall_rules = [rule for rule in cloud_driver.ex_list_firewall_rules()
+                      if fip.id == rule.address.id]
 
     for rule in firewall_rules:
 
@@ -126,8 +123,8 @@ def disconnect_network(ctx, **kwargs):
 
 def get_floating_ip_by_id(ctx, cloud_driver, floating_ip_id):
 
-    fips = [fip for fip in cloud_driver.ex_list_public_ips() if
-            floating_ip_id == fip.id]
+    fips = [fip for fip in cloud_driver.ex_list_public_ips()
+            if floating_ip_id == fip.id]
 
     if not fips:
         ctx.logger.info('could not find floating ip by ID {0}'.

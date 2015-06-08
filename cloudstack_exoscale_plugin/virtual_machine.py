@@ -17,8 +17,6 @@ from cloudify.decorators import operation
 from libcloud.compute.types import Provider
 from cloudstack_exoscale_plugin.cloudstack_common import get_cloud_driver
 
-__author__ = 'adaml'
-
 
 def _get_server_from_context(ctx):
     server = {
@@ -45,16 +43,16 @@ def start(ctx, **kwargs):
     security_groups = server_config['security_groups']
 
     ctx.logger.info('getting required size {0}'.format(size_name))
-    sizes = [size for size in cloud_driver.list_sizes() if size.name
-             == size_name]
+    sizes = [size for size in cloud_driver.list_sizes()
+             if size.name == size_name]
     if sizes is None:
         raise RuntimeError(
             'Could not find size with name {0}'.format(size_name))
     size = sizes[0]
 
     ctx.logger.info('getting required image with ID {0}'.format(image_id))
-    images = [image for image in cloud_driver.list_images() if image_id
-              == image.id]
+    images = [image for image in cloud_driver.list_images()
+              if image_id == image.id]
     if images is None:
         raise RuntimeError('Could not find image with ID {0}'.format(image_id))
     image = images[0]
@@ -82,13 +80,12 @@ def delete(ctx, **kwargs):
 
     node_id = ctx['node_id']
     if node_id is None:
-        raise NameError('could not find node ID in runtime context: '
-                        + node_id)
-
-    ctx.logger.info('getting node with ID: ' + node_id)
+        raise NameError('could not find node ID in runtime context: {0}'
+                        .format(node_id))
+    ctx.logger.info('getting node with ID: {0}'.format(node_id))
     node = _get_node_by_id(cloud_driver, node_id)
     if node is None:
-        raise NameError('could not find node with ID: ' + node_id)
+        raise NameError('could not find node with ID: {0}'.format(node_id))
 
     ctx.logger.info('destroying vm with details: {0}'.format(node))
     cloud_driver.destroy_node(node)
@@ -103,7 +100,7 @@ def stop(ctx, **kwargs):
     node_id = ctx.instance.runtime_properties['node_id']
     if node_id is None:
         raise RuntimeError(
-            'could not find node ID in runtime context: ' + node_id)
+            'could not find node ID in runtime context: {0}'.format(node_id))
 
     ctx.logger.info('getting node with ID: ' + node_id)
     node = _get_node_by_id(cloud_driver, node_id)
@@ -116,8 +113,8 @@ def stop(ctx, **kwargs):
 
 def _get_node_by_id(cloud_driver, node_id):
 
-    nodes = [node for node in cloud_driver.list_nodes() if node_id
-             == node.id]
+    nodes = [node for node in cloud_driver.list_nodes()
+             if node_id == node.id]
     if nodes is None:
         return None
 

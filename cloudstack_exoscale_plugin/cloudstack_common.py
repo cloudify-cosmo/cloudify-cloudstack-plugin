@@ -17,8 +17,6 @@ from libcloud.compute.types import Provider
 from libcloud.compute.providers import get_driver
 import libcloud.security
 
-__author__ = 'uri1803'
-
 
 def _get_auth_from_context(ctx):
     auth_config = {}

@@ -39,9 +39,6 @@ from cloudstack_plugin.volume import get_volume_by_id
 from libcloud.compute.types import Provider
 
 
-__author__ = 'adaml, boul'
-
-
 SERVER_CLOUDSTACK_TYPE = 'VM'
 NETWORKINGTYPE_CLOUDSTACK_TYPE = 'networking_type'
 
@@ -99,7 +96,6 @@ def create(ctx, **kwargs):
                                       '"key_name" nested property and be '
                                       'connected to a keypair via a '
                                       'relationship at the same time')
-        # server_config['key_name'] = rename(server_config['key_name'])
     elif keypair_id:
 
         # TODO pointfix, this must be UTF8,
@@ -118,7 +114,6 @@ def create(ctx, **kwargs):
             "wasn't used, and there is no agent keypair in the provider "
             "context")
 
-    # keypair_name = server_config['keypair_name']
     keypair_name = server_config['key_name']
     default_security_group = network_config.get(['default_security_group'][0],
                                                 None)
@@ -136,8 +131,8 @@ def create(ctx, **kwargs):
             return
 
     ctx.logger.info('Getting service_offering: {0}'.format(size_name))
-    sizes = [size for size in cloud_driver.list_sizes() if size.name
-             == size_name]
+    sizes = [size for size in cloud_driver.list_sizes()
+             if size.name == size_name]
     if sizes is None:
         raise RuntimeError(
             'Could not find service_offering with name {0}'.format(size_name))
@@ -500,8 +495,6 @@ def disconnect_network(ctx, **kwargs):
 def connect_floating_ip(ctx, **kwargs):
 
     cloud_driver = get_cloud_driver(ctx)
-    # network_ids = get_cloudstack_ids_of_connected_nodes_by_cloudstack_type(
-    #     ctx, NETWORK_CLOUDSTACK_TYPE)
 
     network_config = ctx.source.node.properties['network']
     default_network_config = network_config['default_network']

@@ -1,4 +1,3 @@
-__author__ = 'adaml, boul, jedeko'
 from setuptools import setup
 
 setup(

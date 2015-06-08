@@ -30,8 +30,6 @@ VPC_CLOUDSTACK_TYPE = 'vpc'
 # Runtime properties
 RUNTIME_PROPERTIES_KEYS = COMMON_RUNTIME_PROPERTIES_KEYS
 
-__author__ = 'jedeko, boul'
-
 
 @operation
 def create(ctx, **kwargs):
