@@ -22,16 +22,13 @@ from cloudstack_plugin.cloudstack_common import(
     COMMON_RUNTIME_PROPERTIES_KEYS,
     CLOUDSTACK_ID_PROPERTY,
     CLOUDSTACK_TYPE_PROPERTY,
-    CLOUDSTACK_NAME_PROPERTY,
-    )
+    CLOUDSTACK_NAME_PROPERTY,)
 
 
 VPC_CLOUDSTACK_TYPE = 'vpc'
 
 # Runtime properties
 RUNTIME_PROPERTIES_KEYS = COMMON_RUNTIME_PROPERTIES_KEYS
-
-__author__ = 'jedeko, boul'
 
 
 @operation

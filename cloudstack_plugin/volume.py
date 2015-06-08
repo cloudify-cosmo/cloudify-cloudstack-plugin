@@ -19,7 +19,6 @@ from cloudify.exceptions import NonRecoverableError
 
 from cloudstack_plugin.cloudstack_common import (
     get_cloud_driver,
-    get_resource_id,
     CLOUDSTACK_ID_PROPERTY,
     CLOUDSTACK_NAME_PROPERTY,
     CLOUDSTACK_TYPE_PROPERTY,
@@ -121,8 +120,8 @@ def volume_exists(cloud_driver, volume_id):
 
 
 def get_volume_by_id(cloud_driver, volume_id):
-    volumes = [volume for volume in cloud_driver.list_volumes() if
-               volume_id == volume.id]
+    volumes = [volume for volume in cloud_driver.list_volumes()
+               if volume_id == volume.id]
 
     if not volumes:
         ctx.logger.info('Could not find volume with ID {0}'.

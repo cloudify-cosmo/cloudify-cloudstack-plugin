@@ -69,7 +69,6 @@ def create(ctx, **kwargs):
         'name': get_resource_id(ctx, KEYPAIR_CLOUDSTACK_TYPE),
     }
     keypair.update(ctx.node.properties['keypair'])
-    #transform_resource_name(ctx, keypair)
 
     keypair = cloud_driver.create_key_pair(keypair['name'])
 
@@ -104,8 +103,8 @@ def delete(ctx, **kwargs):
         cloud_driver = get_cloud_driver(ctx)
 
         key = get_key_pair(ctx, cloud_driver,
-                                 ctx.instance.runtime_properties
-                                 [CLOUDSTACK_ID_PROPERTY])
+                           ctx.instance.runtime_properties
+                           [CLOUDSTACK_ID_PROPERTY])
         cloud_driver.delete_key_pair(key_pair=key)
     else:
         ctx.logger.info('not deleting keypair since an external keypair is '
@@ -123,7 +122,7 @@ def creation_validation(ctx, **kwargs):
         if not os.access(private_key_path, os.R_OK | os.W_OK):
             err = 'private key file {0} is not readable and/or ' \
                   'writeable'.format(private_key_path)
-            ctx.logger.error('VALIDATION ERROR: ' + err)
+            ctx.logger.error('VALIDATION ERROR: {0}'.format(err))
             raise NonRecoverableError(err)
         ctx.logger.debug('OK: private key file {0} has the correct '
                          'permissions'.format(private_key_path))
@@ -141,11 +140,9 @@ def creation_validation(ctx, **kwargs):
         if not current_user_id == owner_id:
             err = '{0} is not owned by the current user (it is owned by {1})'\
                   .format(path, owner)
-            ctx.logger.error('VALIDATION ERROR: ' + err)
+            ctx.logger.error('VALIDATION ERROR: {0}'.format(err))
             raise NonRecoverableError(err)
         ctx.logger.debug('OK: {0} is owned by the current user'.format(path))
-
-    #validate_resource(ctx, nova_client, KEYPAIR_CLOUDSTACK_TYPE)
 
     private_key_path = _get_private_key_path()
     pk_exists = _check_private_key_exists(private_key_path)
@@ -160,13 +157,13 @@ def creation_validation(ctx, **kwargs):
                   "available on Openstack, but the private key could not be " \
                   "found at {1}".format(ctx.node.properties['resource_id'],
                                         private_key_path)
-            ctx.logger.error('VALIDATION ERROR: ' + err)
+            ctx.logger.error('VALIDATION ERROR: {0}'.format(err))
             raise NonRecoverableError(err)
     else:
         if pk_exists:
             err = 'private key path already exists: {0}'.format(
                 private_key_path)
-            ctx.logger.error('VALIDATION ERROR: ' + err)
+            ctx.logger.error('VALIDATION ERROR: {0}'.format(err))
             raise NonRecoverableError(err)
 
     ctx.logger.debug('OK: keypair configuration is valid')

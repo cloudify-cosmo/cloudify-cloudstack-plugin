@@ -17,7 +17,6 @@ from libcloud.compute.types import Provider
 from libcloud.compute.providers import get_driver
 import libcloud.security
 
-__author__ = 'uri1803'
 
 def _get_auth_from_context(ctx):
     auth_config = {}
@@ -32,5 +31,3 @@ def get_cloud_driver(ctx):
     driver = get_driver(Provider.EXOSCALE)
     libcloud.security.VERIFY_SSL_CERT = False
     return driver(api_key, api_secret_key)
-
-
