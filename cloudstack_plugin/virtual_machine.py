@@ -15,7 +15,6 @@
 import copy
 from time import sleep
 
-from cloudify import context
 from cloudify.decorators import operation
 from cloudify.exceptions import NonRecoverableError
 from cloudstack_plugin.cloudstack_common import (
@@ -23,7 +22,6 @@ from cloudstack_plugin.cloudstack_common import (
     CLOUDSTACK_NAME_PROPERTY,
     CLOUDSTACK_TYPE_PROPERTY,
     COMMON_RUNTIME_PROPERTIES_KEYS,
-    USE_EXTERNAL_RESOURCE_PROPERTY,
     delete_runtime_properties,
     get_cloud_driver,
     get_cloudstack_ids_of_connected_nodes_by_cloudstack_type,
@@ -32,11 +30,10 @@ from cloudstack_plugin.cloudstack_common import (
     get_resource_id,
     provider
 )
-from cloudstack_plugin.keypair import KEYPAIR_CLOUDSTACK_TYPE, get_key_pair
+from cloudstack_plugin.keypair import KEYPAIR_CLOUDSTACK_TYPE
 from cloudstack_plugin.network import (
     NETWORK_CLOUDSTACK_TYPE,
     get_network,
-    get_network_by_id
 )
 from cloudstack_plugin.volume import get_volume_by_id
 from libcloud.compute.types import Provider
@@ -53,7 +50,6 @@ NETWORKS_PROPERTY = 'networks'  # all of the server's ips
 IP_PROPERTY = 'ip'  # the server's private ip
 RUNTIME_PROPERTIES_KEYS = COMMON_RUNTIME_PROPERTIES_KEYS + \
     [NETWORKS_PROPERTY, IP_PROPERTY, ]
-
 
 
 @operation
@@ -103,10 +99,11 @@ def create(ctx, **kwargs):
                                       '"key_name" nested property and be '
                                       'connected to a keypair via a '
                                       'relationship at the same time')
-        #server_config['key_name'] = rename(server_config['key_name'])
+        # server_config['key_name'] = rename(server_config['key_name'])
     elif keypair_id:
 
-        # TODO pointfix, this must be UTF8, otherwise cloudstack interface breaks
+        # TODO pointfix, this must be UTF8,
+        # otherwise cloudstack interface breaks
 
         keyname = keypair_id[0].encode('UTF8')
         server_config['key_name'] = keyname
@@ -121,7 +118,7 @@ def create(ctx, **kwargs):
             "wasn't used, and there is no agent keypair in the provider "
             "context")
 
-   #keypair_name = server_config['keypair_name']
+    # keypair_name = server_config['keypair_name']
     keypair_name = server_config['key_name']
     default_security_group = network_config.get(['default_security_group'][0],
                                                 None)
@@ -185,16 +182,16 @@ def create(ctx, **kwargs):
                         format(default_security_group))
         ctx.logger.info("Creating VM with the following details: {0}".format(
             server_config))
-        _create_in_security_group(ctx=ctx,
-                                  cloud_driver=cloud_driver,
-                                  name=name,
-                                  image=image,
-                                  size=size,
-                                  keypair_name=keypair_name,
-                                  default_security_group_name=
-                                  default_security_group,
-                                  ip_address=ip_address,
-                                  location=location)
+        _create_in_security_group(
+            ctx=ctx,
+            cloud_driver=cloud_driver,
+            name=name,
+            image=image,
+            size=size,
+            keypair_name=keypair_name,
+            default_security_group_name=default_security_group,
+            ip_address=ip_address,
+            location=location)
 
 
 def _create_in_network(ctx, cloud_driver, name, image, size, keypair_name,
@@ -207,8 +204,8 @@ def _create_in_network(ctx, cloud_driver, name, image, size, keypair_name,
     nets = [get_network(cloud_driver, default_network)]
     nets.extend([net for net in network_list if net.id in network_ids])
 
-    #Remove duplicates this results in non-default networks e.g. without
-    #default gateway
+    # Remove duplicates this results in non-default networks e.g. without
+    # default gateway
     seen_nets = set()
     dedup_nets = []
     for obj in nets:
@@ -255,15 +252,15 @@ def _create_in_security_group(ctx, cloud_driver, name, image, size,
                               default_security_group_name, ip_address=None,
                               location=None):
 
-    node = cloud_driver.create_node(name=name,
-                                    image=image,
-                                    size=size,
-                                    ex_keyname=keypair_name,
-                                    ex_security_groups=
-                                    default_security_group_name,
-                                    ex_start_vm=False,
-                                    ex_ipaddress=ip_address,
-                                    location=location)
+    node = cloud_driver.create_node(
+        name=name,
+        image=image,
+        size=size,
+        ex_keyname=keypair_name,
+        ex_security_groups=default_security_group_name,
+        ex_start_vm=False,
+        ex_ipaddress=ip_address,
+        location=location)
 
     # Creating VM in stopped state, starting it in start_phase, this seems
     # quite a bit slower tough (vs starting on creation).
@@ -283,6 +280,7 @@ def _create_in_security_group(ctx, cloud_driver, name, image, size,
     ctx.instance.runtime_properties[NETWORKINGTYPE_CLOUDSTACK_TYPE] = \
         'security_group'
     ctx.instance.runtime_properties[CLOUDSTACK_NAME_PROPERTY] = node.name
+
 
 @operation
 def start(ctx, **kwargs):
@@ -333,7 +331,6 @@ def delete(ctx, **kwargs):
     delete_runtime_properties(ctx, RUNTIME_PROPERTIES_KEYS)
 
 
-
 @operation
 def stop(ctx, **kwargs):
 
@@ -377,7 +374,7 @@ def get_state(ctx, **kwargs):
 
             ctx.logger.info('Management network defined: {0}'
                             .format(ctx.node.properties[
-                            'management_network_name']))
+                                    'management_network_name']))
 
             mgt_net = get_network(cloud_driver, ctx.node.properties[
                 'management_network_name'])
@@ -398,7 +395,8 @@ def get_state(ctx, **kwargs):
             ctx.instance.runtime_properties[IP_PROPERTY] = node.private_ips[0]
 
             ctx.logger.info('VM {1} started successfully with IP {0}'
-                            .format(ctx.instance.runtime_properties[IP_PROPERTY],
+                            .format(ctx.instance.runtime_properties[
+                                    IP_PROPERTY],
                                     ctx.instance.runtime_properties[
                                         CLOUDSTACK_NAME_PROPERTY]))
             return True
@@ -422,7 +420,8 @@ def connect_network(ctx, **kwargs):
 
     # instance_id = ctx.source.instance.runtime_properties[
     #     CLOUDSTACK_ID_PROPERTY]
-    # network_id = ctx.target.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY]
+    # network_id = ctx.target.instance.runtime_properties[
+    # CLOUDSTACK_ID_PROPERTY]
     #
     # cloud_driver = get_cloud_driver(ctx)
     #
@@ -431,7 +430,8 @@ def connect_network(ctx, **kwargs):
     # #
     # # ctx.logger.info('Checking if there is a nic for  '
     # #                 'vm: {0} with id: {1} in network {2} with id: {3}'
-    # #                 .format(node.name, network.name, instance_id, network_id,))
+    # #                 .format(node.name, network.name, instance_id,
+    # #                         network_id,))
     #
     # nic = get_nic_by_node_and_network_id(ctx, cloud_driver, node,
     #                                             network_id)
@@ -458,8 +458,8 @@ def connect_network(ctx, **kwargs):
     #
     #         #nic = get_nic_by_node_and_network_id(ctx, cloud_driver, node,
     #         #                                     mgt_net.id)
-    #         # nics = cloud_driver.ex_list_nics(node)
-    #         # mgmt_nic = [nic for nic in nics if nic.network_id == mgt_net.id]
+    #         #nics = cloud_driver.ex_list_nics(node)
+    #         #mgmt_nic = [nic for nic in nics if nic.network_id == mgt_net.id]
     #
     #         ctx.logger.info('CFY will use {0} for management,'
     #                         ' overwriting previously set value'
@@ -475,7 +475,8 @@ def disconnect_network(ctx, **kwargs):
 
     # instance_id = ctx.source.instance.runtime_properties[
     #     CLOUDSTACK_ID_PROPERTY]
-    # network_id = ctx.target.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY]
+    # network_id = ctx.target.instance.runtime_properties[
+    #                                                     CLOUDSTACK_ID_PROPERTY]
     #
     # cloud_driver = get_cloud_driver(ctx)
     #
@@ -534,7 +535,7 @@ def connect_floating_ip(ctx, **kwargs):
         priv_port = portmap.get(['private_port'][0], None)
         priv_end_port = portmap.get(['private_end_port'][0], None)
 
-        #If not specified assume closed
+        # If not specified assume closed
         open_fw = portmap.get(['open_firewall'][0], False)
 
         if pub_port is None:
@@ -559,18 +560,16 @@ def connect_floating_ip(ctx, **kwargs):
                             format(node.name, priv_port, priv_end_port,
                                    public_ip.address, pub_port, pub_end_port))
 
-            cloud_driver.ex_create_port_forwarding_rule(node=node,
-                                                        address=public_ip,
-                                                        protocol=protocol,
-                                                        public_port=pub_port,
-                                                        public_end_port=
-                                                        pub_end_port,
-                                                        private_port=priv_port,
-                                                        private_end_port=
-                                                        priv_end_port,
-                                                        openfirewall=open_fw,
-                                                        network_id=
-                                                        default_net.id)
+            cloud_driver.ex_create_port_forwarding_rule(
+                node=node,
+                address=public_ip,
+                protocol=protocol,
+                public_port=pub_port,
+                public_end_port=pub_end_port,
+                private_port=priv_port,
+                private_end_port=priv_end_port,
+                openfirewall=open_fw,
+                network_id=default_net.id)
         except Exception as e:
             ctx.logger.warn('Port forward creation failed: '
                             '{0}'.format(str(e)))

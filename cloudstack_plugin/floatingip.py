@@ -43,15 +43,15 @@ def connect_network(ctx, **kwargs):
 
     network_id = ctx.target.instance.runtime_properties[CLOUDSTACK_ID_PROPERTY]
     network = get_network_by_id(ctx, cloud_driver, network_id)
-    #firewall_rules = ctx.node.target.properties.get(['firewall'][0], None)
+    # firewall_rules = ctx.node.target.properties.get(['firewall'][0], None)
 
     if network.extra['vpc_id'] is not None:
 
         ctx.logger.info('Acquiring IP for VPC with id: {0}'
                         .format(network.extra['vpc_id']))
 
-        fip = cloud_driver.ex_allocate_public_ip(vpc_id=
-                                                 network.extra['vpc_id'])
+        fip = cloud_driver.ex_allocate_public_ip(
+            vpc_id=network.extra['vpc_id'])
 
     elif network.id is not None:
 
@@ -135,5 +135,3 @@ def get_floating_ip_by_id(ctx, cloud_driver, floating_ip_id):
         return None
 
     return fips[0]
-
-

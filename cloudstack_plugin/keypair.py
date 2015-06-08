@@ -69,7 +69,7 @@ def create(ctx, **kwargs):
         'name': get_resource_id(ctx, KEYPAIR_CLOUDSTACK_TYPE),
     }
     keypair.update(ctx.node.properties['keypair'])
-    #transform_resource_name(ctx, keypair)
+    # transform_resource_name(ctx, keypair)
 
     keypair = cloud_driver.create_key_pair(keypair['name'])
 
@@ -104,8 +104,8 @@ def delete(ctx, **kwargs):
         cloud_driver = get_cloud_driver(ctx)
 
         key = get_key_pair(ctx, cloud_driver,
-                                 ctx.instance.runtime_properties
-                                 [CLOUDSTACK_ID_PROPERTY])
+                           ctx.instance.runtime_properties
+                           [CLOUDSTACK_ID_PROPERTY])
         cloud_driver.delete_key_pair(key_pair=key)
     else:
         ctx.logger.info('not deleting keypair since an external keypair is '
@@ -145,7 +145,7 @@ def creation_validation(ctx, **kwargs):
             raise NonRecoverableError(err)
         ctx.logger.debug('OK: {0} is owned by the current user'.format(path))
 
-    #validate_resource(ctx, nova_client, KEYPAIR_CLOUDSTACK_TYPE)
+    # validate_resource(ctx, nova_client, KEYPAIR_CLOUDSTACK_TYPE)
 
     private_key_path = _get_private_key_path()
     pk_exists = _check_private_key_exists(private_key_path)

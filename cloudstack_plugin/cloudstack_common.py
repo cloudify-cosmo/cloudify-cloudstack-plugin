@@ -115,7 +115,7 @@ def _get_auth_from_context(ctx):
 
 
 def get_cloud_driver(ctx):
-    #auth_config = Config().get()
+    # auth_config = Config().get()
     auth_config = _get_auth_from_context(ctx)
     api_key = auth_config['cs_api_key']
     api_secret_key = auth_config['cs_api_secret']
@@ -168,15 +168,15 @@ class Config(object):
 
 def get_nic_by_node_and_network_id(ctx, cloud_driver, node, network_id):
 
-    #node = _get_node_by_id(cloud_driver, node_id)
-    #network = _get_network_by_id(cloud_driver, network_id)
+    # node = _get_node_by_id(cloud_driver, node_id)
+    # network = _get_network_by_id(cloud_driver, network_id)
 
     nics = [nic for nic in cloud_driver.ex_list_nics(node) if
             network_id == nic.network_id]
 
     if not nics:
         ctx.logger.debug('could not find nic by node_id {0} and network_id {1}'
-                        .format(node.id, network_id))
+                         .format(node.id, network_id))
         return None
 
     return nics[0]

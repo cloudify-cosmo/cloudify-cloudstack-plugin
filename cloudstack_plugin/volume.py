@@ -19,7 +19,6 @@ from cloudify.exceptions import NonRecoverableError
 
 from cloudstack_plugin.cloudstack_common import (
     get_cloud_driver,
-    get_resource_id,
     CLOUDSTACK_ID_PROPERTY,
     CLOUDSTACK_NAME_PROPERTY,
     CLOUDSTACK_TYPE_PROPERTY,

@@ -15,7 +15,7 @@
 
 import copy
 from cloudify.decorators import operation
-from cloudify.exceptions import NonRecoverableError, RecoverableError
+# from cloudify.exceptions import NonRecoverableError, RecoverableError
 from cloudstack_plugin.cloudstack_common import (
     get_cloud_driver,
     CLOUDSTACK_ID_PROPERTY,
@@ -36,6 +36,7 @@ NETWORK_CLOUDSTACK_TYPE = 'network'
 # Runtime properties
 RUNTIME_PROPERTIES_KEYS = COMMON_RUNTIME_PROPERTIES_KEYS
 
+
 @operation
 def create(ctx, **kwargs):
     """ Create network with rules.
@@ -49,7 +50,7 @@ def create(ctx, **kwargs):
     }
 
     ctx.logger.debug('reading network configuration.')
-    #network.update(ctx.node.properties['network'])
+    # network.update(ctx.node.properties['network'])
     network.update(copy.deepcopy(ctx.node.properties['network']))
 
     network_name = network['name']
@@ -116,8 +117,7 @@ def create(ctx, **kwargs):
                 gateway=network.get(['gateway'][0], None),
                 netmask=network.get(['netmask'][0], None),
                 network_offering=network_offering,
-                location=location,
-                )
+                location=location,)
 
             ctx.logger.info('Created Network: {0}'.format(net.name))
 
@@ -255,11 +255,11 @@ def _create_egress_rules(ctx, cloud_driver, network_id):
 
                     for port in rule_ports:
                         ctx.logger.info('Creating egress fw rule:'
-                                        ' {3}:{0}:{1}-{2}'.format(
-                                        rule_cidr,
-                                        port,
-                                        port,
-                                        rule_protocol))
+                                        ' {3}:{0}:{1}-{2}'.format(rule_cidr,
+                                                                  port,
+                                                                  port,
+                                                                  rule_protocol
+                                                                  ))
 
                         try:
 

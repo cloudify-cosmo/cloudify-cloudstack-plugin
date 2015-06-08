@@ -21,10 +21,11 @@ from cloudstack_exoscale_plugin.virtual_machine import start
 from cloudstack_exoscale_plugin.virtual_machine import stop
 from cloudstack_exoscale_plugin.virtual_machine import delete
 from cloudstack_exoscale_plugin.virtual_machine import get_state
-from cloudstack_exoscale_plugin.security_group import create as create_security_group
-from cloudstack_exoscale_plugin.security_group import delete as delete_security_group
+from cloudstack_exoscale_plugin.security_group import (
+    create as create_security_group)
 
 from cloudify.mocks import MockCloudifyContext
+
 
 class ExoscalePluginTestCase(unittest.TestCase):
 
@@ -32,19 +33,17 @@ class ExoscalePluginTestCase(unittest.TestCase):
         context = MockCloudifyContext(
             node_id='id',
             properties={'server':
-                            {
-                                'name' : 'adaml2-cloudify-exoscale-testing-vm',
-                                'image_id' : '70d31a38-c030-490b-bca9-b9383895ade7',
-                                'keypair_name' : 'cloudify-agents-kp',
-                                'security_groups' :['cloudify-agents-sg', ],
-                                'size' : 'Medium'
-                            },
+                        {
+                            'name': 'adaml2-cloudify-exoscale-testing-vm',
+                            'image_id': '70d31a38-c030-490b-bca9-b9383895ade7',
+                            'keypair_name': 'cloudify-agents-kp',
+                            'security_groups': ['cloudify-agents-sg', ],
+                            'size': 'Medium'
+                        },
                         'auth':
                             {
                                 'API_KEY': 'API_KEY',
-                                'API_SECRET_KEY' : 'API_SECRET_KEY',
-                            }
-            })
+                                'API_SECRET_KEY': 'API_SECRET_KEY', }})
         start(context)
         state_after_start = get_state(context)
         if not state_after_start:
@@ -57,34 +56,22 @@ class ExoscalePluginTestCase(unittest.TestCase):
             raise AssertionError('expecting get_state to return false '
                                  'since server is down.')
 
-
     def test_create_security_group(self):
         ctx = MockCloudifyContext(
             node_id='id',
             properties={'security_group':
-                            {
-                                'name' : 'uri_test_sec_group',
-                                'description' : 'Test security group'
-                            },
+                        {
+                            'name': 'uri_test_sec_group',
+                            'description': 'Test security group'
+                        },
                         'auth':
                             {
                                 'API_KEY': 'API_KEY',
-                                'API_SECRET_KEY' : 'API_SECRET_KEY',
-                            },
+                                'API_SECRET_KEY': 'API_SECRET_KEY', },
                         'rules':
                             [
-                                {'cidr':'0.0.0.0/0', 'start_port': 27017, 'protocol':'TCP'},
-                                {'cidr':'0.0.0.0/0', 'start_port': 28017, 'protocol':'TCP'}
-                            ]
-
-            })
+                                {'cidr': '0.0.0.0/0', 'start_port': 27017,
+                                 'protocol': 'TCP'},
+                                {'cidr': '0.0.0.0/0', 'start_port': 28017,
+                                 'protocol': 'TCP'}]})
         create_security_group(ctx)
-
-
-
-
-
-
-
-
-
