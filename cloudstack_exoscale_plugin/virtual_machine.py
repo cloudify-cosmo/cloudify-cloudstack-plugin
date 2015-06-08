@@ -33,7 +33,6 @@ def start(ctx, **kwargs):
     cloud_driver = get_cloud_driver(ctx)
 
     ctx.logger.info('reading server config from context')
-    # Change to debug level
     server_config = _get_server_from_context(ctx)
 
     name = server_config['name']
