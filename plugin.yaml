@@ -48,22 +48,22 @@ node_types:
         interfaces:
             cloudify.interfaces.worker_installer:
                 install:
-                    implementation: windows_agent_installer.windows_agent_installer.tasks.install
+                    implementation: agent.windows_agent_installer.tasks.install
                     inputs: {}
                 start:
-                    implementation: windows_agent_installer.windows_agent_installer.tasks.start
+                    implementation: agent.windows_agent_installer.tasks.start
                 stop:
-                    implementation: windows_agent_installer.windows_agent_installer.tasks.stop
+                    implementation: agent.windows_agent_installer.tasks.stop
                     inputs: {}
                 uninstall:
-                    implementation: windows_agent_installer.windows_agent_installer.tasks.uninstall
+                    implementation: agent.windows_agent_installer.tasks.uninstall
                     inputs: {}
                 restart:
-                    implementation: windows_agent_installer.windows_agent_installer.tasks.restart
+                    implementation: agent.windows_agent_installer.tasks.restart
                     inputs: {}
             cloudify.interfaces.plugin_installer:
                 install:
-                    implementation: windows_plugin_installer.windows_plugin_installer.tasks.install
+                    implementation: agent.windows_plugin_installer.tasks.install
                     inputs: {}
 
     cloudify.cloudstack.nodes.Network:
