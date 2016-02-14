@@ -17,4 +17,8 @@ test:
   override:
     - tox -e flake8
  
-
+deployment:
+  release:
+    tag: /.*/
+    commands:
+      - (true)
