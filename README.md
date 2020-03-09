@@ -56,3 +56,7 @@ If not: rkuipers@schubergphilis.com, cloudify dev-list, irc-channel or twitter @
 ##Disclaimer
 
 The code in this repository has been contributed by the Cloudify community (thanks [Roeland Kuipers](https://github.com/boul)). We intend to put it through our comprehensive testing framework in the near future, but until then please note that it's considered experimental and provided as is.
+
+## Examples
+For official blueprint examples using this Cloudify plugin, please see [Cloudify Community Blueprints Examples](https://github.com/cloudify-community/blueprint-examples/).
+
